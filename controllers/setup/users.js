@@ -1,5 +1,6 @@
 import Users from "../../models/setup/users.mod.js";
 import bcryptjs from "bcryptjs";
+import moment from "moment/moment.js";
 
 //controller Get ALL User
 export const getUsers = async (req, res) => {
@@ -63,4 +64,23 @@ export const deleteUser = async (req, res) => {
   res.json({
     message: "User Delete",
   });
+};
+
+//controller Update Mode User
+export const updateUserMode = async (req, res) => {
+  try {
+    const dataUser = req.body;
+    await Users.update(dataUser, {
+      where: {
+        USER_ID: req.params.id,
+      },
+    });
+    res.json({
+      message: "User Updated",
+    });
+  } catch (error) {
+    res.json({
+      message: error.message,
+    });
+  }
 };

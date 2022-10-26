@@ -7,6 +7,7 @@ import {
   getUserById,
   updateUser,
   deleteUser,
+  updateUserMode,
 } from "../../controllers/setup/users.js";
 
 // router.get('/', verifyToken, getUsers);
@@ -15,5 +16,6 @@ router.post("/", createUser);
 router.get("/:id", getUserById);
 router.patch("/:id", updateUser);
 router.patch("/delete/:id", deleteUser);
+router.patch("/mode/:id", updateUserMode);
 
 export default router;

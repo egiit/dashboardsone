@@ -1,0 +1,45 @@
+###
+GET http://localhost:5001/menu
+###
+GET http://localhost:5001/user
+###
+POST http://localhost:5001/useraccess/136/37
+Content-Type: application/json
+
+{
+   "MENU_ID" : 3,
+    "USER_ACESS_ADD" : null,
+    "USER_ACESS_DELETE" : null,
+    "USER_ACESS_MOD" : null,
+    "USER_ACESS_PRINT" : null,
+    "USER_ACESS_VIEW" : null,
+    "USER_ID" : 136
+}
+###
+GET http://localhost:5001/useraccess/menuview/135
+
+###
+POST http://localhost:5001/login
+Content-Type: application/json
+
+{
+"USER_PASS": "Asd321`",
+"USER_NAME": "egi"
+}
+
+###
+POST http://localhost:5001/user
+Content-Type: application/json
+
+{
+"USER_INISIAL": "egi",
+"USER_PASS": "Asd321`",
+"USER_NAME": "egi",
+"USER_EMAIL": "egi@sumbiri.com",
+"USER_DEP": 0,
+"USER_JAB": 0,
+"USER_LEVEL": "LEVEL",
+"USER_AKTIF_STATUS": 1,
+"USER_DELETE_STATUS": 0,
+"USER_ADD_ID": "1" 
+}

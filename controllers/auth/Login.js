@@ -26,13 +26,14 @@ export const Login = async (req, res) => {
     const userLevel = user.USER_LEVEL;
     const userUnit = user.USER_UNIT;
     const userDept = user.USER_DEP;
+    const userMode = user.USER_DARK_MODE;
     const accessToken = jwt.sign(
-      { userId, username, userLevel, userDept, userUnit },
+      { userId, username, userLevel, userDept, userUnit, userMode },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: "20s" }
     );
     const refreshToken = jwt.sign(
-      { userId, username, userLevel, userDept, userUnit },
+      { userId, username, userLevel, userDept, userUnit, userMode },
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: "1d" }
     );
@@ -44,6 +45,7 @@ export const Login = async (req, res) => {
         },
       }
     );
+
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,

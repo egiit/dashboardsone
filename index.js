@@ -21,7 +21,7 @@ const runDb = async () => {
     await db.authenticate();
     console.log("DB Connected");
   } catch (err) {
-    console.log("Unable to connect to the database SUMI:", err);
+    console.log("Unable to connect to the database SPM:", err);
   }
 };
 
@@ -29,7 +29,11 @@ runDb();
 
 // app.use(cors());
 
-var whitelist = ["http://localhost:3000", "https://localhost:3000"];
+var whitelist = [
+  "http://localhost:3000",
+  "https://localhost:3000",
+  "https://192.168.3.7:3000",
+];
 
 // const options = {
 //   key: fs.readFileSync("server.key"),
