@@ -12,7 +12,7 @@ export const ScanSewing = db.define(
         },
         SEWING_SCANTIME: {
             type: DataTypes.DATE,
-            allowNull: false
+            allowNull: true
         }
     }
 );

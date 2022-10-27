@@ -10,7 +10,7 @@ export const ScanPacking = db.define(
         },
         PACKING_SCANTIME: {
             type: DataTypes.DATE,
-            allowNull: false
+            allowNull: true
         }
     }
 );

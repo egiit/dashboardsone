@@ -1,4 +1,4 @@
-import { Users, Orders, ScanCutting } from "../../models/production/cutting.mod.js";
+import { Orders, ScanCutting } from "../../models/production/cutting.mod.js";
 import moment from "moment";
 
 // CONTROLLER GET ALL ORDER DATA
@@ -92,7 +92,7 @@ export const newOrder = async (req, res) => {
             });
         }
         
-        ScanCutting.create({
+        await ScanCutting.create({
             BARCODE_SERIAL: barcodeserial
         });
         

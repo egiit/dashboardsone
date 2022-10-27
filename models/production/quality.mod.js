@@ -12,7 +12,7 @@ export const ScanQuality = db.define(
         },
         QC_SCANTIME: {
             type: DataTypes.DATE,
-            allowNull: false
+            allowNull: true
         }
     }
 );
