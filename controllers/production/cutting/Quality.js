@@ -1,10 +1,10 @@
 import { Orders } from "../../../models/setup/production/cutting.mod";
-import { ScanSewing } from "../../../models/setup/production/sewing.mod";
+import { ScanQuality } from "../../../models/setup/production/quality.mod";
 import moment from "moment";
 
 
-// CONTROLLER SCAN SEWING
-export const ScanSewing = async (req, res) => {
+// CONTROLLER SCAN QC
+export const ScanQuality = async (req, res) => {
     try {
         const barcodeserial = req.body.barcodeserial;
         const datetimenow = moment().format("YYYY-DD-MM HH:MM:SS");
@@ -21,14 +21,14 @@ export const ScanSewing = async (req, res) => {
             });
         }
 
-        await ScanSewing.update({ SEWING_SCANTIME: datetimenow }, {
+        await ScanQuality.update({ QC_SCANTIME: datetimenow }, {
             where: {
                 BARCODE_SERIAL: barcodeserial
             }
         });
 
         res.status(200).json({
-            message: "Order Scan Sewing Successfully",
+            message: "Order Scan Quality Successfully",
         });
     } catch (error) {
         res.status(404).json({

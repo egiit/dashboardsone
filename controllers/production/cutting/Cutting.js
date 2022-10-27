@@ -92,6 +92,10 @@ export const newOrder = async (req, res) => {
             BARCODE_SERIAL: barcodeserial,
             SITE_LINE: siteline
         });
+        
+        await ScanCutting.create({
+            BARCODE_SERIAL: barcodeserial
+        });
 
         res.status(201).json({
             message: "Order Data Added Successfully",
@@ -126,9 +130,10 @@ export const deleteOrder = async (req, res) => {
 // CONTROLLER SCAN CUTTING
 export const ScanCutting = async (req, res) => {
     try {
-        const barcodeserial = req.body.barcodeserial;
-        const datetimenow = moment().format("YYYY-DD-MM HH:MM:SS");
-        const checkBarcodeSerial = await Orders.findAll({
+        const barcodeserial         = req.body.barcodeserial;
+        const datetimenow           = moment().format("YYYY-DD-MM HH:MM:SS");
+        
+        const checkBarcodeSerial    = await Orders.findAll({
             attributes: ["BARCODE_SERIAL"],
             where: {
                 BARCODE_SERIAL: barcodeserial,
@@ -141,9 +146,12 @@ export const ScanCutting = async (req, res) => {
             });
         }
 
-        await ScanCutting.create({
-            CUTTING_SCANTIME: datetimenow
+        await ScanCutting.update({CUTTING_SCANTIME: datetimenow}, {
+            where: {
+                BARCODE_SERIAL: barcodeserial
+            }            
         });
+
         res.status(200).json({
             message: "Order Scan Cutting Successfully",
         });
