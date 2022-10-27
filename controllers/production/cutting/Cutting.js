@@ -3,8 +3,14 @@ import moment from "moment";
 
 // CONTROLLER GET ALL ORDER DATA
 export const getOrder = async (req, res) => {
-    const orders = await Orders.findAll();
-    res.status(200).json(orders);
+    try {
+        const orders = await Orders.findAll();
+        res.status(200).json(orders);    
+    } catch (error) {
+        res.status(404).json({
+            message: error
+        });   
+    }
 };
 
 // CONTROLLER GET ORDER DATA BY BARCODE SERIAL
@@ -15,9 +21,11 @@ export const getOrderByBarcodeSerial = async (req, res) => {
                 BARCODE_SERIAL: req.params.barcodeserial,
             },
         });
-        res.status(200).json(orders[0]);    
+        res.status(200).json(orders[0]);
     } catch (error) {
-        res.status(404).json({message: error});
+        res.status(404).json({
+            message: error
+        });
     }
 };
 
@@ -29,9 +37,11 @@ export const getOrderByBLK = async (req, res) => {
                 ORDER_NO: req.params.orderno,
             },
         });
-        res.status(200).json(orders[0]);    
+        res.status(200).json(orders[0]);
     } catch (error) {
-        res.status(404).json({message: error});
+        res.status(404).json({
+            message: error
+        });
     }
 };
 
@@ -53,18 +63,20 @@ export const newOrder = async (req, res) => {
             barcodeserial,
             siteline
         } = req.body;
-        
+
         const checkBarcodeSerial = await Orders.findAll({
             attributes: ["BARCODE_SERIAL"],
             where: {
                 BARCODE_SERIAL: barcodeserial,
-            }       
+            }
         });
-    
-        if(checkBarcodeSerial.length !== 0){
-            return res.status(400).json({ message: "Barcode Serial exist!" });
+
+        if (checkBarcodeSerial.length !== 0) {
+            return res.status(400).json({
+                message: "Barcode Serial exist!"
+            });
         }
-    
+
         await Orders.create({
             BUYER_CODE: buyercode,
             ORDER_NO: orderno,
@@ -80,12 +92,14 @@ export const newOrder = async (req, res) => {
             BARCODE_SERIAL: barcodeserial,
             SITE_LINE: siteline
         });
-    
+
         res.status(201).json({
             message: "Order Data Added Successfully",
         });
     } catch (error) {
-        res.status(404).json({message: error});   
+        res.status(404).json({
+            message: error
+        });
     }
 };
 
@@ -100,9 +114,11 @@ export const deleteOrder = async (req, res) => {
         });
         res.status(200).json({
             message: "Order Delete Successfully",
-        });    
+        });
     } catch (error) {
-        res.status(404).json({message: error});
+        res.status(404).json({
+            message: error
+        });
     }
 };
 
@@ -111,25 +127,29 @@ export const deleteOrder = async (req, res) => {
 export const ScanCutting = async (req, res) => {
     try {
         const barcodeserial = req.body.barcodeserial;
-        const datetimenow   = moment().format("YYYY-DD-MM HH:MM:SS");
+        const datetimenow = moment().format("YYYY-DD-MM HH:MM:SS");
         const checkBarcodeSerial = await Orders.findAll({
             attributes: ["BARCODE_SERIAL"],
             where: {
                 BARCODE_SERIAL: barcodeserial,
-            }       
+            }
         });
-    
-        if(checkBarcodeSerial.length == 0){
-            return res.status(400).json({ message: "Barcode Serial not exist!" });
+
+        if (checkBarcodeSerial.length == 0) {
+            return res.status(400).json({
+                message: "Barcode Serial not exist!"
+            });
         }
-        
+
         await ScanCutting.create({
-            CUTTING_SCANTIME: datetimenow 
+            CUTTING_SCANTIME: datetimenow
         });
         res.status(200).json({
             message: "Order Scan Cutting Successfully",
         });
     } catch (error) {
-        res.status(404).json({message: error});
+        res.status(404).json({
+            message: error
+        });
     }
 };
