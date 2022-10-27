@@ -3,7 +3,7 @@ import { ScanPacking } from "../../../models/setup/production/packing.mod";
 import moment from "moment";
 
 
-// CONTROLLER SCAN SEWING
+// CONTROLLER SCAN PACKING
 export const ScanPacking = async (req, res) => {
     try {
         const barcodeserial = req.body.barcodeserial;
