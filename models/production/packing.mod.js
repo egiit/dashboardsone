@@ -12,5 +12,11 @@ export const ScanPacking = db.define(
             type: DataTypes.DATE,
             allowNull: true
         }
-    }
+    }, {
+        freezeTableName: true,
+        createdAt: false,
+        updatedAt: false,
+      }
 );
+
+ScanPacking.removeAttribute("id");

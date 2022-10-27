@@ -14,5 +14,11 @@ export const ScanSewing = db.define(
             type: DataTypes.DATE,
             allowNull: true
         }
-    }
+    }, {
+        freezeTableName: true,
+        createdAt: false,
+        updatedAt: false,
+      }
 );
+
+ScanSewing.removeAttribute("id");

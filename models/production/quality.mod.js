@@ -14,5 +14,11 @@ export const ScanQuality = db.define(
             type: DataTypes.DATE,
             allowNull: true
         }
-    }
+    }, {
+        freezeTableName: true,
+        createdAt: false,
+        updatedAt: false,
+      }
 );
+
+ScanQuality.removeAttribute("id");
