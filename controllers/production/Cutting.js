@@ -1,4 +1,4 @@
-import { Users, Orders } from "../../models/production/cutting.mod.js";
+import { Users, Orders, ScanCutting } from "../../models/production/cutting.mod.js";
 import moment from "moment";
 
 // CONTROLLER GET ALL ORDER DATA
@@ -91,7 +91,11 @@ export const newOrder = async (req, res) => {
                 message: "Barcode Serial exist!"
             });
         }
-
+        
+        ScanCutting.create({
+            BARCODE_SERIAL: barcodeserial
+        });
+        
         await Orders.create({
             BUYER_CODE: buyercode,
             ORDER_NO: orderno,
@@ -107,11 +111,8 @@ export const newOrder = async (req, res) => {
             BARCODE_SERIAL: barcodeserial,
             SITE_LINE: siteline
         });
-        
-        await ScanCutting.create({
-            BARCODE_SERIAL: barcodeserial
-        });
 
+        
         res.status(201).json({
             success: true,
             message: "Order Data Added Successfully",
@@ -147,7 +148,7 @@ export const deleteOrder = async (req, res) => {
 
 
 // CONTROLLER SCAN CUTTING
-export const ScanCutting = async (req, res) => {
+export const QRScanCutting = async (req, res) => {
     try {
         const barcodeserial         = req.body.barcodeserial;
         const datetimenow           = moment().format("YYYY-DD-MM HH:MM:SS");

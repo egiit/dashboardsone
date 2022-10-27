@@ -102,6 +102,7 @@ export const Orders = db.define(
     updatedAt: "DATE_UPDATE",
   }
 );
+
 export const ScanCutting = db.define(
   "order_scan_log", {
     BARCODE_SERIAL: {
@@ -110,7 +111,22 @@ export const ScanCutting = db.define(
     },
     CUTTING_SCANTIME: {
       type: DataTypes.DATE,
-      allowNull: false
-    }
+      allowNull: true
+    },
+    SEWING_SCANTIME: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    QC_SCANTIME: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    PACKING_SCANTIME: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    
+    
+    
   }
 );
