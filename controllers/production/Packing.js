@@ -32,7 +32,9 @@ export const ScanPacking = async (req, res) => {
         });
     } catch (error) {
         res.status(404).json({
-            message: error
+            success: false,
+            data: error,
+            message: "error processing request"
         });
     }
 };

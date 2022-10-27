@@ -7,13 +7,14 @@ export const getOrder = async (req, res) => {
         const orders = await Orders.findAll();
         res.status(200).json({
             success: true,
-            message: "data retrieved successfully",
-            data: orders
+            data: orders,
+            message: "Data Order Retrieved Successfully"
         });    
     } catch (error) {
         res.status(404).json({
             success: false,
-            message: error
+            data: error,
+            message: "error processing request"
         });   
     }
 };
@@ -28,13 +29,14 @@ export const getOrderByBarcodeSerial = async (req, res) => {
         });
         res.status(200).json({
             success: true,
-            message: "data retrieved successfully",
-            data: orders[0]
+            data: orders[0],
+            message: "data retrieved successfully"
         });
     } catch (error) {
         res.status(404).json({
             success: false,
-            message: error
+            data: error,
+            message: "error processing request"
         });
     }
 };
@@ -55,7 +57,8 @@ export const getOrderByBLK = async (req, res) => {
     } catch (error) {
         res.status(404).json({
             success: false,
-            message: error
+            data: error,
+            message: "error processing request"
         });
     }
 };
@@ -120,7 +123,8 @@ export const newOrder = async (req, res) => {
     } catch (error) {
         res.status(404).json({
             success: false,
-            message: error
+            data: error,
+            message: "error processing request"
         });
     }
 };
@@ -141,7 +145,8 @@ export const deleteOrder = async (req, res) => {
     } catch (error) {
         res.status(404).json({
             success: false,
-            message: error
+            data: error,
+            message: "error processing request"
         });
     }
 };
@@ -179,7 +184,8 @@ export const QRScanCutting = async (req, res) => {
     } catch (error) {
         res.status(404).json({
             success: false,
-            message: error
+            data: error,
+            message: "error processing request"
         });
     }
 };
