@@ -1,8 +1,6 @@
 import { DataTypes } from "sequelize";
 import db from "../../config/database.js";
 
-// import { DataTypes } from 'Sequelize';
-
 export const OrderDetail = db.define(
   "order_detail",
   {
@@ -18,7 +16,7 @@ export const OrderDetail = db.define(
     ORDER_SIZE: { type: DataTypes.STRING(20), allowNull: false },
     ORDER_STYLE: { type: DataTypes.STRING(255), allowNull: false },
     BARCODE_SERIAL: { type: DataTypes.STRING(100), allowNull: false, primaryKey: true },
-    SITE_LINE: { type: DataTypes.DATE, allowNull: false },
+    SITE_LINE: { type: DataTypes.STRING(20), allowNull: false },
     DATE_CREATE: { type: DataTypes.DATE, allowNull: true },
     DATE_UPDATE: { type: DataTypes.DATE, allowNull: true },
   },
