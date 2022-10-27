@@ -29,3 +29,4 @@ export const OrderDetail = db.define(
   }
 );
 
+export default OrderDetail;
