@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import db from "../../config/database.js";
 
-export const OrderDetail = db.define(
+export const Orders = db.define(
   "order_detail",
   {
     BUYER_CODE: { type: DataTypes.STRING(10), allowNull: false },
@@ -27,4 +27,4 @@ export const OrderDetail = db.define(
   }
 );
 
-export default OrderDetail;
+export default Orders;
