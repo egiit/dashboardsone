@@ -5,9 +5,14 @@ import moment from "moment";
 export const getOrder = async (req, res) => {
     try {
         const orders = await Orders.findAll();
-        res.status(200).json(orders);    
+        res.status(200).json({
+            success: true,
+            message: "data retrieved successfully",
+            data: orders
+        });    
     } catch (error) {
         res.status(404).json({
+            success: false,
             message: error
         });   
     }
@@ -21,9 +26,14 @@ export const getOrderByBarcodeSerial = async (req, res) => {
                 BARCODE_SERIAL: req.params.barcodeserial,
             },
         });
-        res.status(200).json(orders[0]);
+        res.status(200).json({
+            success: true,
+            message: "data retrieved successfully",
+            data: orders[0]
+        });
     } catch (error) {
         res.status(404).json({
+            success: false,
             message: error
         });
     }
@@ -37,9 +47,14 @@ export const getOrderByBLK = async (req, res) => {
                 ORDER_NO: req.params.orderno,
             },
         });
-        res.status(200).json(orders[0]);
+        res.status(200).json({
+            success: true,
+            message: "data retrieved successfully",
+            data: orders[0]
+        });
     } catch (error) {
         res.status(404).json({
+            success: false,
             message: error
         });
     }
@@ -98,10 +113,12 @@ export const newOrder = async (req, res) => {
         });
 
         res.status(201).json({
+            success: true,
             message: "Order Data Added Successfully",
         });
     } catch (error) {
         res.status(404).json({
+            success: false,
             message: error
         });
     }
@@ -117,10 +134,12 @@ export const deleteOrder = async (req, res) => {
             },
         });
         res.status(200).json({
+            success: true,
             message: "Order Delete Successfully",
         });
     } catch (error) {
         res.status(404).json({
+            success: false,
             message: error
         });
     }
@@ -153,10 +172,12 @@ export const ScanCutting = async (req, res) => {
         });
 
         res.status(200).json({
+            success: true,
             message: "Order Scan Cutting Successfully",
         });
     } catch (error) {
         res.status(404).json({
+            success: false,
             message: error
         });
     }
