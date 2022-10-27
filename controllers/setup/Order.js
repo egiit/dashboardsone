@@ -75,15 +75,15 @@ export const newOrder = async (req, res) => {
     });
 };
 
+
 // CONTROLLER DELETE ORDER
 export const deleteOrder = async (req, res) => {
-    await Orders.update(req.body, {
-      where: {
-        USER_ID: req.params.id,
-      },
+    await Orders.destroy({
+        where: {
+            BARCODE_SERIAL: req.params.barcodeserial,
+        },
     });
-    res.json({
-      message: "User Delete",
+    res.status(200).json({
+        message: "Order Delete Successfully",
     });
-  };
-  
+};
