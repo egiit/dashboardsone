@@ -6,7 +6,7 @@ import { refreshToken } from "../controllers/auth/RefreshToken.js";
 import userAccesRoute from "./auth/userAccess.route.js";
 import getMenu from "../controllers/setup/Menu.js";
 import { getDept, getDeptById } from "../controllers/setup/Dept.js";
-import cuttingRoute from "./production/cutting.route";
+import cuttingRoute from "./production/cutting.route.js";
 
 const router = express.Router();
 

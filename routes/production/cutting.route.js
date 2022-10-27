@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import { getOrder, getOrderByBarcodeSerial, getOrderByBLK, newOrder, deleteOrder, ScanCutting } from "../../controllers/production/cutting/Cutting";
+import { getOrder, getOrderByBarcodeSerial, getOrderByBLK, newOrder, deleteOrder, ScanCutting } from "../../controllers/production/Cutting.js";
 
 // ROUTE CUTTING
 router.get("/order", getOrder);

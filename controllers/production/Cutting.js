@@ -1,4 +1,4 @@
-import { Users, Orders } from "../../../models/setup/production/cutting.mod";
+import { Users, Orders } from "../../models/production/cutting.mod.js";
 import moment from "moment";
 
 // CONTROLLER GET ALL ORDER DATA
