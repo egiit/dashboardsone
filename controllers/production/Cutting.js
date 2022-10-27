@@ -51,8 +51,8 @@ export const getOrderByBLK = async (req, res) => {
         });
         res.status(200).json({
             success: true,
-            message: "data retrieved successfully",
-            data: orders[0]
+            data: orders[0],
+            message: "data retrieved successfully"
         });
     } catch (error) {
         res.status(404).json({
@@ -118,6 +118,7 @@ export const newOrder = async (req, res) => {
         
         res.status(201).json({
             success: true,
+            data: [],
             message: "Order Data Added Successfully",
         });
     } catch (error) {
@@ -140,6 +141,7 @@ export const deleteOrder = async (req, res) => {
         });
         res.status(200).json({
             success: true,
+            data: [],
             message: "Order Delete Successfully",
         });
     } catch (error) {
@@ -167,6 +169,8 @@ export const QRScanCutting = async (req, res) => {
 
         if (checkBarcodeSerial.length == 0) {
             return res.status(400).json({
+                success: true,
+                data: [],
                 message: "Barcode Serial not exist!"
             });
         }
@@ -179,6 +183,7 @@ export const QRScanCutting = async (req, res) => {
 
         res.status(200).json({
             success: true,
+            data: [],
             message: "Order Scan Cutting Successfully",
         });
     } catch (error) {

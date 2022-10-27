@@ -17,6 +17,8 @@ export const ScanQuality = async (req, res) => {
 
         if (checkBarcodeSerial.length == 0) {
             return res.status(400).json({
+                success: false,
+                data: [],
                 message: "Barcode Serial not exist!"
             });
         }
@@ -28,6 +30,8 @@ export const ScanQuality = async (req, res) => {
         });
 
         res.status(200).json({
+            success: true,
+            data: [],    
             message: "Order Scan Quality Successfully",
         });
     } catch (error) {
