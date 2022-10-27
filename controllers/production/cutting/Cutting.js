@@ -19,7 +19,6 @@ export const getOrderByBarcodeSerial = async (req, res) => {
     } catch (error) {
         res.status(404).json({message: error});
     }
-    
 };
 
 // CONTROLLER GET ORDER DATA BY BLK NUMBER
@@ -105,5 +104,4 @@ export const deleteOrder = async (req, res) => {
     } catch (error) {
         res.status(404).json({message: error})
     }
-    
 };
