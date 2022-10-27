@@ -1,5 +1,5 @@
 import { Users, Orders } from "../../../models/setup/production/cutting.mod";
-
+import moment from "moment";
 
 // CONTROLLER GET ALL ORDER DATA
 export const getOrder = async (req, res) => {
@@ -102,6 +102,34 @@ export const deleteOrder = async (req, res) => {
             message: "Order Delete Successfully",
         });    
     } catch (error) {
-        res.status(404).json({message: error})
+        res.status(404).json({message: error});
+    }
+};
+
+
+// CONTROLLER SCAN CUTTING
+export const ScanCutting = async (req, res) => {
+    try {
+        const barcodeserial = req.body.barcodeserial;
+        const datetimenow   = moment().format("YYYY-DD-MM HH:MM:SS");
+        const checkBarcodeSerial = await Orders.findAll({
+            attributes: ["BARCODE_SERIAL"],
+            where: {
+                BARCODE_SERIAL: barcodeserial,
+            }       
+        });
+    
+        if(checkBarcodeSerial.length == 0){
+            return res.status(400).json({ message: "Barcode Serial not exist!" });
+        }
+        
+        await ScanCutting.create({
+            CUTTING_SCANTIME: datetimenow 
+        });
+        res.status(200).json({
+            message: "Order Scan Cutting Successfully",
+        });
+    } catch (error) {
+        res.status(404).json({message: error});
     }
 };

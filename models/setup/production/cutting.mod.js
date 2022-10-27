@@ -35,7 +35,6 @@ export const Users = db.define(
   }
 );
 
-
 export const Orders = db.define(
   "order_detail",
   {
@@ -62,3 +61,10 @@ export const Orders = db.define(
   }
 );
 
+export const ScanCutting = db.define(
+  "order_scan_log",
+  {
+    BARCODE_SERIAL: { type: DataTypes.STRING(100), allowNull: false },
+    CUTTING_SCANTIME: { type: DataTypes.NOW, allowNull: false }
+  }
+);
