@@ -8,6 +8,8 @@ const Users = db.define(
   {
     USER_ID: {
       type: DataTypes.BIGINT,
+      primaryKey: true,
+      autoIncrement: true,
     },
     USER_INISIAL: { type: DataTypes.STRING(30), allowNull: false },
     USER_NAME: { type: DataTypes.STRING(30), unique: true, allowNull: false },
@@ -33,13 +35,9 @@ const Users = db.define(
   },
   {
     freezeTableName: true,
-    createdAt: false,
-
-    // If don't want updatedAt
-    updatedAt: false,
+    createdAt: "USER_ADD_DATE",
+    updatedAt: "USER_MOD_DATE",
   }
 );
 
 export default Users;
-
-Users.removeAttribute("id");

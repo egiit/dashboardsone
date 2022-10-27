@@ -33,7 +33,6 @@ export const updateOrCreateUserAccess = async (req, res) => {
     const dataAxs = req.body;
 
     if (!foundItem) {
-      // dataAxs.USER_ACESS_ADD_DATE = moment().format("YYYY-MM-DD HH:mm:ss.SSS");
       const item = await UserAcc.create(dataAxs);
       return res.json({
         item: item,
@@ -41,8 +40,6 @@ export const updateOrCreateUserAccess = async (req, res) => {
       });
     }
 
-    // const dataAxs = req.body;
-    // dataAxs.USER_ACESS_MOD_DATE = moment().format("YYYY-MM-DD HH:mm:ss.SSS");
     const item = await UserAcc.update(dataAxs, {
       where: {
         USER_ID: req.params.id,

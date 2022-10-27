@@ -37,10 +37,8 @@ const Menus = db.define(
   },
   {
     freezeTableName: true,
-    // createdAt: "MENU_ACT_ADD",
-    // updatedAt: "MENU_ACT_MOD",
-    createdAt: false,
-    updatedAt: false,
+    createdAt: "MENU_ACT_ADD",
+    updatedAt: "MENU_ACT_MOD",
   }
 );
 
