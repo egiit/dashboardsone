@@ -27,7 +27,6 @@ export const newOrder = async (req, res) => {
                 existData.push(...checkBarcodeSerial);
             } else {
                 await Orders.create(order);
-                    
             }
             
             if (i + 1 === dataOrder.length)
