@@ -1,6 +1,7 @@
 import { Orders, ScanCutting } from "../../../models/production/cutting.mod.js";
 import moment from "moment";
 
+
 // CONTROLLER SCAN CUTTING
 export const QRScanCutting = async (req, res) => {
     try {

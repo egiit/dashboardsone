@@ -7,6 +7,7 @@ import userAccesRoute from "./auth/userAccess.route.js";
 import getMenu from "../controllers/setup/Menu.js";
 import { getDept, getDeptById } from "../controllers/setup/Dept.js";
 import cuttingRoute from "./production/cutting.route.js";
+import sewingRoute from "./production/sewing.route.js";
 
 const router = express.Router();
 
@@ -19,6 +20,7 @@ router.get("/dept/:id", getDeptById);
 router.use("/useraccess", userAccesRoute);
 router.use("/user", userRoute);
 router.use("/cutting", cuttingRoute);
+router.use("/sewing", sewingRoute);
 
 router.all("*", (req, res, next) => {
   next(new ExpressError("Page Not Found", 404));

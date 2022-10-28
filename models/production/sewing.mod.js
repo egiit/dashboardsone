@@ -11,7 +11,7 @@ export const ScanSewing = db.define(
             allowNull: false
         },
         SEWING_SCANTIME: {
-            type: DataTypes.DATE,
+            type: DataTypes.NOW,
             allowNull: true
         }
     }, {
@@ -22,3 +22,5 @@ export const ScanSewing = db.define(
 );
 
 ScanSewing.removeAttribute("id");
+
+export default ScanSewing;
