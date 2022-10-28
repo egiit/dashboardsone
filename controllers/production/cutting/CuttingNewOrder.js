@@ -29,7 +29,9 @@ export const newOrder = async (req, res) => {
 
         if (checkBarcodeSerial.length !== 0) {
             return res.status(400).json({
-                message: "Barcode Serial exist!"
+                success: false,
+                message: `insert order data for ${orderno}/${buyerpo}/${mono}${barcodeserial} failed, barcode serial exist!`,
+                data: req.body
             });
         }
         
@@ -54,16 +56,16 @@ export const newOrder = async (req, res) => {
         });
 
         
-        res.status(201).json({
+        res.status(200).json({
             success: true,
-            data: [],
-            message: "Order Data Added Successfully",
+            message: `Order Data for ${orderno}/${buyerpo}/${mono}${barcodeserial} Added Successfully`,
+            data: []
         });
     } catch (error) {
         res.status(404).json({
             success: false,
-            data: error,
-            message: "error processing request"
+            message: "error processing request",
+            data: error
         });
     }
 };

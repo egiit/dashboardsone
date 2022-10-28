@@ -7,14 +7,14 @@ export const getOrder = async (req, res) => {
         const orders = await Orders.findAll();
         res.status(200).json({
             success: true,
-            data: orders,
-            message: "Data Order Retrieved Successfully"
+            message: "Data Order Retrieved Successfully",
+            data: orders
         });    
     } catch (error) {
         res.status(404).json({
             success: false,
-            data: error,
-            message: "error processing request"
+            message: "error processing request",
+            data: error
         });   
     }
 };
@@ -27,16 +27,25 @@ export const getOrderByBarcodeSerial = async (req, res) => {
                 BARCODE_SERIAL: req.params.barcodeserial,
             },
         });
-        res.status(200).json({
-            success: true,
-            data: orders,
-            message: "data retrieved successfully"
-        });
+        
+        if(orders.length == 0) {
+            res.status(200).json({
+                success: true,
+                message: "data barcode serial not found",
+                data: []
+            });    
+        } else {
+            res.status(200).json({
+                success: true,
+                message: "data barcode serial retrieved successfully",
+                data: orders
+            });
+        }        
     } catch (error) {
         res.status(404).json({
             success: false,
-            data: error,
-            message: "error processing request"
+            message: "error processing request",
+            data: error
         });
     }
 };
@@ -49,16 +58,25 @@ export const getOrderByBLK = async (req, res) => {
                 ORDER_NO: req.params.orderno,
             },
         });
-        res.status(200).json({
-            success: true,
-            data: orders,
-            message: "data retrieved successfully"
-        });
+        if(orders.length==0){
+            res.status(200).json({
+                success: true,
+                message: "data BLK not found",
+                data: []
+            });
+        } else {
+            res.status(200).json({
+                success: true,
+                message: "data retrieved successfully",
+                data: orders
+            });
+        }
+        
     } catch (error) {
         res.status(404).json({
             success: false,
-            data: error,
-            message: "error processing request"
+            message: "error processing request",
+            data: error
         });
     }
 };

@@ -79,7 +79,7 @@ export const ScanCutting = db.define(
       allowNull: false
     },
     CUTTING_SCANTIME: {
-      type: DataTypes.DATE,
+      type: DataTypes.NOW,
       allowNull: true
     }
   }, {

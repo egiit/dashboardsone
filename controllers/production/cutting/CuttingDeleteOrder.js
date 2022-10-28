@@ -10,14 +10,14 @@ export const deleteOrder = async (req, res) => {
         });
         res.status(200).json({
             success: true,
-            data: [],
             message: "Order Delete Successfully",
+            data: []
         });
     } catch (error) {
         res.status(404).json({
             success: false,
-            data: error,
-            message: "error processing request"
+            message: "error processing request",
+            data: error
         });
     }
 };
