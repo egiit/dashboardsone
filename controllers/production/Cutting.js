@@ -94,22 +94,6 @@ export const newOrder = async (req, res) => {
     //     BARCODE_SERIAL: barcodeserial
     // });
 
-    // await Orders.create({
-    //     BUYER_CODE: buyercode,
-    //     ORDER_NO: orderno,
-    //     PRODUCT_TYPE: producttype,
-    //     BUYER_PO: buyerpo,
-    //     MO_NO: mono,
-    //     ORDER_VERSION: orderversion,
-    //     SHIPMENT_DATE: shipmentdate,
-    //     ORDER_QTY: orderqty,
-    //     ORDER_COLOR: ordercolor,
-    //     ORDER_SIZE: ordersize,
-    //     ORDER_STYLE: orderstyle,
-    //     BARCODE_SERIAL: barcodeserial,
-    //     SITE_LINE: siteline
-    // });
-
     res.status(201).json({
       success: true,
       message: "Order Data Added Successfully",
