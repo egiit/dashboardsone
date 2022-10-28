@@ -10,8 +10,8 @@ import QRScanCutting from "../../controllers/production/cutting/CuttingScan.js";
 
 // ROUTE CUTTING
 router.get("/order", getOrder);
-router.get("/order/:barcodeserial", getOrderByBarcodeSerial);
-router.get("/order/:orderno", getOrderByBLK);
+router.get("/order/barcodeserial/:barcodeserial", getOrderByBarcodeSerial);
+router.get("/order/ordernumber/:orderno", getOrderByBLK);
 
 router.post("/order", newOrder);
 router.delete("/order/delete/:barcodeserial", deleteOrder);

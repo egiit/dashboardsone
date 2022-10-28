@@ -29,7 +29,7 @@ export const getOrderByBarcodeSerial = async (req, res) => {
         });
         res.status(200).json({
             success: true,
-            data: orders[0],
+            data: orders,
             message: "data retrieved successfully"
         });
     } catch (error) {
@@ -51,7 +51,7 @@ export const getOrderByBLK = async (req, res) => {
         });
         res.status(200).json({
             success: true,
-            data: orders[0],
+            data: orders,
             message: "data retrieved successfully"
         });
     } catch (error) {
