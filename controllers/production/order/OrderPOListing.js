@@ -33,7 +33,7 @@ export const newOrderPOListing = async (req, res) => {
         }
 
         dataOrder.forEach(async (order, i) => {
-            const checkOrderPOData = await OrderPoListing.findAll({
+            const checkOrderPOData = await OrderPoListing.findOne({
                 attributes: ["ORDER_NO", "ORDER_STYLE_DESCRIPTION", "ORDER_PO_ID", "MO_NO"],
                 where: {
                     ORDER_NO: order.ORDER_NO,
@@ -43,8 +43,16 @@ export const newOrderPOListing = async (req, res) => {
                 },
             });
 
-            if (checkOrderPOData.length !== 0) {
-                existData.push(...checkOrderPOData);
+            if (checkOrderPOData) {
+                //existData.push(...checkOrderPOData);
+                await OrderPoListing.update(order, {
+                    where: {
+                        ORDER_NO: checkOrderPOData.ORDER_NO,
+                        ORDER_STYLE_DESCRIPTION: checkOrderPOData.ORDER_STYLE_DESCRIPTION,
+                        ORDER_PO_ID: checkOrderPOData.ORDER_PO_ID,
+                        MO_NO: checkOrderPOData.MO_NO
+                    }
+                });
             } else {
                 await OrderPoListing.create(order);
             }
