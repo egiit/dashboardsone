@@ -121,7 +121,7 @@ export const OrderPoListing = db.define(
             allowNull: true
         },
         ORDER_STYLE_DESCRIPTION: {
-            type: DataTypes.STRING(50),
+            type: DataTypes.STRING(255),
             allowNull: true
         },
         ORDER_PO_ID: {
@@ -145,6 +145,10 @@ export const OrderPoListing = db.define(
             allowNull: true
         },
         PO_REF_CODE: {
+            type: DataTypes.STRING(255),
+            allowNull: true
+        },
+        PRODUCT_ITEM_ID: {
             type: DataTypes.STRING(50),
             allowNull: true
         },
@@ -153,7 +157,7 @@ export const OrderPoListing = db.define(
             allowNull: true
         },
         PRODUCT_ITEM_DESCRIPTION: {
-            type: DataTypes.STRING(50),
+            type: DataTypes.STRING(255),
             allowNull: true
         },
         PRODUCT_ID: {
@@ -188,8 +192,21 @@ export const OrderPoListing = db.define(
             type: DataTypes.INTEGER(50),
             allowNull: true
         },
+        ORDER_UOM: {
+            type: DataTypes.INTEGER(50),
+            allowNull: true
+        },
+        PLAN_MO_QTY_PERCENTAGE: {
+            type: DataTypes.DOUBLE,
+            allowNull: true
+        },
+        SHIPMENT_PO_QTY_VARIANCE: {
+            type: DataTypes.DOUBLE,
+            allowNull: true
+        },
+        
         PLAN_SHIPMENT_PO_PERCENTAGE: {
-            type: DataTypes.STRING(50),
+            type: DataTypes.DOUBLE,
             allowNull: true
         },
         SHIPPED_QTY: {
@@ -197,7 +214,7 @@ export const OrderPoListing = db.define(
             allowNull: true
         },
         ORDER_TO_SHIPPED_PERCENTAGE: {
-            type: DataTypes.STRING(50),
+            type: DataTypes.DOUBLE,
             allowNull: true
         },
         DELIVERY_TERM: {
@@ -209,19 +226,19 @@ export const OrderPoListing = db.define(
             allowNull: true
         },
         UNIT_PRICE: {
-            type: DataTypes.STRING(50),
+            type: DataTypes.DOUBLE(200, 4),
             allowNull: true
         },
         MO_COST: {
-            type: DataTypes.STRING(50),
+            type: DataTypes.DOUBLE(200, 4),
             allowNull: true
         },
         TOTAL_ORDER_COST: {
-            type: DataTypes.STRING(50),
+            type: DataTypes.DOUBLE(200, 4),
             allowNull: true
         },
         TOTAL_MO_COST: {
-            type: DataTypes.INTEGER(200),
+            type: DataTypes.DOUBLE(200, 4),
             allowNull: true
         },
         CURRENCY_CODE: {
@@ -249,31 +266,31 @@ export const OrderPoListing = db.define(
             allowNull: true
         },
         PO_CREATED_DATE: {
-            type: DataTypes.DATE,
+            type: DataTypes.DATEONLY,
             allowNull: true
         },
         PO_CONFIRMED_DATE: {
-            type: DataTypes.DATE,
+            type: DataTypes.DATEONLY,
             allowNull: true
         },
         TARGET_PCD: {
-            type: DataTypes.DATE,
+            type: DataTypes.DATEONLY,
             allowNull: true
         },
         ORIGINAL_DELIVERY_DATE: {
-            type: DataTypes.DATE,
+            type: DataTypes.DATEONLY,
             allowNull: true
         },
         FINAL_DELIVERY_DATE: {
-            type: DataTypes.DATE,
+            type: DataTypes.DATEONLY,
             allowNull: true
         },
         PLAN_EXFACTORY_DATE: {
-            type: DataTypes.DATE,
+            type: DataTypes.DATEONLY,
             allowNull: true
         },
         PO_EXPIRY_DATE: {
-            type: DataTypes.DATE,
+            type: DataTypes.DATEONLY,
             allowNull: true
         },
         PRODUCTION_MONTH: {
