@@ -300,8 +300,14 @@ export const OrderPoListing = db.define(
             type: DataTypes.STRING(20),
             allowNull: true
         }
+    }, {
+        freezeTableName: true,
+        createdAt: false,
+        updatedAt: false,
     }
 );
 
+Orders.removeAttribute("id");
+OrderPoListing.removeAttribute("id");
 
 export default Orders;
