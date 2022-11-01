@@ -1,5 +1,4 @@
-import { Orders, ScanCutting } from "../../../models/production/cutting.mod.js";
-import moment from "moment";
+import Orders from "../../../models/production/order.mod.js";
 
 // CONTROLLER CREATE NEW ORDER DATA
 export const newOrder = async (req, res) => {
