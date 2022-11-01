@@ -1,4 +1,4 @@
-import { Orders, ScanCutting } from "../../../models/production/cutting.mod.js";
+import Orders from "../../../models/production/order.mod.js";
 
 // CONTROLLER DELETE ORDER
 export const deleteOrder = async (req, res) => {

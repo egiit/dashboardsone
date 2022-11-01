@@ -6,6 +6,7 @@ import { refreshToken } from "../controllers/auth/RefreshToken.js";
 import userAccesRoute from "./auth/userAccess.route.js";
 import getMenu from "../controllers/setup/Menu.js";
 import { getDept, getDeptById } from "../controllers/setup/Dept.js";
+import orderRoute from "./production/order.route.js";
 import cuttingRoute from "./production/cutting.route.js";
 import sewingRoute from "./production/sewing.route.js";
 
@@ -19,6 +20,7 @@ router.get("/dept", getDept);
 router.get("/dept/:id", getDeptById);
 router.use("/useraccess", userAccesRoute);
 router.use("/user", userRoute);
+router.use("/order", orderRoute);
 router.use("/cutting", cuttingRoute);
 router.use("/sewing", sewingRoute);
 
