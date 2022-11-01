@@ -24,8 +24,6 @@ export const newOrderPOListing = async (req, res) => {
         let existData = [];
         const dataOrder = req.body;
 
-        console.log(dataOrder);
-
         if (!dataOrder.length){
             return res.status(404).json({
                 success: false,
