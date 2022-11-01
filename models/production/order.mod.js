@@ -104,8 +104,12 @@ export const OrderPoListing = db.define(
             type: DataTypes.STRING(50),
             allowNull: true
         },
-        PROJECTION_ORDER_CODE: {
+        PROJECTION_ORDER_ID: {
             type: DataTypes.STRING(10),
+            allowNull: true
+        },
+        PROJECTION_ORDER_CODE: {
+            type: DataTypes.STRING(50),
             allowNull: true
         },
         ORDER_TYPE_CODE: {
