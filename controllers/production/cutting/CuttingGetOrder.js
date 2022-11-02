@@ -110,17 +110,33 @@ export const getOrderByBLK = async (req, res) => {
       type: QueryTypes.SELECT,
     });
 
-    if (orders.length == 0)
+    if (orders.length === 0)
       return res.status(200).json({
         success: true,
-        message: "data BLK not found",
+        message: "data Order not found",
         data: [],
       });
+
+    //distinc size
+    const distSize = [
+      ...new Map(orders.map((item) => [item["ORDER_SIZE"], item])).values(),
+    ].map((size) => size.ORDER_SIZE);
+
+    //LOOPING COMBINE SIZE WITH ORDERS
+    let orderWithSeq = [];
+    distSize.forEach((size) => {
+      const newList = orders
+        .filter((ord) => ord.ORDER_SIZE === size)
+        .map((order, i) => ({ ...order, SEQUENCE: i + 1 }));
+      orderWithSeq.push(...newList);
+    });
+
+    // console.log(orderWithSeq);
 
     return res.status(200).json({
       success: true,
       message: "data retrieved successfully",
-      data: orders,
+      data: orderWithSeq,
     });
   } catch (error) {
     res.status(404).json({
