@@ -43,3 +43,6 @@ Content-Type: application/json
 "USER_DELETE_STATUS": 0,
 "USER_ADD_ID": "1" 
 }
+
+###
+GET http://localhost:5001/cutting/order/bundle/BLK0003569
