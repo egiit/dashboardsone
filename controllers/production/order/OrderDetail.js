@@ -8,13 +8,13 @@ export const getOrder = async (req, res) => {
             success: true,
             message: "Data Order Retrieved Successfully",
             data: orders
-        });    
+        });
     } catch (error) {
         res.status(404).json({
             success: false,
             message: "error processing request",
             data: error
-        });   
+        });
     }
 };
 
@@ -26,20 +26,20 @@ export const getOrderByBarcodeSerial = async (req, res) => {
                 BARCODE_SERIAL: req.params.barcodeserial,
             },
         });
-        
-        if(orders.length == 0) {
+
+        if (orders.length == 0) {
             res.status(200).json({
                 success: true,
                 message: "data barcode serial not found",
                 data: []
-            });    
+            });
         } else {
             res.status(200).json({
                 success: true,
                 message: "data barcode serial retrieved successfully",
                 data: orders
             });
-        }        
+        }
     } catch (error) {
         res.status(404).json({
             success: false,
@@ -98,14 +98,14 @@ export const getOrderByBLK = async (req, res) => {
         });
     }
 };
-  
+
 // CONTROLLER CREATE NEW ORDER DATA
 export const newOrder = async (req, res) => {
     try {
         let existData = [];
         const dataOrder = req.body;
 
-        if (!dataOrder.length){
+        if (!dataOrder.length) {
             return res.status(404).json({
                 success: false,
                 message: "no data upload!",
@@ -126,7 +126,7 @@ export const newOrder = async (req, res) => {
             } else {
                 await Orders.create(order);
             }
-            
+
             if (i + 1 === dataOrder.length)
                 return res.status(201).json({
                     success: true,

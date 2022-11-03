@@ -1,4 +1,6 @@
-import { OrderPoListing } from "../../../models/production/order.mod.js";
+import {
+    OrderPoListing
+} from "../../../models/production/order.mod.js";
 
 // CONTROLLER GET ALL ORDER DATA
 export const getOrderPOListing = async (req, res) => {
@@ -8,13 +10,13 @@ export const getOrderPOListing = async (req, res) => {
             success: true,
             message: "Data Order Retrieved Successfully",
             data: orders
-        });    
+        });
     } catch (error) {
         res.status(404).json({
             success: false,
             message: "error processing request",
             data: error
-        });   
+        });
     }
 };
 
@@ -24,7 +26,7 @@ export const newOrderPOListing = async (req, res) => {
         let existData = [];
         const dataOrder = req.body;
 
-        if (!dataOrder.length){
+        if (!dataOrder.length) {
             return res.status(404).json({
                 success: false,
                 message: "no data upload!",
@@ -56,7 +58,7 @@ export const newOrderPOListing = async (req, res) => {
             } else {
                 await OrderPoListing.create(order);
             }
-            
+
             if (i + 1 === dataOrder.length)
                 return res.status(201).json({
                     success: true,

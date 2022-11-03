@@ -1,6 +1,9 @@
 import db from "../../../config/database.js";
 import Orders from "../../../models/production/order.mod.js";
-import { QueryTypes, Op } from "sequelize";
+import {
+  QueryTypes,
+  Op
+} from "sequelize";
 import {
   OrderDetailList,
   SelectOrderNo,
