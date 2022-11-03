@@ -30,7 +30,7 @@ export const PackingWorkdoneByDate = `SELECT
     DATE_FORMAT(order_scan_log.PACKING_SCAN_TIME, '%Y-%m-%d') AS ScanDate,
     TIME_FORMAT(order_scan_log.PACKING_SCAN_TIME, "%H:%i:%s") AS ScanTime,
     order_detail.ORDER_QTY AS Qty,
-    '4' AS StepID,
+    '5' AS StepID,
     SUBSTRING(order_scan_log.PACKING_SCAN_LOCATION, 1, 5) AS Site,
     order_scan_log.PACKING_SCAN_LOCATION AS Line
 FROM order_scan_log
