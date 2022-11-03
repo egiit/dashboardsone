@@ -1,5 +1,4 @@
-import Orders from "../../../models/production/order.mod.js";
-//import GenerateQR from "../../../models/production/orderqrgenerate.mod.js";
+import { Orders } from "../../../models/production/order.mod.js";
 import { GenerateQR } from "../../../models/production/cutting.mod.js";
 import moment from "moment";
 

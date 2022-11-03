@@ -1,4 +1,4 @@
-import Orders from "../../../models/production/order.mod.js";
+import { Orders } from "../../../models/production/order.mod.js";
 
 // CONTROLLER GET ALL ORDER DATA
 export const getOrder = async (req, res) => {

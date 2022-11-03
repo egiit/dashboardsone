@@ -1,5 +1,5 @@
-import Orders from "../../../models/production/order.mod";
-import ScanPacking from "../../../models/setup/production/packing.mod";
+import { Orders } from "../../../models/production/order.mod";
+import { ScanPacking } from "../../../models/setup/production/packing.mod";
 import moment from "moment";
 
 

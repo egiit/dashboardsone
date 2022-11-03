@@ -23,7 +23,6 @@ export const ScanSewing = db.define(
 
 ScanSewing.removeAttribute("id");
 
-export default ScanSewing;
 
 export const SewingWorkdoneByDate = `SELECT
     order_detail.BUYER_CODE AS BuyersCode,

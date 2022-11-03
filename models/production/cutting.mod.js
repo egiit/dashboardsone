@@ -55,7 +55,6 @@ export const GenerateQR = db.define(
 GenerateQR.removeAttribute("id");
 ScanCutting.removeAttribute("id");
 
-//export default ScanCutting;
 
 export const OrderDetailList = `SELECT a.BUYER_CODE, a.ORDER_NO, a.MO_NO, SUM(a.ORDER_QTY) QTY, a.DATE_CREATE
 FROM order_detail a GROUP BY a.BUYER_CODE, a.ORDER_NO WHERE DATE(a.CREATE_DATE) BETWEEN :startDate AND :endDate
