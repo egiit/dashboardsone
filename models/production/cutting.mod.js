@@ -18,10 +18,44 @@ export const ScanCutting = db.define(
   }
 );
 
+export const GenerateQR = db.define(
+  "order_qr_generate", {
+      BARCODE_SERIAL: {
+          type: DataTypes.STRING(100),
+          allowNull: false,
+      },
+      BUNDLE_SEQUENCE: {
+          type: DataTypes.INTEGER(100),
+          allowNull: false,
+      },
+      CREATE_TIME: {
+          type: DataTypes.DATE,
+          allowNull: true,
+      },
+      CREATE_BY: {
+          type: DataTypes.INTEGER(20),
+          allowNull: true,
+      },
+      UPDATE_TIME: {
+          type: DataTypes.DATE,
+          allowNull: true,
+      },
+      UPDATE_BY: {
+          type: DataTypes.INTEGER(20),
+          allowNull: true,
+      },
 
+  }, {
+      freezeTableName: true,
+      createdAt: false,
+      updatedAt: false
+  }
+);
+
+GenerateQR.removeAttribute("id");
 ScanCutting.removeAttribute("id");
 
-export default ScanCutting;
+//export default ScanCutting;
 
 export const OrderDetailList = `SELECT a.BUYER_CODE, a.ORDER_NO, a.MO_NO, SUM(a.ORDER_QTY) QTY, a.DATE_CREATE
 FROM order_detail a GROUP BY a.BUYER_CODE, a.ORDER_NO WHERE DATE(a.CREATE_DATE) BETWEEN :startDate AND :endDate
@@ -51,3 +85,4 @@ export const CuttingWorkdoneByDate = `SELECT
 FROM order_scan_log
 INNER JOIN order_detail ON order_scan_log.BARCODE_SERIAL=order_detail.BARCODE_SERIAL
 WHERE DATE(order_scan_log.CUTTING_SCAN_TIME) BETWEEN :startDate AND :endDate ORDER BY order_scan_log.CUTTING_SCAN_TIME`;
+
