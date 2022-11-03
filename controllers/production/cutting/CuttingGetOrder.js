@@ -10,7 +10,7 @@ import {
 } from "../../../models/production/order.mod.js";
 
 
-export const getCutingOrder = async (req, res) => {
+export const getCuttingOrder = async (req, res) => {
   try {
     const orders = await db.query(OrderDetailList, {
       replacements: {
