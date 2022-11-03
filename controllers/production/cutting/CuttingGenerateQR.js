@@ -7,7 +7,6 @@ export const newQRCutting = async (req, res) => {
     try {
         let existData       = [];
         const dataOrder     = req.body;
-        const datetimenow   = moment().format("YYYY-MM-DD HH:MM:SS");
         
         if (!dataOrder.length) {
             return res.status(404).json({
@@ -26,8 +25,7 @@ export const newQRCutting = async (req, res) => {
                 },
             });
 
-            console.log(datetimenow);
-
+            
             if (checkGeneratedQR.length !== 0) {
                 await GenerateQR.update({ UPDATE_BY: 130 }, {
                     where: {
