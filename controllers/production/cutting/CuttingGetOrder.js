@@ -9,7 +9,13 @@ import {
 
 export const getCutingOrder = async (req, res) => {
   try {
-    const orders = await db.query(OrderDetailList, { type: QueryTypes.SELECT });
+    const orders = await db.query(OrderDetailList, {
+      replacements: {
+        startDate: req.params.startDate,
+        endDate: req.params.endDate
+      },
+      type: QueryTypes.SELECT
+    });
     res.status(200).json({
       success: true,
       message: "Data Order Retrieved Successfully",
@@ -23,6 +29,7 @@ export const getCutingOrder = async (req, res) => {
     });
   }
 };
+
 
 // CONTROLLER GET ORDER DATA BY BARCODE SERIAL
 export const getOrderByBarcodeSerial = async (req, res) => {

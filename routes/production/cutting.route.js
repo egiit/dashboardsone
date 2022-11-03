@@ -9,7 +9,8 @@ import {
 
 // ROUTE CUTTING
 
-router.get("/order/list", getCutingOrder);
+router.get("/order/list/:startDate/:endDate", getCutingOrder);
+
 router.get("/order/bundle/:orderNo", getOrderByBLK);
 router.post("/order/scan", QRScanCutting);
 
