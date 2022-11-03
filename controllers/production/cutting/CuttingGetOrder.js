@@ -30,7 +30,6 @@ export const getCutingOrder = async (req, res) => {
   }
 };
 
-
 // CONTROLLER GET ORDER DATA BY BARCODE SERIAL
 export const getOrderByBarcodeSerial = async (req, res) => {
   try {
@@ -88,7 +87,10 @@ export const getOrderByBLK = async (req, res) => {
     distSize.forEach((size) => {
       const newList = orders
         .filter((ord) => ord.ORDER_SIZE === size)
-        .map((order, i) => ({ ...order, SEQUENCE: i + 1 }));
+        .map((order, i) => ({
+          ...order,
+          SEQUENCE: i + 1
+        }));
       orderWithSeq.push(...newList);
     });
 
