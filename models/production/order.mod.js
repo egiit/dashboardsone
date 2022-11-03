@@ -68,8 +68,8 @@ export const Orders = db.define(
   },
   {
     freezeTableName: true,
-    createdAt: "DATE_CREATE",
-    updatedAt: "DATE_UPDATE",
+    createdAt: "CREATE_DATE",
+    updatedAt: "UPDATE_DATE",
   }
 );
 
