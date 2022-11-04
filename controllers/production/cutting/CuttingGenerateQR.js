@@ -18,10 +18,9 @@ export const newQRCutting = async (req, res) => {
 
         dataOrder.forEach(async (order, i) => {
             const checkGeneratedQR = await GenerateQR.findAll({
-                attributes: ["BARCODE_SERIAL", "BUNDLE_SEQUENCE"],
                 where: {
                     BARCODE_SERIAL: order.BARCODE_SERIAL,
-                    BUNDLE_SEQUENCE: order.BUNDLE_SEQUENCE,
+                    BUNDLE_SEQUENCE: order.SEQUENCE,
                     SITE_LINE: order.SITE_LINE
                 },
             });
@@ -37,7 +36,7 @@ export const newQRCutting = async (req, res) => {
             } else {
                 await GenerateQR.create({
                     BARCODE_SERIAL: order.BARCODE_SERIAL,
-                    BUNDLE_SEQUENCE: order.BUNDLE_SEQUENCE,
+                    BUNDLE_SEQUENCE: order.SEQUENCE,
                     SITE_LINE: order.SITE_LINE,
                     CREATE_BY: 130
                 });
