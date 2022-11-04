@@ -1,4 +1,4 @@
-import Orders from "../../../models/production/order.mod.js";
+import { Orders } from "../../../models/production/order.mod.js";
 import { ScanCutting } from "../../../models/production/cutting.mod.js";
 import { ScanSewing } from "../../../models/production/sewing.mod.js";
 import moment from "moment";
