@@ -68,8 +68,8 @@ export const Orders = db.define(
   },
   {
     freezeTableName: true,
-    createdAt: "DATE_CREATE",
-    updatedAt: "DATE_UPDATE",
+    createdAt: "CREATE_DATE",
+    updatedAt: "UPDATE_DATE",
   }
 );
 
@@ -332,4 +332,14 @@ export const OrderPoListing = db.define(
 Orders.removeAttribute("id");
 OrderPoListing.removeAttribute("id");
 
-export default Orders;
+export const OrderDetailList = `SELECT a.BUYER_CODE, a.ORDER_NO, a.MO_NO, SUM(a.ORDER_QTY) QTY, a.CREATE_DATE
+FROM order_detail a GROUP BY a.BUYER_CODE, a.ORDER_NO WHERE DATE(a.CREATE_DATE) BETWEEN :startDate AND :endDate
+ORDER BY a.CREATE_DATE DESC`;
+
+export const SelectOrderNo = `SELECT DISTINCT a.BUYER_CODE, a.ORDER_NO, a.PRODUCT_TYPE, a.BUYER_PO, a.MO_NO, a.ORDER_VERSION, a.SHIPMENT_DATE,
+a.ORDER_QTY, a.ORDER_SIZE, a.ORDER_STYLE, a.BARCODE_SERIAL, a.SITE_LINE, b.ITEM_COLOR_NAME, SUBSTRING_INDEX(b.ORDER_REFERENCE_PO_NO, ' ', 1) ORDER_REF, b.COUNTRY
+FROM order_detail a 
+LEFT JOIN (
+	SELECT * FROM order_po_listing c WHERE c.ORDER_NO = :orderNo
+	) b ON b.MO_NO = a.MO_NO
+WHERE a.ORDER_NO = :orderNo ORDER BY  a.ORDER_SIZE, a.BARCODE_SERIAL`;

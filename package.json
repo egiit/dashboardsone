@@ -22,7 +22,7 @@
     "moment": "^2.29.4",
     "mysql2": "^2.3.3",
     "passport": "^0.6.0",
-    "passport-local-sequelize": "^0.9.0",
+    "passport-local-sequelize": "^0.8.0",
     "sequelize": "^6.25.2",
     "tedious": "^15.1.0",
     "uuid": "^9.0.0"

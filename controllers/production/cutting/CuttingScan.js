@@ -1,16 +1,16 @@
-import Orders from "../../../models/production/order.mod.js";
-import ScanCutting from "../../../models/production/cutting.mod.js";
+import { Orders } from "../../../models/production/order.mod.js";
+import { ScanCutting } from "../../../models/production/cutting.mod.js";
 import moment from "moment";
 
 
 // CONTROLLER SCAN CUTTING
 export const QRScanCutting = async (req, res) => {
     try {
-        const barcodeserial         = req.body.barcodeserial;
-        const datetimenow           = moment().format("YYYY-MM-DD HH:MM:SS");
-        
-        
-        const checkBarcodeSerial    = await Orders.findAll({
+        const barcodeserial = req.body.barcodeserial;
+        const datetimenow = moment().format("YYYY-MM-DD HH:MM:SS");
+
+
+        const checkBarcodeSerial = await Orders.findAll({
             attributes: ["BARCODE_SERIAL"],
             where: {
                 BARCODE_SERIAL: barcodeserial,
@@ -28,23 +28,25 @@ export const QRScanCutting = async (req, res) => {
                 attributes: ["BARCODE_SERIAL", "CUTTING_SCANTIME"],
                 where: {
                     BARCODE_SERIAL: barcodeserial,
-                }   
+                }
             });
 
-            
-            if(checkCuttingScanTime[0].CUTTING_SCANTIME != null){
+
+            if (checkCuttingScanTime[0].CUTTING_SCANTIME != null) {
                 res.status(200).json({
                     success: true,
                     message: "order already scan on cutting!",
                     data: checkCuttingScanTime
-                });    
+                });
             } else {
-                await ScanCutting.update({CUTTING_SCANTIME: datetimenow}, {
+                await ScanCutting.update({
+                    CUTTING_SCANTIME: datetimenow
+                }, {
                     where: {
                         BARCODE_SERIAL: barcodeserial
-                    }            
+                    }
                 });
-        
+
                 res.status(200).json({
                     success: true,
                     data: [],
@@ -53,7 +55,7 @@ export const QRScanCutting = async (req, res) => {
             }
         }
 
-        
+
     } catch (error) {
         res.status(404).json({
             success: false,

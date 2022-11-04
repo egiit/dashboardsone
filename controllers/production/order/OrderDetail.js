@@ -1,4 +1,4 @@
-import Orders from "../../../models/production/order.mod.js";
+import { Orders } from "../../../models/production/order.mod.js";
 
 // CONTROLLER GET ALL ORDER DATA
 export const getOrder = async (req, res) => {
@@ -8,13 +8,13 @@ export const getOrder = async (req, res) => {
             success: true,
             message: "Data Order Retrieved Successfully",
             data: orders
-        });    
+        });
     } catch (error) {
         res.status(404).json({
             success: false,
             message: "error processing request",
             data: error
-        });   
+        });
     }
 };
 
@@ -26,20 +26,20 @@ export const getOrderByBarcodeSerial = async (req, res) => {
                 BARCODE_SERIAL: req.params.barcodeserial,
             },
         });
-        
-        if(orders.length == 0) {
+
+        if (orders.length == 0) {
             res.status(200).json({
                 success: true,
                 message: "data barcode serial not found",
                 data: []
-            });    
+            });
         } else {
             res.status(200).json({
                 success: true,
                 message: "data barcode serial retrieved successfully",
                 data: orders
             });
-        }        
+        }
     } catch (error) {
         res.status(404).json({
             success: false,
@@ -52,30 +52,49 @@ export const getOrderByBarcodeSerial = async (req, res) => {
 // CONTROLLER GET ORDER DATA BY BLK NUMBER
 export const getOrderByBLK = async (req, res) => {
     try {
-        const orders = await Orders.findAll({
-            where: {
-                ORDER_NO: req.params.orderno,
+        const orders = await db.query(SelectOrderNo, {
+            replacements: {
+                orderNo: req.params.orderNo,
             },
+            type: QueryTypes.SELECT,
         });
-        if(orders.length==0){
-            res.status(200).json({
+
+        if (orders.length === 0)
+            return res.status(200).json({
                 success: true,
-                message: "data BLK not found",
-                data: []
+                message: "data Order not found",
+                data: [],
             });
-        } else {
-            res.status(200).json({
-                success: true,
-                message: "data retrieved successfully",
-                data: orders
-            });
-        }
-        
+
+        //distinc size
+        const distSize = [
+            ...new Map(orders.map((item) => [item["ORDER_SIZE"], item])).values(),
+        ].map((size) => size.ORDER_SIZE);
+
+        //LOOPING COMBINE SIZE WITH ORDERS
+        let orderWithSeq = [];
+        distSize.forEach((size) => {
+            const newList = orders
+                .filter((ord) => ord.ORDER_SIZE === size)
+                .map((order, i) => ({
+                    ...order,
+                    SEQUENCE: i + 1
+                }));
+            orderWithSeq.push(...newList);
+        });
+
+        // console.log(orderWithSeq);
+
+        return res.status(200).json({
+            success: true,
+            message: "data retrieved successfully",
+            data: orderWithSeq,
+        });
     } catch (error) {
         res.status(404).json({
             success: false,
             message: "error processing request",
-            data: error
+            data: error,
         });
     }
 };
@@ -86,7 +105,7 @@ export const newOrder = async (req, res) => {
         let existData = [];
         const dataOrder = req.body;
 
-        if (!dataOrder.length){
+        if (!dataOrder.length) {
             return res.status(404).json({
                 success: false,
                 message: "no data upload!",
@@ -107,7 +126,7 @@ export const newOrder = async (req, res) => {
             } else {
                 await Orders.create(order);
             }
-            
+
             if (i + 1 === dataOrder.length)
                 return res.status(201).json({
                     success: true,

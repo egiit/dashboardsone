@@ -1,32 +1,20 @@
 import db from "../../../config/database.js";
-import Orders from "../../../models/production/order.mod.js";
+import { Orders } from "../../../models/production/order.mod.js";
 import { QueryTypes, Op } from "sequelize";
 import {
   OrderDetailList,
   SelectOrderNo,
-} from "../../../models/production/cutting.mod.js";
+} from "../../../models/production/order.mod.js";
 
-// CONTROLLER GET ALL ORDER DATA
-// export const getOrder = async (req, res) => {
-//     try {
-//         const orders = await Orders.findAll();
-//         res.status(200).json({
-//             success: true,
-//             message: "Data Order Retrieved Successfully",
-//             data: orders
-//         });
-//     } catch (error) {
-//         res.status(404).json({
-//             success: false,
-//             message: "error processing request",
-//             data: error
-//         });
-//     }
-// };
-
-export const getCutingOrder = async (req, res) => {
+export const getCuttingOrder = async (req, res) => {
   try {
-    const orders = await db.query(OrderDetailList, { type: QueryTypes.SELECT });
+    const orders = await db.query(OrderDetailList, {
+      replacements: {
+        startDate: req.params.startDate,
+        endDate: req.params.endDate,
+      },
+      type: QueryTypes.SELECT,
+    });
     res.status(200).json({
       success: true,
       message: "Data Order Retrieved Successfully",
@@ -72,35 +60,6 @@ export const getOrderByBarcodeSerial = async (req, res) => {
   }
 };
 
-// CONTROLLER GET ORDER DATA BY BLK NUMBER
-// export const getOrderByBLK = async (req, res) => {
-//   try {
-//     const orders = await Orders.findAll({
-//       where: {
-//         ORDER_NO: req.params.orderno,
-//       },
-//     });
-//     if (orders.length == 0) {
-//       res.status(200).json({
-//         success: true,
-//         message: "data BLK not found",
-//         data: [],
-//       });
-//     } else {
-//       res.status(200).json({
-//         success: true,
-//         message: "data retrieved successfully",
-//         data: orders,
-//       });
-//     }
-//   } catch (error) {
-//     res.status(404).json({
-//       success: false,
-//       message: "error processing request",
-//       data: error,
-//     });
-//   }
-// };
 export const getOrderByBLK = async (req, res) => {
   try {
     const orders = await db.query(SelectOrderNo, {
