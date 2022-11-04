@@ -17,14 +17,14 @@ export const newQRCutting = async (req, res) => {
         }
 
         dataOrder.forEach(async (order, i) => {
-            const checkGeneratedQR = await GenerateQR.findAll({
+            const checkGeneratedQR = await GenerateQR.findOne({
                 where: {
                     BARCODE_SERIAL: order.BARCODE_SERIAL
                 },
             });
 
             
-            if (checkGeneratedQR.length !== 0) {
+            if (checkGeneratedQR) {
                 await GenerateQR.update({ SITE_LINE: order.SITE_LINE, UPDATE_BY: 130 }, {
                     where: {
                         BARCODE_SERIAL: order.BARCODE_SERIAL,
