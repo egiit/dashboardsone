@@ -121,14 +121,24 @@ export const getOrderByBLK = async (req, res) => {
     const distSize = [
       ...new Map(orders.map((item) => [item["ORDER_SIZE"], item])).values(),
     ].map((size) => size.ORDER_SIZE);
+    const distCol = [
+      ...new Map(
+        orders.map((item) => [item["ITEM_COLOR_NAME"], item])
+      ).values(),
+    ].map((col) => col.ITEM_COLOR_NAME);
 
+    // console.log(distCol);
     //LOOPING COMBINE SIZE WITH ORDERS
     let orderWithSeq = [];
     distSize.forEach((size) => {
-      const newList = orders
-        .filter((ord) => ord.ORDER_SIZE === size)
-        .map((order, i) => ({ ...order, SEQUENCE: i + 1 }));
-      orderWithSeq.push(...newList);
+      distCol.forEach((col) => {
+        const newList = orders
+          .filter(
+            (ord) => ord.ORDER_SIZE === size && ord.ITEM_COLOR_NAME === col
+          )
+          .map((order, i) => ({ ...order, SEQUENCE: i + 1 }));
+        orderWithSeq.push(...newList);
+      });
     });
 
     // console.log(orderWithSeq);
