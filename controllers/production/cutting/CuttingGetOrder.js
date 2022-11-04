@@ -1,23 +1,19 @@
 import db from "../../../config/database.js";
 import { Orders } from "../../../models/production/order.mod.js";
-import {
-  QueryTypes,
-  Op
-} from "sequelize";
+import { QueryTypes, Op } from "sequelize";
 import {
   OrderDetailList,
   SelectOrderNo,
 } from "../../../models/production/order.mod.js";
-
 
 export const getCuttingOrder = async (req, res) => {
   try {
     const orders = await db.query(OrderDetailList, {
       replacements: {
         startDate: req.params.startDate,
-        endDate: req.params.endDate
+        endDate: req.params.endDate,
       },
-      type: QueryTypes.SELECT
+      type: QueryTypes.SELECT,
     });
     res.status(200).json({
       success: true,
@@ -84,17 +80,24 @@ export const getOrderByBLK = async (req, res) => {
     const distSize = [
       ...new Map(orders.map((item) => [item["ORDER_SIZE"], item])).values(),
     ].map((size) => size.ORDER_SIZE);
+    const distCol = [
+      ...new Map(
+        orders.map((item) => [item["ITEM_COLOR_NAME"], item])
+      ).values(),
+    ].map((col) => col.ITEM_COLOR_NAME);
 
+    // console.log(distCol);
     //LOOPING COMBINE SIZE WITH ORDERS
     let orderWithSeq = [];
     distSize.forEach((size) => {
-      const newList = orders
-        .filter((ord) => ord.ORDER_SIZE === size)
-        .map((order, i) => ({
-          ...order,
-          SEQUENCE: i + 1
-        }));
-      orderWithSeq.push(...newList);
+      distCol.forEach((col) => {
+        const newList = orders
+          .filter(
+            (ord) => ord.ORDER_SIZE === size && ord.ITEM_COLOR_NAME === col
+          )
+          .map((order, i) => ({ ...order, SEQUENCE: i + 1 }));
+        orderWithSeq.push(...newList);
+      });
     });
 
     // console.log(orderWithSeq);
