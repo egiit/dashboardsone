@@ -21,22 +21,24 @@ export const newQRCutting = async (req, res) => {
                 attributes: ["BARCODE_SERIAL", "BUNDLE_SEQUENCE"],
                 where: {
                     BARCODE_SERIAL: order.BARCODE_SERIAL,
-                    BUNDLE_SEQUENCE: order.BUNDLE_SEQUENCE
+                    BUNDLE_SEQUENCE: order.BUNDLE_SEQUENCE,
+                    SITE_LINE: order.SITE_LINE
                 },
             });
 
             
             if (checkGeneratedQR.length !== 0) {
-                await GenerateQR.update({ UPDATE_BY: 130 }, {
+                await GenerateQR.update({ SITE_LINE: order.SITE_LINE, UPDATE_BY: 130 }, {
                     where: {
                         BARCODE_SERIAL: order.BARCODE_SERIAL,
-                        BUNDLE_SEQUENCE: order.BUNDLE_SEQUENCE
+                        BUNDLE_SEQUENCE: order.SEQUENCE
                     }
                 });
             } else {
                 await GenerateQR.create({
                     BARCODE_SERIAL: order.BARCODE_SERIAL,
                     BUNDLE_SEQUENCE: order.BUNDLE_SEQUENCE,
+                    SITE_LINE: order.SITE_LINE,
                     CREATE_BY: 130
                 });
             }
