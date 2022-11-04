@@ -28,6 +28,10 @@ export const GenerateQR = db.define(
           type: DataTypes.INTEGER(100),
           allowNull: false,
       },
+      SITE_LINE : {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+      },
       CREATE_TIME: {
           type: DataTypes.DATE,
           allowNull: true,
