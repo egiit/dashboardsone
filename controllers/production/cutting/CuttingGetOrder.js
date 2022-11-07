@@ -3,12 +3,12 @@ import { Orders } from "../../../models/production/order.mod.js";
 import { QueryTypes, Op } from "sequelize";
 import {
   OrderDetailList,
-  SelectOrderNo,
+  OrderDetailHeader,
 } from "../../../models/production/order.mod.js";
 
 export const getCuttingOrder = async (req, res) => {
   try {
-    const orders = await db.query(OrderDetailList, {
+    const orders = await db.query(OrderDetailHeader, {
       replacements: {
         startDate: req.params.startDate,
         endDate: req.params.endDate,
@@ -62,7 +62,7 @@ export const getOrderByBarcodeSerial = async (req, res) => {
 
 export const getOrderByBLK = async (req, res) => {
   try {
-    const orders = await db.query(SelectOrderNo, {
+    const orders = await db.query(OrderDetailList, {
       replacements: {
         orderNo: req.params.orderNo,
       },
