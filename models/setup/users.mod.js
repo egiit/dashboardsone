@@ -23,6 +23,7 @@ const Users = db.define(
     USER_LEVEL: { type: DataTypes.TEXT },
     USER_PASS_WEB: { type: DataTypes.STRING },
     USER_UNIT: { type: DataTypes.STRING(20) },
+    USER_PATH: { type: DataTypes.STRING },
     USER_ACCES: { type: DataTypes.STRING(20) },
     USER_FLAG: { type: DataTypes.STRING(20) },
     USER_AKTIF_STATUS: { type: DataTypes.INTEGER },

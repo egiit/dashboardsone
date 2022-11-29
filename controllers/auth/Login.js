@@ -26,14 +26,15 @@ export const Login = async (req, res) => {
     const userLevel = user.USER_LEVEL;
     const userUnit = user.USER_UNIT;
     const userDept = user.USER_DEP;
+    const userPath = user.USER_PATH;
     const userMode = user.USER_DARK_MODE;
     const accessToken = jwt.sign(
-      { userId, username, userLevel, userDept, userUnit, userMode },
+      { userId, username, userLevel, userDept, userUnit, userMode, userPath },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: "20s" }
     );
     const refreshToken = jwt.sign(
-      { userId, username, userLevel, userDept, userUnit, userMode },
+      { userId, username, userLevel, userDept, userUnit, userMode, userPath },
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: "1d" }
     );

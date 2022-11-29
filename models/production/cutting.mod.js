@@ -2,7 +2,8 @@ import { DataTypes } from "sequelize";
 import db from "../../config/database.js";
 
 export const ScanCutting = db.define(
-  "order_scan_log", {
+  "order_scan_log",
+  {
     BARCODE_SERIAL: {
       type: DataTypes.STRING(100),
       allowNull: false,
@@ -11,54 +12,55 @@ export const ScanCutting = db.define(
       type: DataTypes.NOW,
       allowNull: true,
     },
-  }, {
+  },
+  {
     freezeTableName: true,
     createdAt: false,
-    updatedAt: false
+    updatedAt: false,
   }
 );
 
 export const GenerateQR = db.define(
-  "order_qr_generate", {
-      BARCODE_SERIAL: {
-          type: DataTypes.STRING(100),
-          allowNull: false,
-      },
-      BUNDLE_SEQUENCE: {
-          type: DataTypes.INTEGER(100),
-          allowNull: false,
-      },
-      SITE_LINE : {
-        type: DataTypes.STRING(100),
-        allowNull: false,
-      },
-      CREATE_TIME: {
-          type: DataTypes.DATE,
-          allowNull: true,
-      },
-      CREATE_BY: {
-          type: DataTypes.INTEGER(20),
-          allowNull: true,
-      },
-      UPDATE_TIME: {
-          type: DataTypes.DATE,
-          allowNull: true,
-      },
-      UPDATE_BY: {
-          type: DataTypes.INTEGER(20),
-          allowNull: true,
-      },
-
-  }, {
-      freezeTableName: true,
-      createdAt: false,
-      updatedAt: false
+  "order_qr_generate",
+  {
+    BARCODE_SERIAL: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    BUNDLE_SEQUENCE: {
+      type: DataTypes.INTEGER(100),
+      allowNull: false,
+    },
+    SITE_LINE: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    CREATE_TIME: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    CREATE_BY: {
+      type: DataTypes.INTEGER(20),
+      allowNull: true,
+    },
+    UPDATE_TIME: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    UPDATE_BY: {
+      type: DataTypes.INTEGER(20),
+      allowNull: true,
+    },
+  },
+  {
+    freezeTableName: true,
+    createdAt: false,
+    updatedAt: false,
   }
 );
 
 GenerateQR.removeAttribute("id");
 ScanCutting.removeAttribute("id");
-
 
 export const OrderDetailList = `SELECT * FROM ViewOrderDetailList WHERE UPLOAD_DATE BETWEEN :startDate AND :endDate`;
 

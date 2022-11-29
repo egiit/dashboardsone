@@ -1,6 +1,8 @@
 ###
 GET http://localhost:5001/menu
 ###
+GET http://localhost:5001/useraccess/menuview/132
+###
 GET http://localhost:5001/user
 ###
 POST http://localhost:5001/useraccess/136/37
@@ -45,4 +47,4 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:5001/cutting/order/bundle/BLK0003569
+GET http://localhost:5001/planning/capacity/2022-10-00/2022-11-00
