@@ -32,6 +32,10 @@ export const Orders = db.define(
       type: DataTypes.DATE,
       allowNull: false,
     },
+    SHIPMENT_DATE: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
     ORDER_QTY: {
       type: DataTypes.INTEGER(10),
       allowNull: false,
@@ -321,6 +325,18 @@ export const OrderPoListing = db.define(
       type: DataTypes.STRING(20),
       allowNull: true,
     },
+    NEW_TARGET_PCD: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    NEW_FINAL_DELIVERY_DATE: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    NEW_PLAN_EXFACTORY_DATE: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
     freezeTableName: true,
@@ -331,7 +347,6 @@ export const OrderPoListing = db.define(
 
 Orders.removeAttribute("id");
 OrderPoListing.removeAttribute("id");
-
 
 // export const OrderDetailList = `SELECT a.BUYER_CODE, a.ORDER_NO, a.MO_NO, SUM(a.ORDER_QTY) QTY, a.CREATE_DATE
 // FROM order_detail a GROUP BY a.BUYER_CODE, a.ORDER_NO WHERE DATE(a.CREATE_DATE) BETWEEN :startDate AND :endDate
@@ -353,4 +368,3 @@ LEFT JOIN (
 	LEFT JOIN order_detail b ON a.BARCODE_SERIAL = b.BARCODE_SERIAL AND b.ORDER_NO = :orderNo
 ) d ON d.BARCODE_SERIAL = a.BARCODE_SERIAL
 WHERE a.ORDER_NO = :orderNo ORDER BY  a.ORDER_SIZE, a.BARCODE_SERIAL`;
-

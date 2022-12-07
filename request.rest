@@ -48,3 +48,19 @@ Content-Type: application/json
 
 ###
 GET http://localhost:5001/planning/capacity/2022-10-00/2022-11-00
+
+###
+POST http://localhost:5001/planning/header
+Content-Type: application/json
+
+{
+"SCH_SITE": "SBR_02",
+"SCH_ID_SITELINE": "SLD0000020",
+"SCH_CAPACITY_ID": "SBR_01.H&M.4084711338.HM34S.10210.20221204",
+"SCH_QTY": "778",
+"SCH_START_PROD": "2022-11-23",
+"SCH_FINISH_PROD": "2022-11-23",
+"SCH_DAYS_RUN": 1,
+"SCH_ORDER": 2,
+"SCH_ADD_ID": 1
+}
