@@ -64,3 +64,18 @@ Content-Type: application/json
 "SCH_ORDER": 2,
 "SCH_ADD_ID": 1
 }
+###
+POST http://localhost:5001/planning/daily
+Content-Type: application/json
+
+{"SCH_ID":7,"SCHD_PROD_MONTH":"2022-11-22","SCHD_PROD_DATE":"2022-11-21","SCHD_SITE":"SBR_01","SCHD_ID_SITELINE":"SLD0000001","SCHD_CAPACITY_ID":"SBR_01.C&A.7989320360519001;002 USIM: 2190348.MD2498 Pippa Bralette.128042.20221129","SCHD_HEADER_QTY":7634,"SCHD_QTY":"3","SCHD_ADD_ID":127}
+###
+PATCH  http://localhost:5001/planning/daily
+Content-Type: application/json
+
+{"SCH_ID":7,"SCHD_PROD_MONTH":"2022-11-22","SCHD_PROD_DATE":"2022-11-22","SCHD_SITE":"SBR_01","SCHD_ID_SITELINE":"SLD0000001","SCHD_CAPACITY_ID":"SBR_01.C&A.7989320360519001;002 USIM: 2190348.MD2498 Pippa Bralette.128042.20221129","SCHD_HEADER_QTY":7634,"SCHD_QTY":"3","SCHD_ADD_ID":127}
+
+###
+GET http://localhost:5001/holidays/2002
+###
+GET http://localhost:5001/planning/group/18
