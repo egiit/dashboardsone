@@ -79,3 +79,11 @@ Content-Type: application/json
 GET http://localhost:5001/holidays/2002
 ###
 GET http://localhost:5001/planning/group/18
+###
+GET http://localhost:5001/pocapacity/detail-cap/2022-11-00/2022-11-00/SBR_02A
+###
+GET http://localhost:5001/pocapacity/detail-week/2022-11-00/2022-11-00/SBR_02A
+###
+GET http://localhost:5001/pocapacity/list-cap-buyer/2022-11-00/2022-11-00/SBR_02A
+###
+GET http://localhost:5001/pocapacity/list-cap-style/2022-11-00/2022-11-00/SBR_02A

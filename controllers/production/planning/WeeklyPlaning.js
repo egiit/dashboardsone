@@ -6,6 +6,7 @@ import {
   QueryGetHeadWeekSch,
   QueryGetHeadWeekSchOne,
   QueryGetOneDayliSch,
+  QueryOneCapacity,
   WeeklyProSchd,
   WeekSchDetail,
 } from "../../../models/planning/weekLyPlan.mod.js";
@@ -21,6 +22,29 @@ export const getCapacity = async (req, res) => {
         replacements: {
           startMonth: startMonth,
           endMonth: endMonth,
+        },
+        type: QueryTypes.SELECT,
+      });
+
+      return res.json(capacity);
+    }
+  } catch (error) {
+    res.status(404).json({
+      message: "error processing request",
+      data: error,
+    });
+  }
+};
+export const getOneCapacity = async (req, res) => {
+  try {
+    const { startMonth, endMonth, capId } = req.params;
+
+    if (startMonth && endMonth) {
+      const capacity = await db.query(QueryOneCapacity, {
+        replacements: {
+          startMonth: startMonth,
+          endMonth: endMonth,
+          capId: capId,
         },
         type: QueryTypes.SELECT,
       });
@@ -310,10 +334,15 @@ export const postSchDataDetail = async (req, res) => {
     dataSchDetail.SCHD_DAYS_NUMBER = 1;
     dataSchDetail.SCHD_HEAD_BALANCE =
       dataSchDetail.SCHD_HEADER_QTY - dataSchDetail.SCHD_QTY;
-    const updateDate = {
+
+    let updateDate = {
       SCH_START_PROD: dataSchDetail.SCHD_PROD_DATE,
-      SCH_FINISH_PROD: dataSchDetail.SCHD_PROD_DATE,
+      // SCH_FINISH_PROD: dataSchDetail.SCHD_PROD_DATE,
     };
+
+    if (dataSchDetail.SCHD_HEAD_BALANCE === 0) {
+      updateDate.SCH_FINISH_PROD = dataSchDetail.SCHD_PROD_DATE;
+    }
 
     await WeeklyProSchd.update(updateDate, {
       where: {
@@ -503,13 +532,17 @@ export const deleteSchDataDetail = async (req, res) => {
 const funcUpdateDate = async (data, schdId) => {
   try {
     if (data.length > 0) {
+      const checkTotalSch = totalCol(data, "SCHD_QTY");
       const startDay = data[0];
       const finishDay = data[data.length - 1];
-
-      const updateDate = {
+      let updateDate = {
         SCH_START_PROD: startDay.SCHD_PROD_DATE,
         SCH_FINISH_PROD: finishDay.SCHD_PROD_DATE,
       };
+
+      if (finishDay.SCHD_HEADER_QTY - checkTotalSch !== 0) {
+        delete updateDate.SCH_FINISH_PROD;
+      }
 
       return await WeeklyProSchd.update(updateDate, {
         where: {
