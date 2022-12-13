@@ -62,7 +62,7 @@ export const GenerateQR = db.define(
 GenerateQR.removeAttribute("id");
 ScanCutting.removeAttribute("id");
 
-export const OrderDetailList = `SELECT * FROM ViewOrderDetailList WHERE UPLOAD_DATE BETWEEN :startDate AND :endDate`;
+export const OrderDetailList = `SELECT * FROM vieworderdetaillist WHERE UPLOAD_DATE BETWEEN :startDate AND :endDate`;
 
 export const SelectOrderNo = `SELECT DISTINCT 
 a.BUYER_CODE, a.ORDER_NO, a.PRODUCT_TYPE, a.BUYER_PO, a.MO_NO, a.ORDER_VERSION, a.SHIPMENT_DATE,

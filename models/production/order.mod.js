@@ -352,7 +352,7 @@ OrderPoListing.removeAttribute("id");
 // FROM order_detail a GROUP BY a.BUYER_CODE, a.ORDER_NO WHERE DATE(a.CREATE_DATE) BETWEEN :startDate AND :endDate
 // ORDER BY a.CREATE_DATE DESC`;
 
-export const OrderDetailHeader = `SELECT * FROM ViewOrderDetailHeader WHERE UPLOAD_DATE BETWEEN :startDate AND :endDate`;
+export const OrderDetailHeader = `SELECT * FROM vieworderdetailheader WHERE UPLOAD_DATE BETWEEN :startDate AND :endDate`;
 
 //export const OrderDetailList = `SELECT * FROM ViewOrderDetailList WHERE ORDER_N=:orderNo`;
 
