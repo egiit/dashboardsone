@@ -4,6 +4,7 @@ import {
   deleteSchHeader,
   getCapacity,
   getDayliSch,
+  getGroupHeaderWeekSch,
   getHeaderWeekSch,
   getOneCapacity,
   getOneGroupDayliSch,
@@ -23,6 +24,7 @@ router.get("/capacity/:startMonth/:endMonth", getCapacity);
 router.get("/capacity/:startMonth/:endMonth/:capId", getOneCapacity);
 router.get("/header/:startDate/:endDate", getHeaderWeekSch);
 router.get("/one/header/:schId", getOneHeaderWeekSch);
+router.get("/group-header/header/:capId", getGroupHeaderWeekSch);
 
 router.post("/daily", postSchDataDetail);
 router.patch("/daily", patchSchDataDetail);

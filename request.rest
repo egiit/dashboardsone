@@ -87,3 +87,5 @@ GET http://localhost:5001/pocapacity/detail-week/2022-11-00/2022-11-00/SBR_02A
 GET http://localhost:5001/pocapacity/list-cap-buyer/2022-11-00/2022-11-00/SBR_02A
 ###
 GET http://localhost:5001/pocapacity/list-cap-style/2022-11-00/2022-11-00/SBR_02A
+###
+GET http://localhost:5001/planning/group-header/header/SBR_02A.VANITY%20VAIR%20BRANDS%2C%20LP.355327.2103375%2F72037.Damask%20Neutral.20221214

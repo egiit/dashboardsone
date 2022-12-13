@@ -3,6 +3,7 @@ import { QueryTypes, Op } from "sequelize";
 import {
   QueryCapacity,
   QueryGetDayliSch,
+  QueryGetGroupSch,
   QueryGetHeadWeekSch,
   QueryGetHeadWeekSchOne,
   QueryGetOneDayliSch,
@@ -38,13 +39,14 @@ export const getCapacity = async (req, res) => {
 export const getOneCapacity = async (req, res) => {
   try {
     const { startMonth, endMonth, capId } = req.params;
+    const codeCapId = decodeURIComponent(capId);
 
     if (startMonth && endMonth) {
       const capacity = await db.query(QueryOneCapacity, {
         replacements: {
           startMonth: startMonth,
           endMonth: endMonth,
-          capId: capId,
+          capId: codeCapId,
         },
         type: QueryTypes.SELECT,
       });
@@ -93,6 +95,29 @@ export const getOneHeaderWeekSch = async (req, res) => {
     }
 
     return res.status(404).json({ message: "Sch Header Not Found" });
+  } catch (error) {
+    res.status(404).json({
+      message: "error processing request",
+      data: error,
+    });
+  }
+};
+
+export const getGroupHeaderWeekSch = async (req, res) => {
+  try {
+    const { capId } = req.params;
+    const decodCapId = decodeURIComponent(capId).toString();
+
+    const weekSchHeadGroup = await db.query(QueryGetGroupSch, {
+      replacements: {
+        capId: decodCapId,
+      },
+      type: QueryTypes.SELECT,
+    });
+
+    return res.json(weekSchHeadGroup);
+
+    // return res.status(404).json({ message: "Sch Header Not Found" });
   } catch (error) {
     res.status(404).json({
       message: "error processing request",
