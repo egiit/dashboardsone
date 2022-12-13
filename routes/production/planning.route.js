@@ -20,8 +20,8 @@ router.post("/header", postSchDataHeader);
 router.patch("/header", updateDataHeader);
 router.delete("/header/:id", deleteSchHeader);
 
+router.get("/capacity/:capId", getOneCapacity);
 router.get("/capacity/:startMonth/:endMonth", getCapacity);
-router.get("/capacity/:startMonth/:endMonth/:capId", getOneCapacity);
 router.get("/header/:startDate/:endDate", getHeaderWeekSch);
 router.get("/one/header/:schId", getOneHeaderWeekSch);
 router.get("/group-header/header/:capId", getGroupHeaderWeekSch);

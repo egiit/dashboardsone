@@ -38,21 +38,19 @@ export const getCapacity = async (req, res) => {
 };
 export const getOneCapacity = async (req, res) => {
   try {
-    const { startMonth, endMonth, capId } = req.params;
+    const { capId } = req.params;
     const codeCapId = decodeURIComponent(capId);
 
-    if (startMonth && endMonth) {
-      const capacity = await db.query(QueryOneCapacity, {
-        replacements: {
-          startMonth: startMonth,
-          endMonth: endMonth,
-          capId: codeCapId,
-        },
-        type: QueryTypes.SELECT,
-      });
+    const capacity = await db.query(QueryOneCapacity, {
+      replacements: {
+        // startMonth: startMonth,
+        // endMonth: endMonth,
+        capId: codeCapId,
+      },
+      type: QueryTypes.SELECT,
+    });
 
-      return res.json(capacity);
-    }
+    return res.json(capacity);
   } catch (error) {
     res.status(404).json({
       message: "error processing request",
