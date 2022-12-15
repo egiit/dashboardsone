@@ -32,8 +32,8 @@ runDb();
 var whitelist = [
   "http://localhost:3000",
   "https://localhost:3000",
-  "https://192.168.3.7:3000",
-  "https://192.168.3.6:3000",
+  "https://192.168.1.27:3000",
+  "https://192.168.3.14:3000",
 ];
 
 // const options = {
