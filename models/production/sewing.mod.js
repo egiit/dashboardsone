@@ -23,5 +23,39 @@ export const ScanSewing = db.define(
 ScanSewing.removeAttribute("id");
 
 export const SewingListSite = `SELECT DISTINCT a.SITE, a.SITE_NAME FROM item_siteline a`;
-export const SewingListLine = `SELECT a.ID_SITELINE, a.SITE, a.LINE, a.SITE_NAME, a.LINE_NAME, a.SHIFT FROM item_siteline a`;
+export const SewingListLine = `SELECT a.ID_SITELINE, a.SITE, a.LINE, a.SITE_NAME, a.LINE_NAME, a.SHIFT, a.DEFAULT_MANPOWER, a.START_TIME, a.END_TIME FROM  item_siteline a`;
 export const SewingWorkdoneByDate = `SELECT * FROM ViewWorkdoneSewing WHERE ScanDate BETWEEN :startDate AND :endDate`;
+
+export const SiteLine = db.define(
+  "item_siteline",
+  {
+    ID_SITELINE: {
+      type: DataTypes.STRING(100),
+      primaryKey: true,
+      allowNull: false,
+    },
+    SITE: { type: DataTypes.STRING, allowNull: true },
+    LINE: { type: DataTypes.STRING, allowNull: true },
+    SITE_NAME: { type: DataTypes.STRING, allowNull: true },
+    LINE_NAME: { type: DataTypes.STRING, allowNull: true },
+    SHIFT: { type: DataTypes.STRING },
+    DEFAULT_MANPOWER: { type: DataTypes.STRING },
+    START_TIME: { type: DataTypes.TIME },
+    END_TIME: { type: DataTypes.TIME },
+    CREATE_BY: { type: DataTypes.INTEGER },
+    CREATE_DATE: { type: DataTypes.DATE },
+    UPDATE_BY: { type: DataTypes.INTEGER },
+    UPDATE_DATE: { type: DataTypes.DATE },
+  },
+  {
+    freezeTableName: true,
+    createdAt: false,
+    updatedAt: false,
+  }
+);
+
+export const GetMpPlanVsActual = `SELECT  b.MP_DATE, a.ID_SITELINE, a.SITE, a.LINE, a.SITE_NAME, a.LINE_NAME, a.SHIFT, a.DEFAULT_MANPOWER, b.PLAN_WH, b.PLAN_MP, ROUND(b.PLAN_MP*0.0909) PLAN_AB, 
+b.ACT_WH,b.ACT_MP, ((b.PLAN_MP - b.ACT_MP)/b.PLAN_MP)*100 ACTUAL_AB,  b.OT_WH, b.OT_MP
+FROM  item_siteline a
+LEFT JOIN manpower_detail b ON a.ID_SITELINE = b.ID_SITELINE AND b.MP_DATE = :date
+WHERE a.SITE = :site AND a.SHIFT = :shift`;

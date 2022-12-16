@@ -29,6 +29,11 @@ runDb();
 
 // app.use(cors());
 
+function logOriginalUrl(req, res, next) {
+  console.log("Request URL:", req.originalUrl);
+  next();
+}
+
 var whitelist = [
   "http://localhost:3000",
   "https://localhost:3000",
@@ -46,7 +51,6 @@ app.use(
   cors({
     credentials: true,
     origin: function (origin, callback) {
-      console.log(origin);
       if (whitelist.indexOf(origin) !== -1) {
         callback(null, true);
       } else if (whitelist.indexOf(origin) !== -1 && express.static("public")) {
