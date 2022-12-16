@@ -69,6 +69,12 @@ export const Orders = db.define(
       type: DataTypes.DATE,
       allowNull: true,
     },
+    CREATE_BY: {
+      type: DataTypes.BIGINT
+    },
+    UPDATE_BY: {
+      type: DataTypes.BIGINT
+    }
   },
   {
     freezeTableName: true,
