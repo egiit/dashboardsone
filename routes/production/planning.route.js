@@ -34,6 +34,6 @@ router.get("/daily/:startDate/:endDate/:schId", getDayliSch);
 router.get("/group/:schId", getOneGroupDayliSch);
 
 //daily-planning
-router.get("/planning-daily/:plannDate", getDailyPlanning);
+router.get("/planning-daily/:plannDate/:sitename", getDailyPlanning);
 
 export default router;

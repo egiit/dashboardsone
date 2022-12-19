@@ -4,16 +4,17 @@ import { QueryDailyPlann } from "../../../models/planning/dailyPlan.mod.js";
 
 export const getDailyPlanning = async (req, res) => {
   try {
-    const { plannDate } = req.params;
+    const { plannDate, sitename } = req.params;
 
-    const dailyPlann = await db.query(QueryDailyPlann, {
+    const pland = await db.query(QueryDailyPlann, {
       replacements: {
         plannDate: plannDate,
+        sitename: sitename,
       },
       type: QueryTypes.SELECT,
     });
 
-    return res.json(dailyPlann);
+    return res.json(pland);
   } catch (error) {
     res.status(404).json({
       message: "error processing request",
