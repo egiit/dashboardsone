@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getManpowerPlanVsActual,
+  postRegenerateMp,
   updateManpowerDefault,
 } from "../../controllers/production/sewing/SewingManpower.js";
 const router = express.Router();
@@ -26,6 +27,7 @@ router.get("/manpower-detail/:date/:site/:shift", getManpowerPlanVsActual);
 
 router.post("/sewingsmv", postSewingSmvHeader);
 router.post("/sewingsmvdetail", postSewingSmvDetail);
+router.post("/sewing-mp/generate", postRegenerateMp);
 router.post("/order/scan", QRScanSewing);
 
 router.patch("/sewing-mp/", updateManpowerDefault);

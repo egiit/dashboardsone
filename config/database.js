@@ -5,6 +5,16 @@ import { Sequelize } from "sequelize";
 const { DB_NAME, HOST, USER, PASS } = process.env;
 tedious.Connection;
 
+// const db = new Sequelize(DB_NAME, USER, PASS, {
+//   host: HOST,
+//   port: 44170,
+//   dialect: "mysql",
+//   logging: false,
+//   timezone: "+07:00",
+//   dialectOptions: {
+//     timezone: "local",
+//   },
+// });
 // const db = new Sequelize("db_sumbiri_one", "root", "", {
 //   dialect: "mysql",
 //   logging: false,

@@ -40,6 +40,7 @@ export const SiteLine = db.define(
     LINE_NAME: { type: DataTypes.STRING, allowNull: true },
     SHIFT: { type: DataTypes.STRING },
     DEFAULT_MANPOWER: { type: DataTypes.STRING },
+    FOREMAN: { type: DataTypes.STRING },
     START_TIME: { type: DataTypes.TIME },
     END_TIME: { type: DataTypes.TIME },
     CREATE_BY: { type: DataTypes.INTEGER },
@@ -49,13 +50,41 @@ export const SiteLine = db.define(
   },
   {
     freezeTableName: true,
-    createdAt: false,
-    updatedAt: false,
+    createdAt: "CREATE_DATE",
+    updatedAt: "UPDATE_DATE",
   }
 );
 
-export const GetMpPlanVsActual = `SELECT  b.MP_DATE, a.ID_SITELINE, a.SITE, a.LINE, a.SITE_NAME, a.LINE_NAME, a.SHIFT, a.DEFAULT_MANPOWER, b.PLAN_WH, b.PLAN_MP, ROUND(b.PLAN_MP*0.0909) PLAN_AB, 
+export const GetMpPlanVsActual = `SELECT b.ID_MPD, b.MP_DATE, a.ID_SITELINE, a.SITE, a.LINE, a.SITE_NAME, a.LINE_NAME, a.SHIFT, a.DEFAULT_MANPOWER, b.PLAN_WH, b.PLAN_MP, ROUND(b.PLAN_MP*0.0909) PLAN_AB, 
 b.ACT_WH,b.ACT_MP, ((b.PLAN_MP - b.ACT_MP)/b.PLAN_MP)*100 ACTUAL_AB,  b.OT_WH, b.OT_MP
 FROM  item_siteline a
 LEFT JOIN manpower_detail b ON a.ID_SITELINE = b.ID_SITELINE AND b.MP_DATE = :date
 WHERE a.SITE = :site AND a.SHIFT = :shift`;
+
+export const ManPoerDetail = db.define(
+  "manpower_detail",
+  {
+    ID_MPD: {
+      type: DataTypes.BIGINT,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    MP_DATE: { type: DataTypes.DATE },
+    ID_SITELINE: { type: DataTypes.STRING },
+    PLAN_WH: { type: DataTypes.INTEGER },
+    PLAN_MP: { type: DataTypes.INTEGER },
+    ACT_WH: { type: DataTypes.INTEGER },
+    ACT_MP: { type: DataTypes.INTEGER },
+    OT_WH: { type: DataTypes.INTEGER },
+    OT_MP: { type: DataTypes.INTEGER },
+    CREATE_BY: { type: DataTypes.INTEGER },
+    CREATE_DATE: { type: DataTypes.DATE },
+    UPDATE_BY: { type: DataTypes.INTEGER },
+    UPDATE_DATE: { type: DataTypes.DATE },
+  },
+  {
+    freezeTableName: true,
+    createdAt: "CREATE_DATE",
+    updatedAt: "UPDATE_DATE",
+  }
+);

@@ -1,4 +1,5 @@
 import express from "express";
+import { getDailyPlanning } from "../../controllers/production/planning/DailyPlanning.js";
 import {
   deleteSchDataDetail,
   deleteSchHeader,
@@ -31,5 +32,8 @@ router.patch("/daily", patchSchDataDetail);
 router.delete("/daily/:schId/:schdId", deleteSchDataDetail);
 router.get("/daily/:startDate/:endDate/:schId", getDayliSch);
 router.get("/group/:schId", getOneGroupDayliSch);
+
+//daily-planning
+router.get("/planning-daily/:plannDate", getDailyPlanning);
 
 export default router;
