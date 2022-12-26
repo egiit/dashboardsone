@@ -8,6 +8,7 @@ import {
   QueryGetHeadWeekSchOne,
   QueryGetOneDayliSch,
   QueryOneCapacity,
+  SchSizeAloc,
   WeeklyProSchd,
   WeekSchDetail,
 } from "../../../models/planning/weekLyPlan.mod.js";
@@ -169,7 +170,8 @@ export const getOneGroupDayliSch = async (req, res) => {
 //Post data header
 export const postSchDataHeader = async (req, res) => {
   try {
-    const dataWeekSch = req.body;
+    const { newSchedule, schSize } = req.body;
+    const dataWeekSch = newSchedule;
 
     const findSequence = await WeeklyProSchd.findAll({
       where: {
@@ -184,6 +186,14 @@ export const postSchDataHeader = async (req, res) => {
     }
 
     const newSchHeader = await WeeklyProSchd.create(dataWeekSch);
+    if (newSchHeader) {
+      const newSchSize = schSize.map((dtS) => ({
+        ...dtS,
+        SCH_ID: newSchHeader.SCH_ID,
+        SCH_SIZE_QTY: dtS.NEW_SCH,
+      }));
+      postSchSizeDetail(newSchSize);
+    }
 
     res.status(200).json({ message: "Added new schedule", data: newSchHeader });
   } catch (error) {
@@ -599,3 +609,25 @@ function findSubValue(arryDetail, objDetail, daysNum) {
   const subDetailValue = objDetail.SCHD_HEADER_QTY - nilaiGroupBefore;
   return subDetailValue;
 }
+
+// ########################################################## SCH SIZE DETAIL #############################################################
+//POST DETAIL SIZE ALOCATION
+const postSchSizeDetail = async (data) => {
+  try {
+    if (!data.length) return new Error({ message: "No Data Size Post" });
+    return data.forEach(async (dtSize) => {
+      if (!dtSize.SCH_SIZE_ID) {
+        await SchSizeAloc.create(dtSize);
+      }
+      // else{
+
+      // }
+    });
+  } catch (error) {
+    new Error({
+      success: false,
+      message: "error processing request",
+      data: error,
+    });
+  }
+};

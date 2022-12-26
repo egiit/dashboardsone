@@ -127,3 +127,47 @@ FROM weekly_prod_schedule a
 LEFT JOIN viewcapacity b ON a.SCH_CAPACITY_ID = b.ID_CAPACITY
 LEFT JOIN item_siteline c ON a.SCH_ID_SITELINE = c.ID_SITELINE
 WHERE  a.SCH_CAPACITY_ID = :capId `;
+
+export const SchSizeAloc = db.define(
+  "weekly_sch_size",
+  {
+    SCH_SIZE_ID: {
+      type: DataTypes.BIGINT,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    PDM_ID: { type: DataTypes.BIGINT },
+    SCH_ID: { type: DataTypes.BIGINT },
+    ID_CAPACITY: { type: DataTypes.STRING },
+    SCH_SIZE_QTY: { type: DataTypes.INTEGER },
+    ADD_ID: { type: DataTypes.BIGINT },
+    MOD_ID: { type: DataTypes.BIGINT },
+    ADD_DATE: { type: DataTypes.DATE },
+    MOD_DATE: { type: DataTypes.DATE },
+  },
+  {
+    freezeTableName: true,
+    createdAt: "ADD_DATE",
+    updatedAt: "MOD_DATE",
+  }
+);
+
+export const getSizeAlocForUpdtSch = `SELECT b.ID_CAPACITY, a.PDM_ID, a.SITE_CODE, a.PROD_MONTH, a.BUYER_CODE, a.ORDER_NO, a.ORDER_REF_NO, a.ORDER_PO_STYLE_REF, 
+a.COLOR_CODE, a.COLOR_NAME, a.EX_FACTORY, a.SIZE_CODE, a.TOTAL_QTY, na.SCH_SIZE_QTY SCH_QTY, 
+CASE WHEN ISNULL(na.SCH_SIZE_QTY) THEN a.TOTAL_QTY ELSE a.TOTAL_QTY-na.SCH_SIZE_QTY END BALANCE, nb.SCH_SIZE_QTY SCH_ALOC
+FROM po_matrix_delivery a 
+LEFT JOIN viewcapacity b ON a.SITE_CODE = b.MANUFACTURING_SITE AND a.PROD_MONTH = b.PRODUCTION_MONTH AND a.EX_FACTORY = b.PLAN_EXFACTORY_DATE AND a.BUYER_CODE = b.CUSTOMER_NAME AND a.ORDER_NO = b.ORDER_NO 
+AND a.ORDER_REF_NO = b.ORDER_REFERENCE_PO_NO AND a.COLOR_CODE = b.ITEM_COLOR_CODE
+LEFT JOIN (
+	SELECT  n.PDM_ID, n.SCH_ID, sum(n.SCH_SIZE_QTY) SCH_SIZE_QTY
+	FROM weekly_sch_size n 
+	WHERE n.ID_CAPACITY = :capId AND n.SCH_ID <> :schId
+	GROUP BY n.PDM_ID
+) na ON na.PDM_ID  = a.PDM_ID
+LEFT JOIN (
+	SELECT  n.PDM_ID, n.SCH_ID, sum(n.SCH_SIZE_QTY) SCH_SIZE_QTY
+	FROM weekly_sch_size n 
+	WHERE n.ID_CAPACITY = :capId AND n.SCH_ID = :schId
+	GROUP BY n.PDM_ID
+)nb ON nb.PDM_ID  = a.PDM_ID
+WHERE b.ID_CAPACITY = :capId`;

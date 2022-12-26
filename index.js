@@ -4,7 +4,7 @@ import db from "./config/database.js";
 
 dotenv.config();
 import cookieParser from "cookie-parser";
-// import FileUpload from "express-fileupload";
+import FileUpload from "express-fileupload";
 import cors from "cors";
 
 import sumbiriOneRoute from "./routes/index.js";
@@ -64,7 +64,8 @@ app.use(
 
 app.use(cookieParser());
 // app.use(express.json());
-app.use(express.json({ limit: "5mb" }));
+app.use(express.json({ limit: "45mb" }));
+app.use(FileUpload());
 
 app.use("/", sumbiriOneRoute);
 
