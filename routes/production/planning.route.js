@@ -10,6 +10,7 @@ import {
   getOneCapacity,
   getOneGroupDayliSch,
   getOneHeaderWeekSch,
+  getPlanSizeAlocUpd,
   patchSchDataDetail,
   postSchDataDetail,
   postSchDataHeader,
@@ -26,6 +27,7 @@ router.get("/capacity/:startMonth/:endMonth", getCapacity);
 router.get("/header/:startDate/:endDate", getHeaderWeekSch);
 router.get("/one/header/:schId", getOneHeaderWeekSch);
 router.get("/group-header/header/:capId", getGroupHeaderWeekSch);
+router.get("/size-alocation/:capId/:schId", getPlanSizeAlocUpd);
 
 router.post("/daily", postSchDataDetail);
 router.patch("/daily", patchSchDataDetail);

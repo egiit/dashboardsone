@@ -15,12 +15,14 @@ import {
 } from "../../controllers/production/sewing/SewingSmv.js";
 import {
   getListLine,
+  getListLineByGroup,
   getSiteList,
 } from "../../controllers/production/sewing/SiteLine.js";
 
 // ROUTE SEWING
 router.get("/sitelist", getSiteList);
 router.get("/listLine", getListLine);
+router.get("/listLineBuGroup", getListLineByGroup);
 router.get("/smvlist", getListSmvHeader);
 router.get("/sewingsmvdetail/:orderNO", getSewingSmvDetail);
 router.get("/manpower-detail/:date/:site/:shift", getManpowerPlanVsActual);

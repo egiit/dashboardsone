@@ -1,6 +1,7 @@
 import db from "../../../config/database.js";
 import { QueryTypes, Op } from "sequelize";
 import {
+  getSizeAlocForUpdtSch,
   QueryCapacity,
   QueryGetDayliSch,
   QueryGetGroupSch,
@@ -628,6 +629,30 @@ const postSchSizeDetail = async (data) => {
       success: false,
       message: "error processing request",
       data: error,
+    });
+  }
+};
+
+//get data size for edit size alocation
+export const getPlanSizeAlocUpd = async (req, res) => {
+  try {
+    const { capId, schId } = req.params;
+    const codeCapId = decodeURIComponent(capId);
+
+    // console.log(capId);
+    const getPoDelivSize = await db.query(getSizeAlocForUpdtSch, {
+      replacements: {
+        capId: codeCapId,
+        schId: schId,
+      },
+      type: QueryTypes.SELECT,
+    });
+
+    res.status(200).json(getPoDelivSize);
+  } catch (err) {
+    res.status(404).json({
+      message: "Problem When Get Data PO Matrix Delivery By Capacity ID",
+      data: err,
     });
   }
 };
