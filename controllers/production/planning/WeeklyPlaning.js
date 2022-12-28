@@ -186,12 +186,14 @@ export const postSchDataHeader = async (req, res) => {
       dataWeekSch.SCH_ORDER = 1;
     }
 
+    //post data header
     const newSchHeader = await WeeklyProSchd.create(dataWeekSch);
+    //give SCH_ID
     if (newSchHeader) {
       const newSchSize = schSize.map((dtS) => ({
         ...dtS,
         SCH_ID: newSchHeader.SCH_ID,
-        SCH_SIZE_QTY: dtS.NEW_SCH,
+        SCH_SIZE_QTY: dtS.NEW_SCH, //change name data
       }));
       postSchSizeDetail(newSchSize);
     }
@@ -210,17 +212,20 @@ export const postSchDataHeader = async (req, res) => {
 export const deleteSchHeader = async (req, res) => {
   try {
     const schId = req.params.id;
+    //memastikan data sch header ada
     const findSchHeader = await WeeklyProSchd.findOne({
       where: {
         SCH_ID: schId,
       },
     });
 
+    //jika tidak ada maka delete
     if (!findSchHeader)
       return res.status(404).json({
         message: "Data Schedulue Tidak ditemukan",
       });
 
+    //cari daily or detail schedule
     const detailSch = await db.query(QueryGetOneDayliSch, {
       replacements: {
         schId: schId,
@@ -228,6 +233,7 @@ export const deleteSchHeader = async (req, res) => {
       type: QueryTypes.SELECT,
     });
 
+    //jika ada maka delelte daily schedule yang memeiliki SCH_ID sesuai parameter
     if (detailSch.length > 0) {
       await WeekSchDetail.destroy({
         where: {
@@ -236,6 +242,23 @@ export const deleteSchHeader = async (req, res) => {
       });
     }
 
+    //cari data sch size alocation
+    const schSizeAloc = await SchSizeAloc.findAll({
+      where: {
+        SCH_ID: schId,
+      },
+    });
+
+    //jika ada maka delete sch size
+    if (schSizeAloc.length > 0) {
+      await SchSizeAloc.destroy({
+        where: {
+          SCH_ID: schId,
+        },
+      });
+    }
+
+    //jika semua children(daily sch dan size qty alocation) sudah di delte maka delete headernya
     await WeeklyProSchd.destroy({
       where: {
         SCH_ID: findSchHeader.SCH_ID,
@@ -255,7 +278,7 @@ export const deleteSchHeader = async (req, res) => {
 //Update data header
 export const updateDataHeader = async (req, res) => {
   try {
-    const dataWeekSch = req.body;
+    const { dataWeekSch, schSize } = req.body;
 
     const findSchHeader = await WeeklyProSchd.findOne({
       where: {
@@ -268,12 +291,21 @@ export const updateDataHeader = async (req, res) => {
       return res.status(404).json({
         message: "Data Schedulue Tidak ditemukan",
       });
-
+    //update data QTY HEADER
     const newSchHeader = await WeeklyProSchd.update(dataWeekSch, {
       where: {
         SCH_ID: findSchHeader.SCH_ID,
       },
     });
+    //refresh sch_id and change qty sch size qty
+    if (newSchHeader) {
+      const newSchSize = schSize.map((dtS) => ({
+        ...dtS,
+        SCH_ID: dataWeekSch.SCH_ID,
+        SCH_SIZE_QTY: dtS.NEW_SCH, //change name data
+      }));
+      postSchSizeDetail(newSchSize);
+    }
 
     res
       .status(200)
@@ -612,17 +644,26 @@ function findSubValue(arryDetail, objDetail, daysNum) {
 }
 
 // ########################################################## SCH SIZE DETAIL #############################################################
-//POST DETAIL SIZE ALOCATION
+//POST / UPDATE DETAIL SIZE ALOCATION
 const postSchSizeDetail = async (data) => {
   try {
     if (!data.length) return new Error({ message: "No Data Size Post" });
     return data.forEach(async (dtSize) => {
       if (!dtSize.SCH_SIZE_ID) {
         await SchSizeAloc.create(dtSize);
+      } else if (dtSize.NEW_SCH === null || dtSize.NEW_SCH === 0) {
+        await SchSizeAloc.destroy({
+          where: {
+            SCH_SIZE_ID: dtSize.SCH_SIZE_ID,
+          },
+        });
+      } else {
+        await SchSizeAloc.update(dtSize, {
+          where: {
+            SCH_SIZE_ID: dtSize.SCH_SIZE_ID,
+          },
+        });
       }
-      // else{
-
-      // }
     });
   } catch (error) {
     new Error({
