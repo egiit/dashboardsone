@@ -50,7 +50,7 @@ export const postPOMatrixDeliv = async (req, res) => {
     let siteCode = "";
     let prodMonth = "";
     let customerOrder = "";
-
+    // let pmdData = [];
     //looping, reading, parsing data
     dataJson.forEach(async (pmd, i) => {
       if (
@@ -82,6 +82,7 @@ export const postPOMatrixDeliv = async (req, res) => {
           SIZE_CODE: pmd.__EMPTY_10,
           TOTAL_QTY: pmd.__EMPTY_26,
         };
+        // pmdData.push(dataPmdDetail);
         const findPoCap = await PoMatrixDelivery.findOne({
           where: {
             SITE_CODE: dataPmdDetail.SITE_CODE,
@@ -94,30 +95,22 @@ export const postPOMatrixDeliv = async (req, res) => {
             SIZE_CODE: dataPmdDetail.SIZE_CODE,
           },
         });
-
-        if (findPoCap) {
+        if (findPoCap.dataValues) {
           await PoMatrixDelivery.update(dataPmdDetail, {
-            where: { PDM_ID: findPoCap.PDM_ID },
+            where: { PDM_ID: findPoCap.dataValues.PDM_ID },
           });
-          if (dataJson.length === i + 1) {
-            return res.status(200).json({
-              success: true,
-              message: "Data Order Retrieved Successfully update",
-            });
-          }
         } else {
           await PoMatrixDelivery.create(dataPmdDetail);
-          if (dataJson.length === i + 1) {
-            return res.status(200).json({
-              success: true,
-              message: "Data Order Retrieved Successfully create",
-            });
-          }
         }
+      }
+      if (dataJson.length === i + 1) {
+        return res.status(200).json({
+          success: true,
+          message: "Data Order Retrieved Successfully create",
+        });
       }
     });
   } catch (error) {
-    console.log(error);
     res.status(404).json({
       success: false,
       message: "error processing request",
