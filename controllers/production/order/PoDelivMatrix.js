@@ -153,7 +153,7 @@ export const getMatrixPoDelivSize = async (req, res) => {
     const { capId } = req.params;
     const codeCapId = decodeURIComponent(capId);
 
-    // console.log(capId);
+    // console.log(codeCapId);
     const getPoDelivSize = await db.query(QueryGetPOMatrix, {
       replacements: {
         capId: codeCapId,

@@ -92,3 +92,28 @@ export const ManPoerDetail = db.define(
     updatedAt: "UPDATE_DATE",
   }
 );
+
+export const WorkingHoursDetail = db.define(
+  "workinghour_detail",
+  {
+    ID_WHD: {
+      type: DataTypes.BIGINT,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    SCHD_ID: { type: DataTypes.BIGINT },
+    PLAN_WH: { type: DataTypes.INTEGER },
+    ACT_WH: { type: DataTypes.INTEGER },
+    OT_WH: { type: DataTypes.INTEGER },
+    ACT_OT_WH: { type: DataTypes.INTEGER },
+    CREATE_BY: { type: DataTypes.INTEGER },
+    CREATE_DATE: { type: DataTypes.DATE },
+    UPDATE_BY: { type: DataTypes.INTEGER },
+    UPDATE_DATE: { type: DataTypes.DATE },
+  },
+  {
+    freezeTableName: true,
+    createdAt: "CREATE_DATE",
+    updatedAt: "UPDATE_DATE",
+  }
+);
