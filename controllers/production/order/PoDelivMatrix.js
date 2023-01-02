@@ -80,7 +80,7 @@ export const postPOMatrixDeliv = async (req, res) => {
           COLOR_CODE: pmd.__EMPTY_6,
           COLOR_NAME: pmd.__EMPTY_7,
           SIZE_CODE: pmd.__EMPTY_10,
-          TOTAL_QTY: pmd.__EMPTY_26,
+          TOTAL_QTY: pmd.__EMPTY_26 ? pmd.__EMPTY_26 : pmd.__EMPTY_25,
         };
         // pmdData.push(dataPmdDetail);
         const findPoCap = await PoMatrixDelivery.findOne({
