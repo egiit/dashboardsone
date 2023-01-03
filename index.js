@@ -37,8 +37,8 @@ function logOriginalUrl(req, res, next) {
 var whitelist = [
   "http://localhost:3000",
   "https://localhost:3000",
-  "https://192.168.1.27:3000",
-  "http://192.168.182.246:3000",
+  "https://spm.sumbiri.com",
+  "https://api.sumbiri.com",
 ];
 
 // const options = {
