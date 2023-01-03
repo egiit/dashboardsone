@@ -13,7 +13,10 @@ import {
   postSewingSmvDetail,
   postSewingSmvHeader,
 } from "../../controllers/production/sewing/SewingSmv.js";
-import { postDailyWh } from "../../controllers/production/sewing/SewingWhDetial.js";
+import {
+  postDailyWh,
+  postWhMpOt,
+} from "../../controllers/production/sewing/SewingWhDetial.js";
 import {
   getListLine,
   getListLineByGroup,
@@ -33,6 +36,7 @@ router.post("/sewingsmvdetail", postSewingSmvDetail);
 router.post("/sewing-mp/generate", postRegenerateMp);
 router.post("/sewing-wh-detail/", postDailyWh);
 router.post("/order/scan", QRScanSewing);
+router.post("/ot-mp-wh/", postWhMpOt);
 
 router.patch("/sewing-mp/", updateManpowerDefault);
 

@@ -104,8 +104,33 @@ export const WorkingHoursDetail = db.define(
     SCHD_ID: { type: DataTypes.BIGINT },
     PLAN_WH: { type: DataTypes.INTEGER },
     ACT_WH: { type: DataTypes.INTEGER },
-    OT_WH: { type: DataTypes.INTEGER },
-    ACT_OT_WH: { type: DataTypes.INTEGER },
+    PLAN_WH_OT: { type: DataTypes.INTEGER },
+    ACT_WH_OT: { type: DataTypes.INTEGER },
+    CREATE_BY: { type: DataTypes.INTEGER },
+    CREATE_DATE: { type: DataTypes.DATE },
+    UPDATE_BY: { type: DataTypes.INTEGER },
+    UPDATE_DATE: { type: DataTypes.DATE },
+  },
+  {
+    freezeTableName: true,
+    createdAt: "CREATE_DATE",
+    updatedAt: "UPDATE_DATE",
+  }
+);
+
+export const ManpowewrDailyDetail = db.define(
+  "mp_daily_detail",
+  {
+    ID_MPD: {
+      type: DataTypes.BIGINT,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    SCHD_ID: { type: DataTypes.BIGINT },
+    PLAN_MP: { type: DataTypes.INTEGER },
+    ACT_MP: { type: DataTypes.INTEGER },
+    PLAN_MP_OT: { type: DataTypes.INTEGER },
+    ACT_MP_OT: { type: DataTypes.INTEGER },
     CREATE_BY: { type: DataTypes.INTEGER },
     CREATE_DATE: { type: DataTypes.DATE },
     UPDATE_BY: { type: DataTypes.INTEGER },
