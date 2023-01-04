@@ -38,7 +38,7 @@ export const newOrderPOListing = async (req, res) => {
           ORDER_NO: order.ORDER_NO,
           ORDER_STYLE_DESCRIPTION: order.ORDER_STYLE_DESCRIPTION,
           ORDER_PO_ID: order.ORDER_PO_ID,
-          MO_NO: order.MO_NO,
+          // MO_NO: order.MO_NO,
         },
       });
 
@@ -84,7 +84,7 @@ export const newOrderPOListing = async (req, res) => {
             ORDER_NO: records.ORDER_NO,
             ORDER_STYLE_DESCRIPTION: records.ORDER_STYLE_DESCRIPTION,
             ORDER_PO_ID: records.ORDER_PO_ID,
-            MO_NO: records.MO_NO,
+            // MO_NO: records.MO_NO,
           },
         });
       } else {
