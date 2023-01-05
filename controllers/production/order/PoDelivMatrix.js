@@ -43,7 +43,6 @@ export const postPOMatrixDeliv = async (req, res) => {
     };
 
     let dataJson = arrayBufferToJson(dataPMD.file.data);
-
     if (!dataJson.length)
       return res.status(404).json({ message: "No Data Worksheet" });
     //pakai cara looping
@@ -51,6 +50,8 @@ export const postPOMatrixDeliv = async (req, res) => {
     let prodMonth = "";
     let customerOrder = "";
     // let pmdData = [];
+
+    // console.log(dataJson);
     //looping, reading, parsing data
     dataJson.forEach(async (pmd, i) => {
       if (
@@ -69,6 +70,9 @@ export const postPOMatrixDeliv = async (req, res) => {
         customerOrder = pmd.__EMPTY_2.replace("Customer Order: ", "");
       }
       if (pmd.__EMPTY_3) {
+        //find total_qty empty with object key last array
+        const lastEmpty = Object.keys(pmd).at(-1);
+
         const dataPmdDetail = {
           SITE_CODE: siteCode.trim(),
           PROD_MONTH: prodMonth.trim(),
@@ -79,9 +83,12 @@ export const postPOMatrixDeliv = async (req, res) => {
           ORDER_PO_STYLE_REF: pmd.__EMPTY_4,
           COLOR_CODE: pmd.__EMPTY_6,
           COLOR_NAME: pmd.__EMPTY_7,
+          PACKING_METHOD: pmd.__EMPTY_8,
           SIZE_CODE: pmd.__EMPTY_10,
-          TOTAL_QTY: pmd.__EMPTY_26 ? pmd.__EMPTY_26 : pmd.__EMPTY_25,
+          TOTAL_QTY: pmd[lastEmpty],
         };
+
+        // console.log(dataPmdDetail);
         // pmdData.push(dataPmdDetail);
         const findPoCap = await PoMatrixDelivery.findOne({
           where: {
@@ -91,13 +98,15 @@ export const postPOMatrixDeliv = async (req, res) => {
             BUYER_CODE: dataPmdDetail.BUYER_CODE,
             ORDER_NO: dataPmdDetail.ORDER_NO,
             ORDER_REF_NO: dataPmdDetail.ORDER_REF_NO,
+            PACKING_METHOD: dataPmdDetail.PACKING_METHOD,
             COLOR_CODE: dataPmdDetail.COLOR_CODE,
             SIZE_CODE: dataPmdDetail.SIZE_CODE,
           },
         });
-        if (findPoCap.dataValues) {
+        if (findPoCap) {
+          const dataRecod = findPoCap.dataValues;
           await PoMatrixDelivery.update(dataPmdDetail, {
-            where: { PDM_ID: findPoCap.dataValues.PDM_ID },
+            where: { PDM_ID: dataRecod.PDM_ID },
           });
         } else {
           await PoMatrixDelivery.create(dataPmdDetail);

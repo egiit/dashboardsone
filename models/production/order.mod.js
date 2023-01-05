@@ -218,6 +218,7 @@ export const PoMatrixDelivery = db.define(
     ORDER_PO_STYLE_REF: { type: DataTypes.STRING },
     COLOR_CODE: { type: DataTypes.STRING },
     COLOR_NAME: { type: DataTypes.STRING },
+    PACKING_METHOD: { type: DataTypes.STRING },
     EX_FACTORY: { type: DataTypes.DATE },
     SIZE_CODE: { type: DataTypes.STRING },
     TOTAL_QTY: { type: DataTypes.INTEGER },
