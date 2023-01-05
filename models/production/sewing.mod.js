@@ -102,6 +102,8 @@ export const WorkingHoursDetail = db.define(
       autoIncrement: true,
     },
     SCHD_ID: { type: DataTypes.BIGINT },
+    LINE_NAME: { type: DataTypes.STRING },
+    SHIFT: { type: DataTypes.STRING },
     PLAN_WH: { type: DataTypes.INTEGER },
     ACT_WH: { type: DataTypes.INTEGER },
     PLAN_WH_OT: { type: DataTypes.INTEGER },
@@ -127,10 +129,38 @@ export const ManpowewrDailyDetail = db.define(
       autoIncrement: true,
     },
     SCHD_ID: { type: DataTypes.BIGINT },
+    SHIFT: { type: DataTypes.STRING },
+    LINE_NAME: { type: DataTypes.STRING },
     PLAN_MP: { type: DataTypes.INTEGER },
     ACT_MP: { type: DataTypes.INTEGER },
     PLAN_MP_OT: { type: DataTypes.INTEGER },
     ACT_MP_OT: { type: DataTypes.INTEGER },
+    CREATE_BY: { type: DataTypes.INTEGER },
+    CREATE_DATE: { type: DataTypes.DATE },
+    UPDATE_BY: { type: DataTypes.INTEGER },
+    UPDATE_DATE: { type: DataTypes.DATE },
+  },
+  {
+    freezeTableName: true,
+    createdAt: "CREATE_DATE",
+    updatedAt: "UPDATE_DATE",
+  }
+);
+
+export const RemarkDailyDetail = db.define(
+  "remark_detail",
+  {
+    ID_REMARK: {
+      type: DataTypes.BIGINT,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    SCHD_ID: { type: DataTypes.BIGINT },
+    SHIFT: { type: DataTypes.STRING },
+    LINE_NAME: { type: DataTypes.STRING },
+    PLAN_REMARK: { type: DataTypes.STRING },
+    ACT_REMARK: { type: DataTypes.STRING },
+    ACT_OT_REMARK: { type: DataTypes.STRING },
     CREATE_BY: { type: DataTypes.INTEGER },
     CREATE_DATE: { type: DataTypes.DATE },
     UPDATE_BY: { type: DataTypes.INTEGER },

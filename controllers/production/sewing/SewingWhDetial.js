@@ -2,6 +2,7 @@ import db from "../../../config/database.js";
 import { QueryTypes, Op } from "sequelize";
 import {
   ManpowewrDailyDetail,
+  RemarkDailyDetail,
   WorkingHoursDetail,
 } from "../../../models/production/sewing.mod.js";
 
@@ -13,6 +14,7 @@ export const postDailyWh = async (req, res) => {
     const findWh = await WorkingHoursDetail.findOne({
       where: {
         SCHD_ID: data.SCHD_ID,
+        SHIFT: data.SHIFT,
       },
     });
 
@@ -26,6 +28,7 @@ export const postDailyWh = async (req, res) => {
     const newwh = await WorkingHoursDetail.update(data, {
       where: {
         SCHD_ID: data.SCHD_ID,
+        SHIFT: data.SHIFT,
       },
     });
     return res
@@ -49,6 +52,7 @@ export const postWhMpOt = async (req, res) => {
     const checkMpOt = await ManpowewrDailyDetail.findOne({
       where: {
         SCHD_ID: dataPlan.SCHD_ID,
+        SHIFT: dataPlan.SHIFT,
       },
     });
 
@@ -56,6 +60,7 @@ export const postWhMpOt = async (req, res) => {
     const checkWhOt = await WorkingHoursDetail.findOne({
       where: {
         SCHD_ID: dataPlan.SCHD_ID,
+        SHIFT: dataPlan.SHIFT,
       },
     });
 
@@ -89,6 +94,43 @@ export const postWhMpOt = async (req, res) => {
     res.status(200).json({
       message: "success add Mp or WH ot",
     });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      message: "error processing request",
+      data: error,
+    });
+  }
+};
+
+//POST Remark  hours detail
+export const postRemark = async (req, res) => {
+  try {
+    const data = req.body;
+
+    const findRemark = await RemarkDailyDetail.findOne({
+      where: {
+        SCHD_ID: data.SCHD_ID,
+        SHIFT: data.SHIFT,
+      },
+    });
+
+    if (!findRemark) {
+      const newRemark = await RemarkDailyDetail.create(data);
+      return res
+        .status(200)
+        .json({ message: "Success Set Remark", data: newRemark });
+    }
+
+    const updateNwRemak = await RemarkDailyDetail.update(data, {
+      where: {
+        SCHD_ID: data.SCHD_ID,
+        SHIFT: data.SHIFT,
+      },
+    });
+    return res
+      .status(200)
+      .json({ message: "Success Update Remark", data: updateNwRemak });
   } catch (error) {
     console.log(error);
     res.status(404).json({

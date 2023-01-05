@@ -15,6 +15,7 @@ import {
 } from "../../controllers/production/sewing/SewingSmv.js";
 import {
   postDailyWh,
+  postRemark,
   postWhMpOt,
 } from "../../controllers/production/sewing/SewingWhDetial.js";
 import {
@@ -37,6 +38,7 @@ router.post("/sewing-mp/generate", postRegenerateMp);
 router.post("/sewing-wh-detail/", postDailyWh);
 router.post("/order/scan", QRScanSewing);
 router.post("/ot-mp-wh/", postWhMpOt);
+router.post("/daily-remark/", postRemark);
 
 router.patch("/sewing-mp/", updateManpowerDefault);
 

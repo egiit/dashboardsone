@@ -4,12 +4,13 @@ import { QueryDailyPlann } from "../../../models/planning/dailyPlan.mod.js";
 
 export const getDailyPlanning = async (req, res) => {
   try {
-    const { plannDate, sitename } = req.params;
+    const { plannDate, sitename, shift } = req.params;
 
     const pland = await db.query(QueryDailyPlann, {
       replacements: {
         plannDate: plannDate,
         sitename: sitename,
+        shift: shift,
       },
       type: QueryTypes.SELECT,
     });
