@@ -55,7 +55,7 @@ export const newOrderPOListing = async (req, res) => {
           CUSTOMER_PROGRAM,
           CUSTOMER_SEASON,
           ORDER_NO,
-          ORDER_REFERENCE_PO_NO,
+          // ORDER_REFERENCE_PO_NO,
           PRODUCT_ITEM_CODE,
           ORDER_STYLE_DESCRIPTION,
           ITEM_COLOR_CODE,
@@ -79,7 +79,7 @@ export const newOrderPOListing = async (req, res) => {
         if (joinAfterDecon.PLAN_EXFACTORY_DATE !== order.PLAN_EXFACTORY_DATE)
           joinAfterDecon.NEW_PLAN_EXFACTORY_DATE = order.PLAN_EXFACTORY_DATE;
 
-        await OrderPoListing.update(joinAfterDecon, {
+        const updtD = await OrderPoListing.update(joinAfterDecon, {
           where: {
             ORDER_NO: records.ORDER_NO,
             ORDER_STYLE_DESCRIPTION: records.ORDER_STYLE_DESCRIPTION,
@@ -87,8 +87,10 @@ export const newOrderPOListing = async (req, res) => {
             // MO_NO: records.MO_NO,
           },
         });
+        console.log({ msg: "update", data: updtD });
       } else {
-        await OrderPoListing.create(order);
+        const crtD = await OrderPoListing.create(order);
+        console.log({ msg: "data create", data: crtD });
       }
 
       if (i + 1 === dataOrder.length)
