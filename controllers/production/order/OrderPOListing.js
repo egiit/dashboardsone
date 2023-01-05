@@ -87,10 +87,8 @@ export const newOrderPOListing = async (req, res) => {
             // MO_NO: records.MO_NO,
           },
         });
-        console.log({ msg: "update", data: updtD });
       } else {
         const crtD = await OrderPoListing.create(order);
-        console.log({ msg: "data create", data: crtD });
       }
 
       if (i + 1 === dataOrder.length)
