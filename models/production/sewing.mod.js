@@ -28,6 +28,7 @@ export const SewingListLineByGroup = `SELECT DISTINCT a.ID_SITELINE, a.SITE, a.L
 a.FOREMAN, a.START_TIME, a.END_TIME 
 FROM  item_siteline a
 GROUP BY a.SITE, a.SITE_NAME, a.LINE_NAME`;
+
 export const SewingWorkdoneByDate = `SELECT * FROM ViewWorkdoneSewing WHERE ScanDate BETWEEN :startDate AND :endDate`;
 
 export const SiteLine = db.define(

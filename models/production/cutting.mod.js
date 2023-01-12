@@ -74,3 +74,23 @@ LEFT JOIN (
 WHERE a.ORDER_NO = :orderNo ORDER BY  a.ORDER_SIZE, a.BARCODE_SERIAL`;
 
 export const CuttingWorkdoneByDate = `SELECT * FROM ViewWorkdoneCutting WHERE ScanDate BETWEEN :startDate AND :endDate`;
+
+export const CuttinScanSewingIn = db.define(
+  "scan_sewing_in",
+  {
+    BARCODE_SERIAL: {
+      type: DataTypes.STRING,
+      primaryKey: true,
+    },
+    SCH_ID: { type: DataTypes.BIGINT },
+    SCHD_ID: { type: DataTypes.BIGINT },
+    SEWING_SCAN_BY: { type: DataTypes.BIGINT },
+    SEWING_SCAN_LOCATION: { type: DataTypes.STRING },
+    SEWING_SCAN_TIME: { type: DataTypes.DATE },
+  },
+  {
+    freezeTableName: true,
+    createdAt: "SEWING_SCAN_TIME",
+    updatedAt: false,
+  }
+);

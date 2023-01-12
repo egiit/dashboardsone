@@ -1,68 +1,171 @@
 import { Orders } from "../../../models/production/order.mod.js";
-import { ScanCutting } from "../../../models/production/cutting.mod.js";
-import moment from "moment";
+import db from "../../../config/database.js";
+import { QueryTypes, Op } from "sequelize";
 
+import {
+  CuttinScanSewingIn,
+  ScanCutting,
+} from "../../../models/production/cutting.mod.js";
+import moment from "moment";
+import {
+  QueryCheckSchdScan,
+  QueryfindQrSewingIn,
+} from "../../../models/planning/dailyPlan.mod.js";
 
 // CONTROLLER SCAN CUTTING
 export const QRScanCutting = async (req, res) => {
-    try {
-        const barcodeserial = req.body.barcodeserial;
-        const datetimenow = moment().format("YYYY-MM-DD HH:MM:SS");
+  try {
+    const barcodeserial = req.body.barcodeserial;
+    const datetimenow = moment().format("YYYY-MM-DD HH:MM:SS");
 
+    const checkBarcodeSerial = await Orders.findAll({
+      attributes: ["BARCODE_SERIAL"],
+      where: {
+        BARCODE_SERIAL: barcodeserial,
+      },
+    });
 
-        const checkBarcodeSerial = await Orders.findAll({
-            attributes: ["BARCODE_SERIAL"],
+    if (checkBarcodeSerial.length == 0) {
+      return res.status(400).json({
+        success: true,
+        message: "Barcode Serial not exist!",
+        data: [],
+      });
+    } else {
+      const checkCuttingScanTime = await ScanCutting.findAll({
+        attributes: ["BARCODE_SERIAL", "CUTTING_SCANTIME"],
+        where: {
+          BARCODE_SERIAL: barcodeserial,
+        },
+      });
+
+      if (checkCuttingScanTime[0].CUTTING_SCANTIME != null) {
+        res.status(200).json({
+          success: true,
+          message: "order already scan on cutting!",
+          data: checkCuttingScanTime,
+        });
+      } else {
+        await ScanCutting.update(
+          {
+            CUTTING_SCANTIME: datetimenow,
+          },
+          {
             where: {
-                BARCODE_SERIAL: barcodeserial,
-            }
+              BARCODE_SERIAL: barcodeserial,
+            },
+          }
+        );
+
+        res.status(200).json({
+          success: true,
+          data: [],
+          message: "order scan cutting successfully",
         });
-
-        if (checkBarcodeSerial.length == 0) {
-            return res.status(400).json({
-                success: true,
-                message: "Barcode Serial not exist!",
-                data: []
-            });
-        } else {
-            const checkCuttingScanTime = await ScanCutting.findAll({
-                attributes: ["BARCODE_SERIAL", "CUTTING_SCANTIME"],
-                where: {
-                    BARCODE_SERIAL: barcodeserial,
-                }
-            });
-
-
-            if (checkCuttingScanTime[0].CUTTING_SCANTIME != null) {
-                res.status(200).json({
-                    success: true,
-                    message: "order already scan on cutting!",
-                    data: checkCuttingScanTime
-                });
-            } else {
-                await ScanCutting.update({
-                    CUTTING_SCANTIME: datetimenow
-                }, {
-                    where: {
-                        BARCODE_SERIAL: barcodeserial
-                    }
-                });
-
-                res.status(200).json({
-                    success: true,
-                    data: [],
-                    message: "order scan cutting successfully",
-                });
-            }
-        }
-
-
-    } catch (error) {
-        res.status(404).json({
-            success: false,
-            data: error,
-            message: "error processing request"
-        });
+      }
     }
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      data: error,
+      message: "error processing request",
+    });
+  }
 };
 
-export default QRScanCutting;
+//CUTTING SEWING IN
+export const QRScanSewingIn = async (req, res) => {
+  try {
+    const { barcodeserial, schDate, sitename, lineName, userId } = req.body;
+    //check apakah barcode serial ada pada table orders detail
+    //find schedule
+    const checkBarcodeSerial = await db.query(QueryfindQrSewingIn, {
+      replacements: {
+        barcodeserial: barcodeserial,
+      },
+      type: QueryTypes.SELECT,
+    });
+
+    //jika tidak ada reject
+    if (checkBarcodeSerial.length === 0) {
+      return res.status(200).json({
+        success: true,
+        qrstatus: "error",
+        message: "QRCode Not Found",
+      });
+    }
+
+    //jika ada maka bandingkan dengan
+    if (checkBarcodeSerial) {
+      const valueBarcode = checkBarcodeSerial[0];
+
+      const checkScan = await CuttinScanSewingIn.findAll({
+        where: {
+          BARCODE_SERIAL: barcodeserial,
+        },
+      });
+      //jika ketemu sudah di scan reject
+      if (checkScan.length !== 0) {
+        return res.status(200).json({
+          success: true,
+          qrstatus: "duplicate",
+          message: "Already Scan",
+        });
+      }
+
+      const paramsFind = {
+        plannDate: schDate,
+        sitename: sitename,
+        lineName: lineName ? lineName : valueBarcode.LINE_NAME,
+        moNo: valueBarcode.MO_NO,
+        styleDesc: valueBarcode.ORDER_STYLE,
+        colorCode: valueBarcode.ORDER_COLOR,
+        sizeCode: valueBarcode.ORDER_SIZE,
+      };
+
+      //find schedule
+      const checkSchdNsize = await db.query(QueryCheckSchdScan, {
+        replacements: {
+          plannDate: schDate,
+          sitename: sitename,
+          lineName: lineName ? lineName : valueBarcode.LINE_NAME,
+          moNo: valueBarcode.MO_NO,
+          styleDesc: valueBarcode.ORDER_STYLE,
+          colorCode: valueBarcode.ORDER_COLOR,
+          sizeCode: valueBarcode.ORDER_SIZE,
+        },
+        type: QueryTypes.SELECT,
+      });
+
+      if (checkSchdNsize.length === 1) {
+        const { SCHD_ID, SCH_ID } = checkSchdNsize[0];
+        const dataBarcode = {
+          BARCODE_SERIAL: valueBarcode.BARCODE_SERIAL,
+          SCHD_ID,
+          SCH_ID,
+          SEWING_SCAN_BY: userId,
+          SEWING_SCAN_LOCATION: sitename,
+        };
+        const pushQrSewin = await CuttinScanSewingIn.create(dataBarcode);
+        if (pushQrSewin)
+          return res.status(200).json({
+            success: true,
+            qrstatus: "success",
+            message: "Scan Success",
+          });
+      }
+
+      return res.status(200).json({
+        success: true,
+        qrstatus: "error",
+        message: "Pls Find Line",
+      });
+    }
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      data: error,
+      message: "error processing request",
+    });
+  }
+};

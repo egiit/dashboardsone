@@ -1,5 +1,8 @@
 import express from "express";
-import { getDailyPlanning } from "../../controllers/production/planning/DailyPlanning.js";
+import {
+  getDailyPlanning,
+  getDailySchSewIn,
+} from "../../controllers/production/planning/DailyPlanning.js";
 import {
   deleteSchDataDetail,
   deleteSchHeader,
@@ -37,5 +40,7 @@ router.get("/group/:schId", getOneGroupDayliSch);
 
 //daily-planning
 router.get("/planning-daily/:plannDate/:sitename/:shift", getDailyPlanning);
+//daily-planning sewing in
+router.get("/planning-daily-sewin/:plannDate/:sitename", getDailySchSewIn);
 
 export default router;

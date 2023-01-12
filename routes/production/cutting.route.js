@@ -1,7 +1,10 @@
 import express from "express";
 const router = express.Router();
 
-import QRScanCutting from "../../controllers/production/cutting/CuttingScan.js";
+import {
+  QRScanCutting,
+  QRScanSewingIn,
+} from "../../controllers/production/cutting/CuttingScan.js";
 import { newQRCutting } from "../../controllers/production/cutting/CuttingGenerateQR.js";
 import {
   getCuttingOrder,
@@ -15,5 +18,6 @@ router.get("/order/bundle/:orderNo", getOrderByBLK);
 
 router.post("/order/qrgenerate", newQRCutting);
 router.post("/order/scan", QRScanCutting);
+router.post("/qr/scan-sewing-in", QRScanSewingIn);
 
 export default router;
