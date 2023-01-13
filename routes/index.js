@@ -12,7 +12,7 @@ import cuttingRoute from "./production/cutting.route.js";
 import sewingRoute from "./production/sewing.route.js";
 import planningRoute from "./production/planning.route.js";
 import pocapacityRoute from "./production/poByCap.route.js";
-
+import reportsrouter from "./production/reports.router.js";
 const router = express.Router();
 
 router.post("/login", Login);
@@ -29,6 +29,7 @@ router.use("/cutting", cuttingRoute);
 router.use("/sewing", sewingRoute);
 router.use("/planning", planningRoute);
 router.use("/pocapacity", pocapacityRoute);
+router.use("/reports", reportsrouter);
 
 router.all("*", (req, res, next) => {
   next(new ExpressError("Page Not Found", 404));
