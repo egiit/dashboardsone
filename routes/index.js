@@ -13,6 +13,8 @@ import sewingRoute from "./production/sewing.route.js";
 import planningRoute from "./production/planning.route.js";
 import pocapacityRoute from "./production/poByCap.route.js";
 import reportsrouter from "./production/reports.router.js";
+import qcroutes from "./production/qc.route.js";
+
 const router = express.Router();
 
 router.post("/login", Login);
@@ -29,6 +31,7 @@ router.use("/cutting", cuttingRoute);
 router.use("/sewing", sewingRoute);
 router.use("/planning", planningRoute);
 router.use("/pocapacity", pocapacityRoute);
+router.use("/qc", qcroutes);
 router.use("/reports", reportsrouter);
 
 router.all("*", (req, res, next) => {
