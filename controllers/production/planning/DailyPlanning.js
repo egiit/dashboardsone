@@ -3,6 +3,7 @@ import { QueryTypes, Op } from "sequelize";
 import {
   QueryDailyPlann,
   QueryDailySchSewIn,
+  QueryQcEndlineDaily,
 } from "../../../models/planning/dailyPlan.mod.js";
 
 export const getDailyPlanning = async (req, res) => {
@@ -40,7 +41,31 @@ export const getDailySchSewIn = async (req, res) => {
 
     return res.json(pland);
   } catch (error) {
-    console.log(error);
+    res.status(404).json({
+      message: "error processing request",
+      data: error,
+    });
+  }
+};
+
+//schedule untuk tablet qc Endline
+export const getDailyPlanningQCend = async (req, res) => {
+  try {
+    const { plannDate, sitename, linename, idstieline, shift } = req.params;
+
+    const pland = await db.query(QueryQcEndlineDaily, {
+      replacements: {
+        plannDate: plannDate,
+        sitename: sitename,
+        linename: linename,
+        idstieline: idstieline,
+        shift: shift,
+      },
+      type: QueryTypes.SELECT,
+    });
+
+    return res.json(pland);
+  } catch (error) {
     res.status(404).json({
       message: "error processing request",
       data: error,

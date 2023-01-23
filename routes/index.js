@@ -1,8 +1,11 @@
 import express from "express";
 import userRoute from "./setup/user.route.js";
 
-import { Login, Logout } from "../controllers/auth/Login.js";
-import { refreshToken } from "../controllers/auth/RefreshToken.js";
+import { Login, Logout, LoginQc, LogoutQc } from "../controllers/auth/Login.js";
+import {
+  refreshToken,
+  refreshTokenQc,
+} from "../controllers/auth/RefreshToken.js";
 import userAccesRoute from "./auth/userAccess.route.js";
 import getMenu from "../controllers/setup/Menu.js";
 import { getDept, getDeptById } from "../controllers/setup/Dept.js";
@@ -18,8 +21,11 @@ import qcroutes from "./production/qc.route.js";
 const router = express.Router();
 
 router.post("/login", Login);
+router.post("/loginqc", LoginQc);
 router.delete("/logout", Logout);
+router.delete("/logoutqc", LogoutQc);
 router.get("/token", refreshToken);
+router.get("/tokenQc", refreshTokenQc);
 router.get("/menu", getMenu);
 router.get("/dept", getDept);
 router.get("/dept/:id", getDeptById);

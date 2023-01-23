@@ -1,7 +1,12 @@
 import Users from "../../models/setup/users.mod.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
-
+import {
+  QcUsers,
+  QueryGetUserQc,
+} from "../../models/production/quality.mod.js";
+import { QueryTypes, Op } from "sequelize";
+import db from "../../config/database.js";
 // export const getUserLogin = async (req, res) =>{
 //   const users = await Users.findAll();
 //   res.json(users);
@@ -71,6 +76,108 @@ export const Logout = async (req, res) => {
   if (!user[0]) return res.sendStatus(204);
   const userId = user[0].USER_ID;
   await Users.update({ USER_REF_TOKEN: null }, { where: { USER_ID: userId } });
+  res.clearCookie("refreshToken");
+  return res.sendStatus(200);
+};
+
+export const LoginQc = async (req, res) => {
+  try {
+    const { QC_USERNAME, QC_USER_PASSWORD } = req.body;
+    const finduser = await db.query(QueryGetUserQc, {
+      replacements: {
+        userNameQc: QC_USERNAME,
+      },
+      type: QueryTypes.SELECT,
+    });
+
+    if (finduser.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "User Name or Password Incorrect" });
+    }
+
+    const user = finduser[0];
+    const match = await bcryptjs.compare(
+      QC_USER_PASSWORD,
+      user.QC_USER_PASSWORD
+    );
+
+    if (!match)
+      return res
+        .status(400)
+        .json({ message: "User Name or Password Incorrect" });
+    const userId = user.QC_USER_ID;
+    const username = user.QC_USERNAME;
+    const qcName = user.QC_NAME;
+    const qcType = user.QC_TYPE_NAME;
+    const siteName = user.SITE_NAME;
+    const lineName = user.LINE_NAME;
+    const idSiteLine = user.ID_SITELINE;
+    const shift = user.SHIFT;
+    const accessToken = jwt.sign(
+      {
+        userId,
+        username,
+        qcName,
+        qcType,
+        siteName,
+        lineName,
+        idSiteLine,
+        shift,
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "20s" }
+    );
+    const refreshToken = jwt.sign(
+      {
+        userId,
+        username,
+        qcName,
+        qcType,
+        siteName,
+        lineName,
+        idSiteLine,
+        shift,
+      },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "1d" }
+    );
+    await QcUsers.update(
+      { QC_USER_REF_TOKEN: refreshToken },
+      {
+        where: {
+          QC_USER_ID: userId,
+        },
+      }
+    );
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+    res.json({ accessToken });
+  } catch (error) {
+    res.status(404).json({ message: "User Name or Password Incorrect" });
+  }
+};
+
+export const LogoutQc = async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  //ambil token di client
+  if (!refreshToken) return res.sendStatus(204);
+  //jika tidak ada kasih respons forbiden
+  const user = await QcUsers.findAll({
+    where: {
+      QC_USER_REF_TOKEN: refreshToken,
+    },
+  });
+  //ambil token di server
+  if (!user[0]) return res.sendStatus(204);
+  const userId = user[0].QC_USER_ID;
+  await QcUsers.update(
+    { QC_USER_REF_TOKEN: null },
+    { where: { QC_USER_ID: userId } }
+  );
   res.clearCookie("refreshToken");
   return res.sendStatus(200);
 };

@@ -49,7 +49,7 @@ export const newOrderPOListing = async (req, res) => {
         // console.log(records);
         // Rest in Object Destructuring New Object/Data  PO Listing without Don’t Update Category and Change Name New Cloumn Date
         const {
-          MANUFACTURING_SITE,
+          // MANUFACTURING_SITE,
           CUSTOMER_NAME,
           CUSTOMER_DIVISION,
           CUSTOMER_PROGRAM,

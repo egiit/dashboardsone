@@ -128,7 +128,16 @@ export const QRScanSewingIn = async (req, res) => {
         type: QueryTypes.SELECT,
       });
 
-      if (checkSchdNsize.length === 1) {
+      // console.log({
+      //   plannDate: schDate,
+      //   sitename: sitename,
+      //   lineName: lineName ? lineName : valueBarcode.LINE_NAME,
+      //   moNo: valueBarcode.MO_NO,
+      //   styleDesc: valueBarcode.ORDER_STYLE,
+      //   colorCode: valueBarcode.ORDER_COLOR,
+      //   sizeCode: valueBarcode.ORDER_SIZE,
+      // });
+      if (checkSchdNsize.length > 0) {
         const { SCHD_ID, SCH_ID } = checkSchdNsize[0];
         const dataBarcode = {
           BARCODE_SERIAL: valueBarcode.BARCODE_SERIAL,
@@ -161,6 +170,7 @@ export const QRScanSewingIn = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error);
     res.status(404).json({
       success: false,
       data: error,
@@ -171,10 +181,11 @@ export const QRScanSewingIn = async (req, res) => {
 
 export const QrListAftrSewingIn = async (req, res) => {
   try {
-    const { schDate, sitename, barcodeserial } = req.params;
+    //line name disini tidak dipakai tapi dipakai untuk tablet
+    const { schDate, sitename, linename, barcodeserial } = req.params;
 
     const listQrAfterScan = await db.query(GetQrlistAftrScan, {
-      replacements: { schDate, sitename, barcodeserial },
+      replacements: { schDate, sitename, linename, barcodeserial },
       type: QueryTypes.SELECT,
     });
 

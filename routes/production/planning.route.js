@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getDailyPlanning,
+  getDailyPlanningQCend,
   getDailySchSewIn,
 } from "../../controllers/production/planning/DailyPlanning.js";
 import {
@@ -42,5 +43,10 @@ router.get("/group/:schId", getOneGroupDayliSch);
 router.get("/planning-daily/:plannDate/:sitename/:shift", getDailyPlanning);
 //daily-planning sewing in
 router.get("/planning-daily-sewin/:plannDate/:sitename", getDailySchSewIn);
+//daily-planning qcEndLine
+router.get(
+  "/planning-daily-qcend/:plannDate/:sitename/:linename/:idstieline/:shift/",
+  getDailyPlanningQCend
+);
 
 export default router;

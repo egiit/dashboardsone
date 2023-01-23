@@ -18,7 +18,7 @@ import {
 router.get("/order/list/:startDate/:endDate", getCuttingOrder);
 router.get("/order/bundle/:orderNo", getOrderByBLK);
 router.get(
-  "/qr/scan-sewing-in/:schDate/:sitename/:barcodeserial",
+  "/qr/scan-sewing-in/:schDate/:sitename/:linename/:barcodeserial",
   QrListAftrSewingIn
 );
 
