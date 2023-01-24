@@ -107,6 +107,7 @@ export const getGroupHeaderWeekSch = async (req, res) => {
   try {
     const { capId } = req.params;
     const decodCapId = decodeURIComponent(capId).toString();
+    // console.log(decodCapId);
 
     const weekSchHeadGroup = await db.query(QueryGetGroupSch, {
       replacements: {

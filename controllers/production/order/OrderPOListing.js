@@ -1,4 +1,14 @@
-import { OrderPoListing } from "../../../models/production/order.mod.js";
+import db from "../../../config/database.js";
+import { QueryTypes, Op } from "sequelize";
+import {
+  findNewCapId,
+  OrderPoListing,
+} from "../../../models/production/order.mod.js";
+import {
+  SchSizeAloc,
+  WeeklyProSchd,
+  WeekSchDetail,
+} from "../../../models/planning/weekLyPlan.mod.js";
 
 // CONTROLLER GET ALL ORDER DATA
 export const getOrderPOListing = async (req, res) => {
@@ -49,7 +59,7 @@ export const newOrderPOListing = async (req, res) => {
         // console.log(records);
         // Rest in Object Destructuring New Object/Data  PO Listing without Don’t Update Category and Change Name New Cloumn Date
         const {
-          // MANUFACTURING_SITE,
+          MANUFACTURING_SITE,
           CUSTOMER_NAME,
           CUSTOMER_DIVISION,
           CUSTOMER_PROGRAM,
@@ -70,6 +80,9 @@ export const newOrderPOListing = async (req, res) => {
 
         //Join New Data with existing Object/Data
         const joinAfterDecon = { ...records, ...newOrdr };
+        if (records.MANUFACTURING_SITE !== order.MANUFACTURING_SITE)
+          joinAfterDecon.NEW_MANUFACTURING_SITE = order.MANUFACTURING_SITE;
+
         if (records.TARGET_PCD !== order.TARGET_PCD)
           joinAfterDecon.NEW_TARGET_PCD = order.TARGET_PCD;
 
@@ -91,13 +104,15 @@ export const newOrderPOListing = async (req, res) => {
         const crtD = await OrderPoListing.create(order);
       }
 
-      if (i + 1 === dataOrder.length)
+      if (i + 1 === dataOrder.length) {
+        await updateIdCapacity(order.PRODUCTION_MONTH);
         return res.status(201).json({
           success: true,
           message: "Order PO Data Added Successfully",
           data: order,
           // duplicate: existData,
         });
+      }
     });
   } catch (error) {
     res.status(404).json({
@@ -107,3 +122,70 @@ export const newOrderPOListing = async (req, res) => {
     });
   }
 };
+
+//function for update ID Capacity in weekly_sch_schedule, weekly_prod_sch_detail, weekly_sch_size
+async function updateIdCapacity(prodMonth) {
+  //first find List NEW_ID_CAPACITY base on PO Listing updated controler on the top
+  const listCapNewId = await db.query(findNewCapId, {
+    replacements: {
+      prodMonth: prodMonth,
+    },
+    type: QueryTypes.SELECT,
+  });
+
+  //if finded do looping and update every table wit Capacity ID
+  if (listCapNewId.length > 0) {
+    listCapNewId.forEach(async (capNew) => {
+      //find and update Schedule Header
+      const schHeader = await WeeklyProSchd.findAll({
+        where: {
+          SCH_CAPACITY_ID: capNew.ID_CAPACITY,
+        },
+      });
+      if (schHeader) {
+        await WeeklyProSchd.update(
+          { SCH_CAPACITY_ID: capNew.NEW_ID_CAPACITY },
+          {
+            where: {
+              SCH_CAPACITY_ID: capNew.ID_CAPACITY,
+            },
+          }
+        );
+      }
+
+      //find and update Schedule Detail/daily
+      const schDetail = await WeekSchDetail.findAll({
+        where: {
+          SCHD_CAPACITY_ID: capNew.ID_CAPACITY,
+        },
+      });
+      if (schDetail) {
+        await WeekSchDetail.update(
+          { SCHD_CAPACITY_ID: capNew.NEW_ID_CAPACITY },
+          {
+            where: {
+              SCHD_CAPACITY_ID: capNew.ID_CAPACITY,
+            },
+          }
+        );
+      }
+
+      //find and update Schedule size
+      const schSize = await SchSizeAloc.findAll({
+        where: {
+          ID_CAPACITY: capNew.ID_CAPACITY,
+        },
+      });
+      if (schSize) {
+        await SchSizeAloc.update(
+          { ID_CAPACITY: capNew.NEW_ID_CAPACITY },
+          {
+            where: {
+              ID_CAPACITY: capNew.ID_CAPACITY,
+            },
+          }
+        );
+      }
+    });
+  }
+}

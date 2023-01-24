@@ -92,7 +92,7 @@ export const postPOMatrixDeliv = async (req, res) => {
         // pmdData.push(dataPmdDetail);
         const findPoCap = await PoMatrixDelivery.findOne({
           where: {
-            SITE_CODE: dataPmdDetail.SITE_CODE,
+            // SITE_CODE: dataPmdDetail.SITE_CODE,
             PROD_MONTH: dataPmdDetail.PROD_MONTH,
             EX_FACTORY: dataPmdDetail.EX_FACTORY,
             BUYER_CODE: dataPmdDetail.BUYER_CODE,

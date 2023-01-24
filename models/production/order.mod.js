@@ -142,6 +142,10 @@ export const OrderPoListing = db.define(
       type: DataTypes.STRING(15),
       allowNull: true,
     },
+    NEW_MANUFACTURING_SITE: {
+      type: DataTypes.STRING(15),
+      allowNull: true,
+    },
     ORDER_PRODUCT_ITEM_ID: {
       type: DataTypes.STRING(10),
       allowNull: true,
@@ -272,3 +276,6 @@ LEFT JOIN (
 	GROUP BY n.PDM_ID
 ) na ON na.PDM_ID  = a.PDM_ID
 WHERE b.ID_CAPACITY = :capId`;
+
+export const findNewCapId = `SELECT a.ID_CAPACITY, a.NEW_ID_CAPACITY
+FROM viewcapacity_new_id a WHERE a.PRODUCTION_MONTH = :prodMonth AND  NEW_ID_CAPACITY IS NOT NULL `;
