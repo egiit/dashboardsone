@@ -6,7 +6,7 @@ import {
 } from "../../controllers/production/sewing/SewingManpower.js";
 const router = express.Router();
 
-import QRScanSewing from "../../controllers/production/sewing/SewingScan.js";
+import { QRScanSewing } from "../../controllers/production/sewing/SewingScan.js";
 import {
   getListSmvHeader,
   getSewingSmvDetail,

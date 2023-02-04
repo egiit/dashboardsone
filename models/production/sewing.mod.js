@@ -186,3 +186,39 @@ LEFT JOIN item_siteline e ON e.ID_SITELINE = g.SCHD_ID_SITELINE
 LEFT JOIN order_qr_generate h ON  h.BARCODE_SERIAL = a.BARCODE_SERIAL
 WHERE g.SCHD_PROD_DATE = :schDate AND a.SEWING_SCAN_LOCATION = :sitename  AND 
 e.LINE_NAME LIKE :linename  AND a.BARCODE_SERIAL LIKE :barcodeserial`;
+
+export const ScanSewingOut = db.define(
+  "scan_sewing_out",
+  {
+    BARCODE_SERIAL: {
+      type: DataTypes.STRING,
+      primaryKey: true,
+    },
+    SCH_ID: { type: DataTypes.BIGINT },
+    SCHD_ID: { type: DataTypes.BIGINT },
+    SEWING_SCAN_BY: { type: DataTypes.BIGINT },
+    SEWING_SCAN_LOCATION: { type: DataTypes.STRING },
+    SEWING_SCAN_TIME: { type: DataTypes.DATE },
+  },
+  {
+    freezeTableName: true,
+    createdAt: "SEWING_SCAN_TIME",
+    updatedAt: false,
+  }
+);
+
+export const QuerySewingInQr = `SELECT a.BARCODE_SERIAL, h.BUNDLE_SEQUENCE, a.SCH_ID, a.SCHD_ID, b.BUYER_CODE, b.SITE_LINE, g.SCHD_SITE SITE_NAME, e.LINE_NAME,
+b.ORDER_NO, b.MO_NO, f.ORDER_REFERENCE_PO_NO ORDER_REF, f.ITEM_COLOR_NAME ORDER_COLOR, b.ORDER_STYLE, b.ORDER_SIZE, 
+b.ORDER_QTY, a.SEWING_SCAN_BY, d.USER_INISIAL, g.SCHD_PROD_DATE, DATE(a.SEWING_SCAN_TIME) SCAN_DATE, TIME(a.SEWING_SCAN_TIME) SCAN_TIME, 
+i.BARCODE_SERIAL BARCODE_TRANSFER, DATE(a.SEWING_SCAN_TIME) TRANSFER_DATE, TIME(i.SEWING_SCAN_TIME) TRANSFER_TIME	
+FROM scan_sewing_in a
+LEFT JOIN order_detail b ON a.BARCODE_SERIAL = b.BARCODE_SERIAL 
+LEFT JOIN weekly_prod_sch_detail g ON a.SCHD_ID = g.SCHD_ID
+LEFT JOIN viewcapacity f ON f.ID_CAPACITY = g.SCHD_CAPACITY_ID
+LEFT JOIN xref_user_web d ON a.SEWING_SCAN_BY = d.USER_ID 
+LEFT JOIN item_siteline e ON e.ID_SITELINE = g.SCHD_ID_SITELINE
+LEFT JOIN order_qr_generate h ON  h.BARCODE_SERIAL = a.BARCODE_SERIAL
+LEFT JOIN scan_sewing_out i ON i.BARCODE_SERIAL = a.BARCODE_SERIAL
+WHERE g.SCHD_PROD_DATE = :schDate AND a.SEWING_SCAN_LOCATION = :sitename  AND 
+e.LINE_NAME LIKE :linename  AND a.BARCODE_SERIAL LIKE :barcodeserial
+ORDER BY  b.ORDER_SIZE, h.BUNDLE_SEQUENCE`;

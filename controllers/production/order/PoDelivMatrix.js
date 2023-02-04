@@ -97,7 +97,7 @@ export const postPOMatrixDeliv = async (req, res) => {
             EX_FACTORY: dataPmdDetail.EX_FACTORY,
             BUYER_CODE: dataPmdDetail.BUYER_CODE,
             ORDER_NO: dataPmdDetail.ORDER_NO,
-            ORDER_REF_NO: dataPmdDetail.ORDER_REF_NO,
+            // ORDER_REF_NO: dataPmdDetail.ORDER_REF_NO,
             PACKING_METHOD: dataPmdDetail.PACKING_METHOD,
             COLOR_CODE: dataPmdDetail.COLOR_CODE,
             SIZE_CODE: dataPmdDetail.SIZE_CODE,
@@ -161,7 +161,6 @@ export const getMatrixPoDelivSize = async (req, res) => {
   try {
     const { capId } = req.params;
     const codeCapId = decodeURIComponent(capId);
-
     // console.log(codeCapId);
     const getPoDelivSize = await db.query(QueryGetPOMatrix, {
       replacements: {

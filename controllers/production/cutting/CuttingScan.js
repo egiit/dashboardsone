@@ -86,7 +86,7 @@ export const QRScanSewingIn = async (req, res) => {
       },
       type: QueryTypes.SELECT,
     });
-
+    // console.log(checkBarcodeSerial);
     //jika tidak ada reject
     if (checkBarcodeSerial.length === 0) {
       return res.status(200).json({
@@ -128,6 +128,7 @@ export const QRScanSewingIn = async (req, res) => {
         type: QueryTypes.SELECT,
       });
 
+      // console.log(checkSchdNsize);
       // console.log({
       //   plannDate: schDate,
       //   sitename: sitename,
@@ -170,7 +171,6 @@ export const QRScanSewingIn = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error);
     res.status(404).json({
       success: false,
       data: error,
