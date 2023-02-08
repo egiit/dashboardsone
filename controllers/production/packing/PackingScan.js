@@ -20,6 +20,8 @@ export const ScanPackingQrIn = async (req, res) => {
       type: QueryTypes.SELECT,
     });
 
+    console.log(checkBarcodeSerial);
+
     if (checkBarcodeSerial.length === 0) {
       return res.status(200).json({
         qrstatus: "error",
@@ -58,6 +60,7 @@ export const ScanPackingQrIn = async (req, res) => {
       message: "OK",
     });
   } catch (error) {
+    console.log(error);
     res.status(404).json({
       success: false,
       qrstatus: "error",

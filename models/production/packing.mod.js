@@ -8,6 +8,8 @@ export const ScanPackingIn = db.define(
       type: DataTypes.STRING,
       primaryKey: true,
     },
+    SCHD_ID: { type: DataTypes.BIGINT },
+    SCH_ID: { type: DataTypes.BIGINT },
     PACKING_SCAN_BY: { type: DataTypes.BIGINT },
     PACKING_SCAN_LOCATION: { type: DataTypes.STRING },
     PACKING_SCAN_TIME: { type: DataTypes.DATE },
