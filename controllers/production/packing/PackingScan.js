@@ -4,8 +4,10 @@ import moment from "moment";
 
 import {
   FindTransferData,
+  QueryResPackScanIn,
   ScanPackingIn,
 } from "../../../models/production/packing.mod.js";
+import { QueryDailyPlanPackIn } from "../../../models/planning/dailyPlan.mod.js";
 
 // CONTROLLER SCAN PACKING
 export const ScanPackingQrIn = async (req, res) => {
@@ -20,7 +22,7 @@ export const ScanPackingQrIn = async (req, res) => {
       type: QueryTypes.SELECT,
     });
 
-    console.log(checkBarcodeSerial);
+    // console.log(req.body);
 
     if (checkBarcodeSerial.length === 0) {
       return res.status(200).json({
@@ -44,7 +46,8 @@ export const ScanPackingQrIn = async (req, res) => {
       });
     }
 
-    const addQr = await ScanPackingIn.create(req.body);
+    const barcodePacking = { ...checkBarcodeSerial[0], ...req.body };
+    const addQr = await ScanPackingIn.create(barcodePacking);
 
     if (!addQr)
       return res.status(400).json({
@@ -69,4 +72,54 @@ export const ScanPackingQrIn = async (req, res) => {
   }
 };
 
-//FOR FIND TRANSFER QR
+//resulst packscan in
+export const QrListAftrPackingIn = async (req, res) => {
+  try {
+    //line line name dan barcode serialhanya  pemaniss
+    const { scanDate, linename, barcodeserial } = req.params;
+
+    const listQrAfterScan = await db.query(QueryResPackScanIn, {
+      replacements: { scanDate, linename, barcodeserial },
+      type: QueryTypes.SELECT,
+    });
+
+    if (listQrAfterScan)
+      return res.status(200).json({
+        success: true,
+        message: "Found Data Scan",
+        data: listQrAfterScan,
+      });
+  } catch (error) {
+    // console.log(error);
+    res.status(404).json({
+      success: false,
+      data: error,
+      message: "error processing request",
+    });
+  }
+};
+
+export const getDailyPlanPackIn = async (req, res) => {
+  try {
+    const { schDate } = req.params;
+
+    const listPlanning = await db.query(QueryDailyPlanPackIn, {
+      replacements: { schDate },
+      type: QueryTypes.SELECT,
+    });
+
+    if (listPlanning)
+      return res.status(200).json({
+        success: true,
+        message: "Found Data Scan",
+        data: listPlanning,
+      });
+  } catch (error) {
+    // console.log(error);
+    res.status(404).json({
+      success: false,
+      data: error,
+      message: "error processing request",
+    });
+  }
+};

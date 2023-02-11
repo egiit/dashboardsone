@@ -19,6 +19,8 @@ import {
   QueryGetLastRttDefBS,
   QueryGetListDefect,
   QueryGetListPart,
+  QueryGetQrPendding,
+  QueryPlanSizePending,
 } from "../../../models/production/quality.mod.js";
 import { CuttinScanSewingIn } from "../../../models/production/cutting.mod.js";
 
@@ -234,7 +236,7 @@ export const getDataQcEndSizeResult = async (req, res) => {
 
     return res.json(getQREndlineQty);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(404).json({
       message: "error processing get data qr qty",
       data: error,
@@ -305,9 +307,11 @@ export const planSizePost = async (req, res) => {
       delete dataPlanSize.PLANSIZE_MOD_ID;
       const dataplanSizePost = await PlanSize.create(dataPlanSize);
       if (dataplanSizePost) {
-        return res
-          .status(200)
-          .json({ message: "New Plan Size", data: dataplanSizePost });
+        return res.status(200).json({
+          staus: "create",
+          message: "New Plan Size",
+          data: dataplanSizePost,
+        });
       }
     }
 
@@ -320,15 +324,57 @@ export const planSizePost = async (req, res) => {
     });
 
     if (updatePlanSize) {
-      return res
-        .status(200)
-        .json({ message: "Update Plan Size", data: updatePlanSize });
+      return res.status(200).json({
+        staus: "update",
+        message: "Update Plan Size",
+        data: updatePlanSize,
+      });
     }
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(404).json({
       message: "error processing Plan Size",
       data: error,
+    });
+  }
+};
+
+//update plansize after inspection or closed main button
+export const planSizeUpdate = async (req, res) => {
+  try {
+    let dataPlanSize = req.body;
+    if (!dataPlanSize.PLANSIZE_ID) {
+      return res.status(404).json({
+        message: "NO Plan Size ID",
+      });
+    }
+    const totalQty = parseInt(dataPlanSize.QTY);
+    const goodQty =
+      parseInt(dataPlanSize.RTT) + parseInt(dataPlanSize.REPAIRED);
+    // console.log(totalQty);
+    // console.log(goodQty);
+
+    dataPlanSize.COMPLETE_STATUS = null;
+    dataPlanSize.GOOD = goodQty;
+
+    if (totalQty === goodQty) {
+      dataPlanSize.COMPLETE_STATUS = "Y";
+    }
+    const updatePlanSize = await PlanSize.update(dataPlanSize, {
+      where: {
+        PLANSIZE_ID: dataPlanSize.PLANSIZE_ID,
+      },
+    });
+    return res.status(200).json({
+      staus: "update",
+      message: "Update Plan Size After Count",
+      data: updatePlanSize,
+    });
+  } catch (error) {
+    return res.status(404).json({
+      success: false,
+      data: error,
+      message: "error Update Plan Size After Count",
     });
   }
 };
@@ -472,7 +518,7 @@ export async function sewingScanOut(req, res) {
       message: "error transfer QR",
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(404).json({
       success: false,
       data: error,
@@ -480,3 +526,45 @@ export async function sewingScanOut(req, res) {
     });
   }
 }
+
+//get plansize pendding
+export const getPlanSizePendding = async (req, res) => {
+  try {
+    const { schDate, sitename, linename } = req.params;
+    const planSizePendding = await db.query(QueryPlanSizePending, {
+      type: QueryTypes.SELECT,
+      replacements: { schDate, sitename, linename },
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: planSizePendding,
+    });
+  } catch (error) {
+    res.status(404).json({
+      message: "error processing request plansize pendding",
+      data: error,
+    });
+  }
+};
+
+//get Qr List pendding
+export const getQrListPendding = async (req, res) => {
+  try {
+    const { schDate, sitename, linename } = req.params;
+    const qrlistPendding = await db.query(QueryGetQrPendding, {
+      type: QueryTypes.SELECT,
+      replacements: { schDate, sitename, linename },
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: qrlistPendding,
+    });
+  } catch (error) {
+    res.status(404).json({
+      message: "error processing request Qr List pendding",
+      data: error,
+    });
+  }
+};

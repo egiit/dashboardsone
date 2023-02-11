@@ -12,9 +12,12 @@ import {
   getListDefect,
   getListPart,
   getPlanningEendBySize,
+  getPlanSizePendding,
+  getQrListPendding,
   GetQrSewingIn,
   handleUndo,
   planSizePost,
+  planSizeUpdate,
   postEndlineOutput,
   repairedProccess,
   SetActualMp,
@@ -47,14 +50,25 @@ router.get(
   "/endline/qr-sewing-in/:schDate/:sitename/:linename/:barcodeserial",
   GetQrSewingIn
 );
+//get list qr pendding
+router.get(
+  "/endline/qr-sewing-in-pend/:schDate/:sitename/:linename",
+  getQrListPendding
+);
 
-//qc endline qr output qty
+//qc endline inspection resullt main button
 router.get("/endline/planz/:schdid/:size", getDataQcEndSizeResult);
+//get plansize pendding
+router.get(
+  "/endline/planz-pendding/:schDate/:sitename/:linename/",
+  getPlanSizePendding
+);
 router.get("/endline/defect/:schdid/:size", getDefForRepair);
 
 //post qc endline tablet
 router.post("/endline/output", postEndlineOutput);
 router.post("/endline/plansize", planSizePost);
+router.patch("/endline/plansize", planSizeUpdate);
 router.patch("/endline/repaired", repairedProccess);
 router.post("/endline/qr/transfer", sewingScanOut);
 
