@@ -13,6 +13,7 @@ import {
   getEndllineQROutput,
   PlanSize,
   QcEndlineOutput,
+  QcRemarks,
   QueryEndlinePlanSize,
   QueryGetDefForRepair,
   QueryGetLastRepaird,
@@ -562,6 +563,54 @@ export const getQrListPendding = async (req, res) => {
       data: qrlistPendding,
     });
   } catch (error) {
+    res.status(404).json({
+      message: "error processing request Qr List pendding",
+      data: error,
+    });
+  }
+};
+
+//add update remark
+export const postUpdtEndlineRmks = async (req, res) => {
+  try {
+    let dataRemark = req.body;
+
+    const checkRemark = await QcRemarks.findOne({
+      attributes: ["SCHD_ID", "ID_SITELINE", "TYPE_PROD"],
+      where: {
+        SCHD_ID: dataRemark.SCHD_ID,
+        ID_SITELINE: dataRemark.ID_SITELINE,
+        TYPE_PROD: dataRemark.TYPE_PROD,
+      },
+    });
+
+    if (checkRemark) {
+      const updateRmk = await QcRemarks.update(dataRemark, {
+        where: {
+          SCHD_ID: dataRemark.SCHD_ID,
+          ID_SITELINE: dataRemark.ID_SITELINE,
+          TYPE_PROD: dataRemark.TYPE_PROD,
+        },
+      });
+
+      delete dataRemark.ADD_ID;
+      return res.status(200).json({
+        success: true,
+        message: "Remark Updated",
+        data: updateRmk,
+      });
+    }
+
+    delete dataRemark.MOD_ID;
+    const addDataRemark = await QcRemarks.create(dataRemark);
+
+    return res.status(200).json({
+      success: true,
+      message: "Remark Added",
+      data: addDataRemark,
+    });
+  } catch (error) {
+    console.log(error);
     res.status(404).json({
       message: "error processing request Qr List pendding",
       data: error,

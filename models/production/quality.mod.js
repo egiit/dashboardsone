@@ -46,6 +46,30 @@ export const QcType = db.define(
   }
 );
 
+export const QcRemarks = db.define(
+  "qc_endline_remark",
+  {
+    SCHD_ID: {
+      type: DataTypes.INTEGER,
+    },
+    ID_SITELINE: { type: DataTypes.STRING, allowNull: false },
+    TYPE_PROD: { type: DataTypes.STRING, allowNull: false },
+    REMARK: { type: DataTypes.TEXT },
+    PROD_DATE: { type: DataTypes.DATE },
+    ADD_ID: { type: DataTypes.INTEGER },
+    MOD_ID: { type: DataTypes.INTEGER },
+    ADD_DATE: { type: DataTypes.DATE },
+    MOD_DATE: { type: DataTypes.DATE },
+  },
+  {
+    freezeTableName: true,
+    createdAt: "ADD_DATE",
+    updatedAt: "MOD_DATE",
+  }
+);
+
+QcRemarks.removeAttribute("id");
+
 export const QcUsers = db.define(
   "qc_inspection_user",
   {
