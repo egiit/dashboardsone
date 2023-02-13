@@ -130,7 +130,7 @@ LEFT JOIN (
 			CASE WHEN xc.TYPE_PROD = 'O'  THEN  xc.REMARK END AS OT_REMARK
   	FROM (
 			SELECT a.SCHD_ID, a.ID_SITELINE, a.TYPE_PROD, a.REMARK
-			FROM qc_endline_remark a WHERE a.PROD_DATE = '2023-02-06' AND a.ID_SITELINE = 'SLD0000001' 
+			FROM qc_endline_remark a WHERE a.PROD_DATE = :plannDate  AND a.ID_SITELINE = :idstieline 
 			)xc
 ) XN ON XN.SCHD_ID = a.SCHD_ID 
 WHERE a.SCHD_PROD_DATE = :plannDate   AND e.MP_DATE = :plannDate  AND d.SITE_NAME = :sitename AND d.LINE_NAME = :linename
