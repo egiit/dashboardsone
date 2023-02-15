@@ -10,6 +10,7 @@ import {
   ScanSewingOut,
 } from "../../../models/production/sewing.mod.js";
 import {
+  EndlineUndo,
   getEndllineQROutput,
   PlanSize,
   QcEndlineOutput,
@@ -55,7 +56,7 @@ export const SetActualMp = async (req, res) => {
       message: "Create Actual Manpower Successfully",
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(404).json({
       success: false,
       data: error,
@@ -82,7 +83,7 @@ export const GetQrSewingIn = async (req, res) => {
         data: listQrAfterScan,
       });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(404).json({
       success: false,
       data: error,
@@ -130,7 +131,7 @@ export const postEndlineOutput = async (req, res) => {
     handleAddUndo(dataGood);
     return res.json(postDataGood);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(404).json({
       message: "error processing request",
       data: error,
@@ -196,7 +197,7 @@ export const handleUndo = async (req, res) => {
       message: "No Data For Undo",
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(404).json({
       message: "error processing get Undo",
       data: error,
@@ -207,9 +208,9 @@ export const handleUndo = async (req, res) => {
 //get list plan size for main table
 export const getPlanningEendBySize = async (req, res) => {
   try {
-    const { schDate, sitename, linename } = req.params;
+    const { schDate, sitename, linename, userId } = req.params;
     const dataPlanBysize = await db.query(QueryEndlinePlanSize, {
-      replacements: { schDate, sitename, linename },
+      replacements: { schDate, sitename, linename, userId },
       type: QueryTypes.SELECT,
     });
 
@@ -218,7 +219,7 @@ export const getPlanningEendBySize = async (req, res) => {
       data: dataPlanBysize,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(404).json({
       message: "error processing get data planning by size",
       data: error,
@@ -256,7 +257,7 @@ export const getDefForRepair = async (req, res) => {
 
     return res.json(getDefList);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(404).json({
       message: "error processing get data Defect qty",
       data: error,
@@ -279,6 +280,7 @@ export const repairedProccess = async (req, res) => {
         { ENDLINE_REPAIR: "Y" },
         { where: { ENDLINE_OUT_ID: repair.ENDLINE_OUT_ID } }
       );
+      // console.log(repair);
       handleAddUndo({ ...repair, ENDLINE_OUT_TYPE: "REPAIR" });
       if (i + 1 === dataRepaird.length) {
         return res.status(200).json({ message: "Repaired Success" });
@@ -309,7 +311,7 @@ export const planSizePost = async (req, res) => {
       const dataplanSizePost = await PlanSize.create(dataPlanSize);
       if (dataplanSizePost) {
         return res.status(200).json({
-          staus: "create",
+          status: "create",
           message: "New Plan Size",
           data: dataplanSizePost,
         });
@@ -326,7 +328,7 @@ export const planSizePost = async (req, res) => {
 
     if (updatePlanSize) {
       return res.status(200).json({
-        staus: "update",
+        status: "update",
         message: "Update Plan Size",
         data: updatePlanSize,
       });
@@ -367,7 +369,7 @@ export const planSizeUpdate = async (req, res) => {
       },
     });
     return res.status(200).json({
-      staus: "update",
+      status: "update",
       message: "Update Plan Size After Count",
       data: updatePlanSize,
     });
@@ -382,35 +384,69 @@ export const planSizeUpdate = async (req, res) => {
 
 //funtion untuk mendambahkan qty undo
 async function handleAddUndo(data) {
-  const checkDataPlanSize = await PlanSize.findOne({
+  const checkEndUndo = await EndlineUndo.findOne({
     where: {
       SCHD_ID: data.ENDLINE_SCHD_ID,
-      ORDER_SIZE: data.ENDLINE_PLAN_SIZE,
+      PLANSIZE_ID: data.PLANSIZE_ID,
+      USER_ID: data.ENDLINE_ADD_ID,
     },
   });
 
-  if (checkDataPlanSize) {
-    const { PLANSIZE_ID, UNDO_RTT, UNDO_DEFECT, UNDO_BS, UNDO_REPAIR } =
-      checkDataPlanSize.dataValues;
+  if (!checkEndUndo) {
+    const newUndo = {
+      SCHD_ID: data.ENDLINE_SCHD_ID,
+      PLANSIZE_ID: data.PLANSIZE_ID,
+      USER_ID: data.ENDLINE_ADD_ID,
+      ADD_ID: data.ENDLINE_ADD_ID,
+      NDO_RTT: data.ENDLINE_OUT_TYPE === "RTT" ? 1 : 0,
+      UNDO_DEFECT: data.ENDLINE_OUT_TYPE === "DEFECT" ? 1 : 0,
+      UNDO_BS: data.ENDLINE_OUT_TYPE === "BS" ? 1 : 0,
+      UNDO_REPAIR: data.ENDLINE_OUT_TYPE === "REPAIR" ? 1 : 0,
+    };
+    return await EndlineUndo.create(newUndo);
+  }
+
+  if (checkEndUndo) {
+    const {
+      PLANSIZE_ID,
+      SCHD_ID,
+      USER_ID,
+      UNDO_RTT,
+      UNDO_DEFECT,
+      UNDO_BS,
+      UNDO_REPAIR,
+    } = checkEndUndo.dataValues;
     switch (data.ENDLINE_OUT_TYPE) {
       case "RTT":
         if (UNDO_RTT < 3) {
-          return updateUndo({ UNDO_RTT: UNDO_RTT + 1 }, { PLANSIZE_ID });
+          return updateUndo(
+            { UNDO_RTT: UNDO_RTT + 1 },
+            { PLANSIZE_ID, SCHD_ID, USER_ID }
+          );
         }
         break;
       case "DEFECT":
         if (UNDO_DEFECT < 3) {
-          return updateUndo({ UNDO_DEFECT: UNDO_DEFECT + 1 }, { PLANSIZE_ID });
+          return updateUndo(
+            { UNDO_DEFECT: UNDO_DEFECT + 1 },
+            { PLANSIZE_ID, SCHD_ID, USER_ID }
+          );
         }
         break;
       case "BS":
         if (UNDO_BS < 3) {
-          return updateUndo({ UNDO_BS: UNDO_BS + 1 }, { PLANSIZE_ID });
+          return updateUndo(
+            { UNDO_BS: UNDO_BS + 1 },
+            { PLANSIZE_ID, SCHD_ID, USER_ID }
+          );
         }
         break;
-      case "REPAIRD":
+      case "REPAIR":
         if (UNDO_REPAIR < 3) {
-          return updateUndo({ UNDO_REPAIR: UNDO_REPAIR + 1 }, { PLANSIZE_ID });
+          return updateUndo(
+            { UNDO_REPAIR: UNDO_REPAIR + 1 },
+            { PLANSIZE_ID, SCHD_ID, USER_ID }
+          );
         }
         break;
 
@@ -421,35 +457,56 @@ async function handleAddUndo(data) {
 }
 //funtion untuk mendambahkan qty undo
 async function handleMinUndo(data) {
-  const checkDataPlanSize = await PlanSize.findOne({
+  // console.log(data);
+  const checkEndUndo = await EndlineUndo.findOne({
     where: {
       SCHD_ID: data.SCHD_ID,
-      ORDER_SIZE: data.ORDER_SIZE,
+      PLANSIZE_ID: data.PLANSIZE_ID,
+      USER_ID: data.USER_ID,
     },
   });
 
-  if (checkDataPlanSize) {
-    const { PLANSIZE_ID, UNDO_RTT, UNDO_DEFECT, UNDO_BS, UNDO_REPAIR } =
-      checkDataPlanSize.dataValues;
+  if (checkEndUndo) {
+    const {
+      PLANSIZE_ID,
+      SCHD_ID,
+      USER_ID,
+      UNDO_RTT,
+      UNDO_DEFECT,
+      UNDO_BS,
+      UNDO_REPAIR,
+    } = checkEndUndo.dataValues;
     switch (data.ENDLINE_OUT_TYPE) {
       case "RTT":
         if (UNDO_RTT > 0) {
-          return updateUndo({ UNDO_RTT: UNDO_RTT - 1 }, { PLANSIZE_ID });
+          return updateUndo(
+            { UNDO_RTT: UNDO_RTT - 1 },
+            { PLANSIZE_ID, SCHD_ID, USER_ID }
+          );
         }
         break;
       case "DEFECT":
         if (UNDO_DEFECT > 0) {
-          return updateUndo({ UNDO_DEFECT: UNDO_DEFECT - 1 }, { PLANSIZE_ID });
+          return updateUndo(
+            { UNDO_DEFECT: UNDO_DEFECT - 1 },
+            { PLANSIZE_ID, SCHD_ID, USER_ID }
+          );
         }
         break;
       case "BS":
         if (UNDO_BS > 0) {
-          return updateUndo({ UNDO_BS: UNDO_BS - 1 }, { PLANSIZE_ID });
+          return updateUndo(
+            { UNDO_BS: UNDO_BS - 1 },
+            { PLANSIZE_ID, SCHD_ID, USER_ID }
+          );
         }
         break;
       case "REPAIR":
         if (UNDO_REPAIR > 0) {
-          return updateUndo({ UNDO_REPAIR: UNDO_REPAIR - 1 }, { PLANSIZE_ID });
+          return updateUndo(
+            { UNDO_REPAIR: UNDO_REPAIR - 1 },
+            { PLANSIZE_ID, SCHD_ID, USER_ID }
+          );
         }
         break;
 
@@ -460,7 +517,7 @@ async function handleMinUndo(data) {
 }
 //for update add or min undo
 async function updateUndo(dataUpdate, dataWhere) {
-  await PlanSize.update(dataUpdate, {
+  return await EndlineUndo.update(dataUpdate, {
     where: dataWhere,
   }).catch((err) => console.log(err));
 }
@@ -531,10 +588,10 @@ export async function sewingScanOut(req, res) {
 //get plansize pendding
 export const getPlanSizePendding = async (req, res) => {
   try {
-    const { schDate, sitename, linename } = req.params;
+    const { schDate, sitename, linename, userId } = req.params;
     const planSizePendding = await db.query(QueryPlanSizePending, {
       type: QueryTypes.SELECT,
-      replacements: { schDate, sitename, linename },
+      replacements: { schDate, sitename, linename, userId },
     });
 
     return res.status(200).json({
@@ -610,7 +667,7 @@ export const postUpdtEndlineRmks = async (req, res) => {
       data: addDataRemark,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(404).json({
       message: "error processing request Qr List pendding",
       data: error,

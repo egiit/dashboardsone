@@ -42,7 +42,7 @@ router.post("/endline/act-manpower", SetActualMp);
 
 //planning size endline
 router.get(
-  "/endline/plan-by-size/:schDate/:sitename/:linename/",
+  "/endline/plan-by-size/:schDate/:sitename/:linename/:userId",
   getPlanningEendBySize
 );
 
@@ -61,7 +61,7 @@ router.get(
 router.get("/endline/planz/:schdid/:size", getDataQcEndSizeResult);
 //get plansize pendding
 router.get(
-  "/endline/planz-pendding/:schDate/:sitename/:linename/",
+  "/endline/planz-pendding/:schDate/:sitename/:linename/:userId",
   getPlanSizePendding
 );
 router.get("/endline/defect/:schdid/:size", getDefForRepair);
