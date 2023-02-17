@@ -1,5 +1,10 @@
 import express from "express";
 import {
+  getPlanningEendReport,
+  getQcEndCheckPerHour,
+  getQcEndSumPartDefCode,
+} from "../../controllers/production/quality/QcEndlineRep.js";
+import {
   createUserQC,
   deleteUserQC,
   getListQcType,
@@ -76,4 +81,18 @@ router.post("/endline/plan/remarks", postUpdtEndlineRmks);
 
 //undo
 router.patch("/endline/undo", handleUndo);
+
+//qc endlineReport
+router.get(
+  "/report/endline-planing/:schDate/:sitename/:shift",
+  getPlanningEendReport
+);
+router.get(
+  "/report/check-per-hour/:schDate/:idSiteLine/:schdId",
+  getQcEndCheckPerHour
+);
+router.get(
+  "/report/sum-part-def/:schDate/:idSiteLine/:schdId",
+  getQcEndSumPartDefCode
+);
 export default router;
