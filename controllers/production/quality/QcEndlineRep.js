@@ -3,6 +3,7 @@ import { QueryTypes, Op } from "sequelize";
 import {
   QueryDetailEndCheck,
   QueryDtlEndChckTblet,
+  QuerySumPartDefCodChk,
   QuerySumPartDefCodeCheck,
   QurTablPlanQcEndRep,
 } from "../../../models/production/qcEndRep.mod.js";
@@ -94,6 +95,31 @@ export const getQcEndChckTablet = async (req, res) => {
         schDate: schDate,
         idSiteLine: idSiteLine,
         //   schdId: schdId,
+      },
+      type: QueryTypes.SELECT,
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: checkPerHour,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(404).json({
+      message: "error processing get data check perhour",
+      data: error,
+    });
+  }
+};
+
+//get list qc endline check per hour tablet
+export const getQcEndDefReprTblt = async (req, res) => {
+  try {
+    const { schDate, idSiteLine } = req.params;
+    const checkPerHour = await db.query(QuerySumPartDefCodChk, {
+      replacements: {
+        schDate: schDate,
+        idSiteLine: idSiteLine,
       },
       type: QueryTypes.SELECT,
     });

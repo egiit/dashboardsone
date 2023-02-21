@@ -3,6 +3,7 @@ import {
   getPlanningEendReport,
   getQcEndChckTablet,
   getQcEndCheckPerHour,
+  getQcEndDefReprTblt,
   getQcEndSumPartDefCode,
 } from "../../controllers/production/quality/QcEndlineRep.js";
 import {
@@ -99,5 +100,9 @@ router.get(
 router.get(
   "/report/sum-per-hour-tablet/:schDate/:idSiteLine",
   getQcEndChckTablet
+);
+router.get(
+  "/report/sum-part-def-tablet/:schDate/:idSiteLine",
+  getQcEndDefReprTblt
 );
 export default router;
