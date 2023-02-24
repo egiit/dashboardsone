@@ -5,9 +5,9 @@ import { QueryWorkerDone } from "../../../models/reports/workerdone.mod.js";
 //query get plan vs actual Manpower
 export const getWorkerDoneRep = async (req, res) => {
   try {
-    const { scanDate } = req.params;
+    const { startDate, endDate } = req.params;
     const workerdone = await db.query(QueryWorkerDone, {
-      replacements: { scanDate },
+      replacements: { startDate, endDate },
       type: QueryTypes.SELECT,
     });
 
