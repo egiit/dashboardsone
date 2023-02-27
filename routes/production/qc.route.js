@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  getDailyDefDetail,
   getPlanningEendReport,
   getQcEndChckTablet,
   getQcEndCheckPerHour,
@@ -105,4 +106,9 @@ router.get(
   "/report/sum-part-def-tablet/:schDate/:idSiteLine",
   getQcEndDefReprTblt
 );
+router.get(
+  "/report/detail-defect/:schDate/:sitename/:shift",
+  getDailyDefDetail
+);
+
 export default router;

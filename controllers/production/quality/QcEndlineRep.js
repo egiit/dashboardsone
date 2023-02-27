@@ -2,6 +2,7 @@ import db from "../../../config/database.js";
 import { QueryTypes, Op } from "sequelize";
 import {
   QueryDetailEndCheck,
+  QueryDtlDayDef,
   QueryDtlEndChckTblet,
   QuerySumPartDefCodChk,
   QuerySumPartDefCodeCheck,
@@ -132,6 +133,32 @@ export const getQcEndDefReprTblt = async (req, res) => {
     console.log(error);
     return res.status(404).json({
       message: "error processing get data check perhour",
+      data: error,
+    });
+  }
+};
+
+//get list detail defect
+export const getDailyDefDetail = async (req, res) => {
+  try {
+    const { schDate, sitename, shift } = req.params;
+    const detailSch = await db.query(QueryDtlDayDef, {
+      replacements: {
+        schDate: schDate,
+        sitename: sitename,
+        shift: shift,
+      },
+      type: QueryTypes.SELECT,
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: detailSch,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(404).json({
+      message: "error processing get deteail defect",
       data: error,
     });
   }
