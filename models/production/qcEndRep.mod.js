@@ -48,7 +48,7 @@ LEFT JOIN (
         FROM weekly_prod_sch_detail a
         LEFT JOIN viewqcendcheckall b ON a.SCHD_ID = b.ENDLINE_ACT_SCHD_ID 
          LEFT JOIN item_siteline c ON a.SCHD_ID_SITELINE = c.ID_SITELINE
-        WHERE a.SCHD_PROD_DATE = :schDate AND   b.ENDLINE_ID_SITELINE = :idSiteLine AND c.SHIFT = :shift
+        WHERE a.SCHD_PROD_DATE = :schDate AND    c.SITE_NAME = :sitename AND c.SHIFT = :shift
         ORDER BY b.HOUR_TIME    
 ) xs ON xs.ENDLINE_ACT_SCHD_ID = n.SCHD_ID
 group by n.SCHD_ID, n.SCH_ID, n.SCHD_PROD_DATE, n.ID_SITELINE,  n.SITE_NAME, n.LINE_NAME, n.SHIFT,	n.ORDER_REFERENCE_PO_NO, 
