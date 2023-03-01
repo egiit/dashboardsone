@@ -164,7 +164,7 @@ export const handleUndo = async (req, res) => {
 
       if (dataUndo.ENDLINE_OUT_TYPE === "REPAIR") {
         const ekseundoRep = await QcEndlineOutput.update(
-          { ENDLINE_REPAIR: null },
+          { ENDLINE_REPAIR: null, ENDLINE_ACT_RPR_SCHD_ID: null },
           {
             where: {
               ENDLINE_OUT_ID: lastRecod.ENDLINE_OUT_ID,
@@ -275,9 +275,13 @@ export const repairedProccess = async (req, res) => {
         data: error,
       });
 
+    // console.log(dataRepaird);
     dataRepaird.forEach(async (repair, i) => {
       await QcEndlineOutput.update(
-        { ENDLINE_REPAIR: "Y" },
+        {
+          ENDLINE_REPAIR: "Y",
+          ENDLINE_ACT_RPR_SCHD_ID: repair.ENDLINE_ACT_RPR_SCHD_ID,
+        },
         { where: { ENDLINE_OUT_ID: repair.ENDLINE_OUT_ID } }
       );
       // console.log(repair);

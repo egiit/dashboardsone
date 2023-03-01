@@ -144,6 +144,7 @@ export const QcEndlineOutput = db.define(
     ENDLINE_SCH_ID: { type: DataTypes.INTEGER },
     ENDLINE_SCHD_ID: { type: DataTypes.INTEGER },
     ENDLINE_ACT_SCHD_ID: { type: DataTypes.INTEGER },
+    ENDLINE_ACT_RPR_SCHD_ID: { type: DataTypes.INTEGER },
     ENDLINE_SCHD_DATE: { type: DataTypes.DATE },
     ENDLINE_SEQUANCE: { type: DataTypes.INTEGER },
     ENDLINE_TIME: { type: DataTypes.TIME },
