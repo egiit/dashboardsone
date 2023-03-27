@@ -41,7 +41,7 @@ LEFT JOIN workinghour_detail f ON f.SCHD_ID = a.SCHD_ID AND f.SHIFT = :shift
 LEFT JOIN mp_daily_detail m ON m.SCHD_ID = a.SCHD_ID AND m.SHIFT = :shift
 -- LEFT JOIN qc_endline_remark o ON o.SCHD_ID = a.SCHD_ID 
 WHERE a.SCHD_PROD_DATE = :schDate  AND e.MP_DATE = :schDate AND d.SITE_NAME = :sitename 
-)n LEFT JOIN qcendlineoutput xc ON xc.ENDLINE_ACT_SCHD_ID = n.SCHD_ID
+)n LEFT JOIN qcendlineoutput xc ON xc.ENDLINE_ACT_SCHD_ID = n.SCHD_ID AND xc.ENDLINE_ID_SITELINE = n.ID_SITELINE
 LEFT JOIN (
         SELECT a.SCHD_PROD_DATE, b.ENDLINE_ID_SITELINE, b.ENDLINE_ACT_SCHD_ID, 
         SUM(b.CHECKED) CHECKED, SUM(b.GOOD) GOOD, SUM(b.RTT) RTT, SUM(b.DEFECT) DEFECT, SUM(b.REPAIRED) REPAIRED, SUM(b.BS) BS
