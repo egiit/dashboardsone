@@ -94,7 +94,7 @@ ORDER by a.ID_SITELINE
 LEFT JOIN workinghour_detail f ON f.SCHD_ID = a.SCHD_ID AND f.SHIFT = :shift
 LEFT JOIN mp_daily_detail m ON m.SCHD_ID = a.SCHD_ID AND m.SHIFT = :shift
 LEFT JOIN remark_detail o ON o.SCHD_ID = a.SCHD_ID AND o.SHIFT = :shift
-LEFT JOIN qcendlineoutput p ON a.SCHD_ID = p.ENDLINE_ACT_SCHD_ID
+LEFT JOIN qcendlineoutput p ON a.SCHD_ID = p.ENDLINE_ACT_SCHD_ID AND p.ENDLINE_ID_SITELINE = :idstieline 
 LEFT JOIN (
 	SELECT xc.SCHD_ID, xc.ID_SITELINE, 
 			CASE WHEN xc.TYPE_PROD = 'N'  THEN  xc.REMARK END AS NORMAL_REMARK,
