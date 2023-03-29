@@ -18,6 +18,7 @@ import pocapacityRoute from "./production/poByCap.route.js";
 import reportsrouter from "./production/reports.router.js";
 import qcroutes from "./production/qc.route.js";
 import packingroute from "./production/packing.route.js";
+import measurement from "./production/measurement.route.js";
 
 const router = express.Router();
 
@@ -41,6 +42,7 @@ router.use("/pocapacity", pocapacityRoute);
 router.use("/qc", qcroutes);
 router.use("/reports", reportsrouter);
 router.use("/packing", packingroute);
+router.use("/measurement", measurement);
 
 router.all("*", (req, res, next) => {
   next(new ExpressError("Page Not Found", 404));
