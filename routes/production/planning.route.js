@@ -5,6 +5,7 @@ import {
   getDailySchSewIn,
 } from "../../controllers/production/planning/DailyPlanning.js";
 import {
+  checkBdllBfrDel,
   deleteSchDataDetail,
   deleteSchHeader,
   getCapacity,
@@ -35,7 +36,7 @@ router.get("/size-alocation/:capId/:schId", getPlanSizeAlocUpd);
 
 router.post("/daily", postSchDataDetail);
 router.patch("/daily", patchSchDataDetail);
-router.delete("/daily/:schId/:schdId", deleteSchDataDetail);
+router.delete("/daily/:schId/:schdId", checkBdllBfrDel, deleteSchDataDetail);
 router.get("/daily/:startDate/:endDate/:schId", getDayliSch);
 router.get("/group/:schId", getOneGroupDayliSch);
 

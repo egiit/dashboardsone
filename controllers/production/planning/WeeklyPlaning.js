@@ -15,6 +15,8 @@ import {
 } from "../../../models/planning/weekLyPlan.mod.js";
 import moment from "moment";
 import { totalCol, CheckNilai } from "../../util/Utility.js";
+import { PlanSize } from "../../../models/production/quality.mod.js";
+import { CuttinScanSewingIn } from "../../../models/production/cutting.mod.js";
 
 export const getCapacity = async (req, res) => {
   try {
@@ -220,10 +222,36 @@ export const deleteSchHeader = async (req, res) => {
       },
     });
 
-    //jika tidak ada maka delete
+    //jika tidak ada return
     if (!findSchHeader)
-      return res.status(404).json({
-        message: "Data Schedulue Tidak ditemukan",
+      return res.status(405).json({
+        message: "Data Schedulue Not Found",
+      });
+
+    //check apakah sudah ada scan box ke sewing
+    const findBundle = await CuttinScanSewingIn.findOne({
+      where: {
+        SCH_ID: schId,
+      },
+    });
+    //jika tidak ada return
+    if (!findBundle)
+      return res.status(405).json({
+        message:
+          "Can't Delete, Schedule already have bundle or box scan Sewing IN",
+      });
+
+    //check apakah sudah ada plan size
+    const findCheck = await PlanSize.findOne({
+      where: {
+        SCH_ID: schId,
+      },
+    });
+
+    //jika tidak ada return
+    if (!findCheck)
+      return res.status(405).json({
+        message: "Can't Delete, Already QC Endline Planing Size Check",
       });
 
     //cari daily or detail schedule
@@ -238,7 +266,7 @@ export const deleteSchHeader = async (req, res) => {
     if (detailSch.length > 0) {
       await WeekSchDetail.destroy({
         where: {
-          SCH_ID: findSchHeader.SCH_ID,
+          SCH_ID: schId,
         },
       });
     }
@@ -268,6 +296,7 @@ export const deleteSchHeader = async (req, res) => {
 
     res.status(200).json({ message: "Success Delete Sch" });
   } catch (error) {
+    console.log(error);
     res.status(404).json({
       success: false,
       message: "error Delete request",
@@ -336,7 +365,7 @@ export const postSchDataDetail = async (req, res) => {
       type: QueryTypes.SELECT,
     });
 
-    //jika apakah ada group
+    //jika  ada group header
     if (records.length > 0) {
       //check saldo header lebih dari alocation detail atau tidak
       const qtyAlocation = records.reduce(
@@ -698,3 +727,38 @@ export const getPlanSizeAlocUpd = async (req, res) => {
     });
   }
 };
+
+export async function checkBdllBfrDel(req, res, next) {
+  try {
+    const { schdId } = req.params;
+
+    const checks = WeekSchDetail.findOne({
+      where: {
+        SCHD_ID: schdId,
+      },
+    });
+
+    if (!checks) {
+      return res.status(404).json({ message: "No Data Schedule Detail" });
+    }
+
+    //check apakah sudah ada scan box ke sewing
+    const findBundle = await CuttinScanSewingIn.findOne({
+      where: {
+        SCHD_ID: schdId,
+      },
+    });
+    //jika tidak ada return
+    if (!findBundle)
+      return res.status(405).json({
+        message:
+          "Can't Delete, Schedule already have bundle or box scan Sewing IN",
+      });
+    next();
+  } catch (error) {
+    res.status(404).json({
+      message: "Problem When Delete Schedule Detail",
+      data: err,
+    });
+  }
+}
