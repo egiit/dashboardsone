@@ -749,7 +749,7 @@ export async function checkBdllBfrDel(req, res, next) {
       },
     });
     //jika tidak ada return
-    if (!findBundle)
+    if (findBundle)
       return res.status(405).json({
         message:
           "Can't Delete, Schedule already have bundle or box scan Sewing IN",

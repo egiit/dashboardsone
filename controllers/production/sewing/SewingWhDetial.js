@@ -10,7 +10,6 @@ import {
 export const postDailyWh = async (req, res) => {
   try {
     const data = req.body;
-
     const findWh = await WorkingHoursDetail.findOne({
       where: {
         SCHD_ID: data.SCHD_ID,
@@ -23,18 +22,18 @@ export const postDailyWh = async (req, res) => {
       return res
         .status(200)
         .json({ message: "Success Set Working Hours", data: newWh });
+    } else {
+      await WorkingHoursDetail.update(data, {
+        where: {
+          SCHD_ID: data.SCHD_ID,
+          SHIFT: data.SHIFT,
+        },
+      });
     }
 
-    const newwh = await WorkingHoursDetail.update(data, {
-      where: {
-        SCHD_ID: data.SCHD_ID,
-        SHIFT: data.SHIFT,
-      },
-    });
-    return res
-      .status(200)
-      .json({ message: "Success Set Working Hours", data: newwh });
+    return res.status(200).json({ message: "Success Set Working Hours" });
   } catch (error) {
+    console.log(error);
     res.status(404).json({
       message: "error processing request",
       data: error,

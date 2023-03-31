@@ -4,6 +4,8 @@ import { QueryTypes, Op } from "sequelize";
 
 import {
   CuttinScanSewingIn,
+  QryCutScanInWithSize,
+  QueryCheckQcOut,
   ScanCutting,
 } from "../../../models/production/cutting.mod.js";
 import moment from "moment";
@@ -209,16 +211,31 @@ export const DelQrScanSewIN = async (req, res) => {
   try {
     const { barcodeserial } = req.params;
 
-    const checkQr = await CuttinScanSewingIn.findAll({
-      where: {
-        BARCODE_SERIAL: barcodeserial,
+    const checkQr = await db.query(QryCutScanInWithSize, {
+      replacements: {
+        qrcode: barcodeserial,
       },
+      type: QueryTypes.SELECT,
     });
 
     if (!checkQr)
-      return res.status(200).json({
+      return res.status(202).json({
         success: false,
         message: "QR Not Found",
+      });
+
+    const checkOutput = await db.query(QueryCheckQcOut, {
+      replacements: {
+        sizeCode: checkQr[0].ORDER_SIZE,
+        schdId: checkQr[0].SCHD_ID,
+      },
+      type: QueryTypes.SELECT,
+    });
+
+    if (checkOutput)
+      return res.status(202).json({
+        success: false,
+        message: "Can't Delete QR Already Output QC Endline",
       });
 
     const deleteQr = await CuttinScanSewingIn.destroy({
@@ -234,6 +251,7 @@ export const DelQrScanSewIN = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error);
     res.status(404).json({
       success: false,
       data: error,

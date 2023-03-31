@@ -94,3 +94,17 @@ export const CuttinScanSewingIn = db.define(
     updatedAt: false,
   }
 );
+
+export const QryCutScanInWithSize = `SELECT a.SCH_ID, a.SCHD_ID, b.ORDER_QTY, b.BUYER_CODE, b.SITE_LINE SITE_LINE_FX, g.SCHD_SITE SITE_NAME, e.LINE_NAME,
+b.ORDER_NO, a.BARCODE_SERIAL, b.ORDER_SIZE, b.ORDER_QTY, f.BUNDLE_SEQUENCE 
+FROM scan_sewing_in a
+LEFT JOIN order_detail b ON a.BARCODE_SERIAL = b.BARCODE_SERIAL 
+LEFT JOIN weekly_prod_sch_detail g ON a.SCHD_ID = g.SCHD_ID
+LEFT JOIN item_siteline e ON e.ID_SITELINE = g.SCHD_ID_SITELINE
+LEFT JOIN order_qr_generate f ON f.BARCODE_SERIAL = a.BARCODE_SERIAL
+WHERE a.BARCODE_SERIAL = :qrcode `;
+
+export const QueryCheckQcOut = `SELECT a.ENDLINE_SCHD_DATE, a.PLANSIZE_ID, a.ENDLINE_PLAN_SIZE, a.ENDLINE_SCHD_ID, a.ENDLINE_ACT_SCHD_ID
+FROM qc_endline_output a
+WHERE a.ENDLINE_PLAN_SIZE = :sizeCode 
+AND  a.ENDLINE_SCHD_ID = :schdId`;
