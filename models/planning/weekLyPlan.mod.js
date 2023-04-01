@@ -183,3 +183,7 @@ LEFT JOIN (
 	GROUP BY n.PDM_ID
 )nb ON nb.PDM_ID  = a.PDM_ID
 WHERE b.ID_CAPACITY = :capId`;
+
+export const QryCheckOutput = `SELECT a.ENDLINE_SCHD_DATE, a.PLANSIZE_ID, a.ENDLINE_PLAN_SIZE, a.ENDLINE_SCHD_ID, a.ENDLINE_ACT_SCHD_ID
+FROM qc_endline_output a
+WHERE a.ENDLINE_ACT_SCHD_ID = :schdId`;

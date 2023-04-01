@@ -2,6 +2,7 @@ import db from "../../../config/database.js";
 import { QueryTypes, Op } from "sequelize";
 import {
   getSizeAlocForUpdtSch,
+  QryCheckOutput,
   QueryCapacity,
   QueryGetDayliSch,
   QueryGetGroupSch,
@@ -732,7 +733,7 @@ export async function checkBdllBfrDel(req, res, next) {
   try {
     const { schdId } = req.params;
 
-    const checks = WeekSchDetail.findOne({
+    const checks = await WeekSchDetail.findOne({
       where: {
         SCHD_ID: schdId,
       },
@@ -741,7 +742,6 @@ export async function checkBdllBfrDel(req, res, next) {
     if (!checks) {
       return res.status(404).json({ message: "No Data Schedule Detail" });
     }
-
     //check apakah sudah ada scan box ke sewing
     const findBundle = await CuttinScanSewingIn.findOne({
       where: {
@@ -753,6 +753,18 @@ export async function checkBdllBfrDel(req, res, next) {
       return res.status(405).json({
         message:
           "Can't Delete, Schedule already have bundle or box scan Sewing IN",
+      });
+
+    //check if any output with schd id
+    const checkOutput = await db.query(QryCheckOutput, {
+      replacements: { schdId },
+      type: QueryTypes.SELECT,
+    });
+
+    //if already output reject delete
+    if (checkOutput.length > 0)
+      return res.status(405).json({
+        message: "Can't Delete, Already Sewing Output",
       });
     next();
   } catch (error) {
