@@ -236,7 +236,7 @@ export const deleteSchHeader = async (req, res) => {
       },
     });
     //jika tidak ada return
-    if (!findBundle)
+    if (findBundle)
       return res.status(405).json({
         message:
           "Can't Delete, Schedule already have bundle or box scan Sewing IN",
@@ -250,7 +250,7 @@ export const deleteSchHeader = async (req, res) => {
     });
 
     //jika tidak ada return
-    if (!findCheck)
+    if (findCheck)
       return res.status(405).json({
         message: "Can't Delete, Already QC Endline Planing Size Check",
       });
