@@ -44,7 +44,7 @@ function logOriginalUrl(req, res, next) {
 var whitelist = [
   "http://localhost:3000",
   "http://localhost:3001",
-  "https://spmqc.sumbiri.com/",
+  "https://spmqc.sumbiri.com",
   "https://spm.sumbiri.com",
   "https://api.sumbiri.com",
 ];
