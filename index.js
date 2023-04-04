@@ -6,8 +6,10 @@ dotenv.config();
 import cookieParser from "cookie-parser";
 import FileUpload from "express-fileupload";
 import cors from "cors";
+import cron from "node-cron";
 
 import sumbiriOneRoute from "./routes/index.js";
+import { funcReschedule } from "./cronjob/cronSchdVsActual.js";
 
 // import fs from "fs"; //untuk ssl
 // import https from "https"; //untuk ssl
@@ -26,6 +28,11 @@ const runDb = async () => {
 };
 
 runDb();
+
+cron.schedule("* * 1 * *", () => {
+  console.log("running a task reschedule");
+  funcReschedule();
+});
 
 // app.use(cors());
 

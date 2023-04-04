@@ -54,14 +54,14 @@ LEFT JOIN item_siteline c ON a.SCH_ID_SITELINE = c.ID_SITELINE
 WHERE a.SCH_ID = :schId`;
 
 export const QueryGetDayliSch = `SELECT a.SCHD_ID, a.SCH_ID, a.SCHD_PROD_MONTH, a.SCHD_PROD_DATE, a.SCHD_SITE, a.SCHD_ID_SITELINE,
-a.SCHD_CAPACITY_ID, a.SCHD_DAYS_NUMBER, b.SCH_QTY SCHD_HEADER_QTY,  a.SCHD_HEAD_BALANCE, a.SCHD_QTY
+a.SCHD_CAPACITY_ID, a.SCHD_DAYS_NUMBER, b.SCH_QTY SCHD_HEADER_QTY, a.SCHD_STATUS_OUTPUT,  a.SCHD_HEAD_BALANCE, a.SCHD_QTY
 FROM weekly_prod_sch_detail a 
 LEFT JOIN weekly_prod_schedule b ON a.SCH_ID = b.SCH_ID
 WHERE a.SCHD_PROD_DATE BETWEEN :startDate AND :endDate AND a.SCH_ID LIKE :schId
 ORDER BY a.SCHD_DAYS_NUMBER`;
 
 export const QueryGetOneDayliSch = `SELECT a.SCHD_ID, a.SCH_ID, a.SCHD_PROD_MONTH, a.SCHD_PROD_DATE, a.SCHD_SITE, a.SCHD_ID_SITELINE,
-a.SCHD_CAPACITY_ID, a.SCHD_DAYS_NUMBER, b.SCH_QTY SCHD_HEADER_QTY,  a.SCHD_HEAD_BALANCE, a.SCHD_QTY
+a.SCHD_CAPACITY_ID, a.SCHD_DAYS_NUMBER, b.SCH_QTY SCHD_HEADER_QTY,  a.SCHD_HEAD_BALANCE, a.SCHD_QTY, a.SCHD_STATUS_OUTPUT
 FROM weekly_prod_sch_detail a 
 LEFT JOIN weekly_prod_schedule b ON a.SCH_ID = b.SCH_ID
 WHERE a.SCH_ID = :schId
@@ -107,6 +107,7 @@ export const WeekSchDetail = db.define(
     SCHD_HEADER_QTY: { type: DataTypes.INTEGER },
     SCHD_HEAD_BALANCE: { type: DataTypes.INTEGER },
     SCHD_QTY: { type: DataTypes.INTEGER },
+    SCHD_STATUS_OUTPUT: { type: DataTypes.STRING },
     SCHD_ADD_DATE: { type: DataTypes.DATE },
     SCHD_MOD_DATE: { type: DataTypes.DATE },
     SCHD_ADD_ID: { type: DataTypes.BIGINT },
@@ -187,3 +188,10 @@ WHERE b.ID_CAPACITY = :capId`;
 export const QryCheckOutput = `SELECT a.ENDLINE_SCHD_DATE, a.PLANSIZE_ID, a.ENDLINE_PLAN_SIZE, a.ENDLINE_SCHD_ID, a.ENDLINE_ACT_SCHD_ID
 FROM qc_endline_output a
 WHERE a.ENDLINE_ACT_SCHD_ID = :schdId`;
+
+export const QryCronPvsA = `SELECT a.ID_SITELINE, b.SCH_ID, b.SCHD_ID, b.SCHD_PROD_DATE, b.SCHD_QTY, b.TOTAL_OUTPUT 
+FROM item_line_running a 
+LEFT JOIN scheduel_vs_actual b ON a.ID_SITELINE = b.SCHD_ID_SITELINE 
+WHERE b.SCHD_PROD_DATE = '2023-03-31' -- DATE_SUB(CURDATE(), INTERVAL 1 DAY)`;
+
+export const QryChckShiftById = `SELECT a.ID_SITELINE, SUBSTRING_INDEX(a.SHIFT,"_",1) SHIFT  FROM item_siteline a WHERE a.ID_SITELINE = :idSiteline`;
