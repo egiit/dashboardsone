@@ -7,6 +7,7 @@ import {
   QryChckShiftById,
   QryCronPvsA,
   QueryGetOneDayliSch,
+  WeeklyProSchd,
   WeekSchDetail,
 } from "../models/planning/weekLyPlan.mod.js";
 import { QueryGetHoliday } from "../models/setup/holidays.mod.js";
@@ -69,8 +70,10 @@ export const funcReschedule = async () => {
           },
         }).then((res) => {
           if (i + 1 === newDnumber.length) {
-            if (newDet.SCHD_HEAD_BALANCE !== 0) {
-              createNewSchdl(newDet);
+            if (newDet.SCHD_HEAD_BALANCE > 0) {
+              createNewSchdl(newDet, newDnumber);
+            } else {
+              funcUpdateDate(newDnumber, newDet.SCH_ID);
             }
           }
         });
@@ -84,20 +87,8 @@ export const funcReschedule = async () => {
   }
 };
 
-//function untuk find sub total Header pada tiap detail
-function findSubValue(arryDetail, objDetail, daysNum) {
-  if (daysNum === 1) return objDetail.SCHD_HEADER_QTY - objDetail.SCHD_QTY;
-
-  const groupHeaderSch = arryDetail.filter((det, i) => i + 1 <= daysNum);
-
-  const nilaiGroupBefore = totalCol(groupHeaderSch, "SCHD_QTY");
-
-  const subDetailValue = objDetail.SCHD_HEADER_QTY - nilaiGroupBefore;
-  return subDetailValue;
-}
-
 //function untuk mendapatkan date berikutnnyna pada schedule yang memiliki balance
-export const createNewSchdl = async (newDet) => {
+export const createNewSchdl = async (newDet, datas) => {
   try {
     //check shift dengan menggunakan id siteline maka akan mereturn
     const chcekShift = await db.query(QryChckShiftById, {
@@ -140,9 +131,62 @@ export const createNewSchdl = async (newDet) => {
       SCHD_QTY: newSchd.SCHD_HEAD_BALANCE,
       SCHD_HEAD_BALANCE: 0,
       SCHD_ADD_ID: 0,
+      SCHD_STATUS_OUTPUT: "N",
     };
 
-    await WeekSchDetail.create(newBalance);
+    await WeekSchDetail.create(newBalance).then((res) => {
+      funcUpdateDate(datas, newDet.SCH_ID);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//function untuk find sub total Header pada tiap detail
+function findSubValue(arryDetail, objDetail, daysNum) {
+  if (daysNum === 1) return objDetail.SCHD_HEADER_QTY - objDetail.SCHD_QTY;
+
+  const groupHeaderSch = arryDetail.filter((det, i) => i + 1 <= daysNum);
+
+  const nilaiGroupBefore = totalCol(groupHeaderSch, "SCHD_QTY");
+
+  const subDetailValue = objDetail.SCHD_HEADER_QTY - nilaiGroupBefore;
+  return subDetailValue;
+}
+
+//function untuk update data start dan end date
+const funcUpdateDate = async (datas, schdId) => {
+  try {
+    if (datas.length > 0) {
+      const dataWhOutNull = datas.filter((data) => data.SCHD_QTY !== null);
+      const checkTotalSch = totalCol(dataWhOutNull, "SCHD_QTY");
+      const startDay = dataWhOutNull[0];
+      const finishDay = dataWhOutNull[dataWhOutNull.length - 1];
+      let updateDate = {
+        SCH_START_PROD: startDay.SCHD_PROD_DATE,
+        SCH_FINISH_PROD: finishDay.SCHD_PROD_DATE,
+      };
+
+      if (finishDay.SCHD_HEADER_QTY - checkTotalSch !== 0) {
+        delete updateDate.SCH_FINISH_PROD;
+      }
+
+      return await WeeklyProSchd.update(updateDate, {
+        where: {
+          SCH_ID: schdId,
+        },
+      });
+    }
+    const updateDate = {
+      SCH_START_PROD: null,
+      SCH_FINISH_PROD: null,
+    };
+
+    return await WeeklyProSchd.update(updateDate, {
+      where: {
+        SCH_ID: schdId,
+      },
+    });
   } catch (error) {
     console.log(error);
   }
