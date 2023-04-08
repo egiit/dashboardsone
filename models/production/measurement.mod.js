@@ -92,3 +92,23 @@ export const QryGetMesByOrder = `SELECT a.MES_CHART_NO, a.ORDER_NO, b.MES_BUYER,
 FROM  measurement_and_order a 
 LEFT JOIN measurement_chart b ON b.MES_CHART_NO = a.MES_CHART_NO
 WHERE  a.ORDER_NO = :orderNo`;
+
+export const QrcChckMeasChartOrdOut = `SELECT * FROM measurement_qc_output a WHERE a.MES_CHART_NO = :chartNo AND a.ORDDER_NO = :orderNo`;
+
+export const MeasChartNOrder = db.define(
+  "measurement_and_order",
+  {
+    MES_CHART_NO: { type: DataTypes.STRING },
+    ORDER_NO: { type: DataTypes.STRING },
+    ADD_ID: { type: DataTypes.BIGINT },
+    UPDATE_ID: { type: DataTypes.BIGINT },
+    ADD_DATE: { type: DataTypes.DATE },
+    UPDATE_DATE: { type: DataTypes.DATE },
+  },
+  {
+    freezeTableName: true,
+    createdAt: "ADD_DATE",
+    updatedAt: "UPDATE_DATE",
+  }
+);
+MeasChartNOrder.removeAttribute("id");

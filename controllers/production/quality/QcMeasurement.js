@@ -2,8 +2,10 @@ import db from "../../../config/database.js";
 import { QueryTypes, Op } from "sequelize";
 import {
   MeasChartDetail,
+  MeasChartNOrder,
   MeasPOM,
   MeasurementChart,
+  QrcChckMeasChartOrdOut,
   QrcChckMeasChartOut,
   QryGetMesByOrder,
   QryMesCheckInput,
@@ -487,10 +489,10 @@ export async function deleteMeasChart(req, res) {
   }
 }
 
+//chart by PO
 export async function getMeasurChartByPO(req, res) {
   try {
     const { orderNo } = req.params;
-
     if (!orderNo) {
       return res.status(404).json({ message: "No Order Requirment" });
     }
@@ -511,6 +513,101 @@ export async function getMeasurChartByPO(req, res) {
     console.log(error);
     return res.status(404).json({
       message: "error get data chart",
+      data: error,
+    });
+  }
+}
+
+export async function postChartToOrder(req, res) {
+  try {
+    const datas = req.body;
+    if (datas.length === 0) {
+      return res.status(404).json({ message: "No Data To Set" });
+    }
+
+    let duplicate = [];
+    let dataSuccess = [];
+    datas.forEach(async (data, i) => {
+      const findChart = await MeasChartNOrder.findAll({
+        where: {
+          MES_CHART_NO: data.MES_CHART_NO,
+          ORDER_NO: data.ORDER_NO,
+        },
+      });
+
+      if (findChart.length > 0) {
+        duplicate.push(data.MES_CHART_NO);
+      } else {
+        const pushSuccs = await MeasChartNOrder.create(data);
+        if (pushSuccs) dataSuccess.push(pushSuccs);
+      }
+
+      if (i + 1 === datas.length) {
+        const messag =
+          duplicate.length === 0
+            ? "Succeess Add"
+            : `Succeess Add Chart : ${
+                dataSuccess.length
+              } , Duplicate data : ${JSON.stringify(duplicate)}`;
+
+        if (dataSuccess.length === 0) {
+          return res
+            .status(202)
+            .json({ message: "ALL Chart Selected Already Set" });
+        }
+
+        return res.status(200).json({ message: messag });
+      }
+    });
+  } catch (error) {
+    return res.status(404).json({
+      message: "error get data chart",
+      data: error,
+    });
+  }
+}
+
+export async function removeChartInOrder(req, res) {
+  try {
+    const { MES_CHART_NO, ORDER_NO } = req.params;
+    const checkChartInOrd = await MeasChartNOrder.findAll({
+      where: {
+        MES_CHART_NO,
+        ORDER_NO,
+      },
+    });
+
+    if (!checkChartInOrd) {
+      return res.status(404).json({ message: "No Data For Remove" });
+    }
+
+    const chckChart = await db.query(QrcChckMeasChartOrdOut, {
+      replacements: {
+        chartNo: MES_CHART_NO,
+        orderNo: ORDER_NO,
+      },
+      type: QueryTypes.SELECT,
+    });
+
+    if (chckChart.length > 0) {
+      return res.status(404).json({
+        message: "Can't Remove, Already Ouput With This Chart NO And Order NO",
+      });
+    }
+
+    const deslete = await MeasChartNOrder.destroy({
+      where: {
+        MES_CHART_NO,
+        ORDER_NO,
+      },
+    });
+    if (deslete) {
+      return res.json({ message: "Success Remove Chart From Order" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(404).json({
+      message: "error remove chart",
       data: error,
     });
   }
