@@ -112,3 +112,49 @@ export const MeasChartNOrder = db.define(
   }
 );
 MeasChartNOrder.removeAttribute("id");
+
+export const MeasOutput = db.define(
+  "measurement_qc_output",
+  {
+    MES_CHART_NO: { type: DataTypes.STRING },
+    POM_ID: { type: DataTypes.STRING },
+    SIZE_CODE: { type: DataTypes.STRING },
+    BARCODE_SERIAL: { type: DataTypes.STRING },
+    MES_VALUE: { type: DataTypes.STRING },
+    ORDER_NO: { type: DataTypes.STRING },
+    MES_CAT: { type: DataTypes.STRING },
+    MES_SEQ: { type: DataTypes.INTEGER },
+    SCHD_ID: { type: DataTypes.BIGINT },
+    SITE_NAME: { type: DataTypes.STRING },
+    LINE_NAME: { type: DataTypes.STRING },
+    SHIFT: { type: DataTypes.STRING },
+    ADD_ID: { type: DataTypes.BIGINT },
+    createdAt: { type: DataTypes.DATE },
+    updatedAt: { type: DataTypes.DATE },
+  },
+  {
+    freezeTableName: true,
+    createdAt: "createdAt",
+    updatedAt: "updatedAt",
+  }
+);
+
+MeasOutput.removeAttribute("id");
+
+//QC end Measurement
+export const QryGetSpecQCend = `SELECT a.MES_CHART_NO, a.ORDER_NO, c.POM_ID, a.MES_UOM, c.POM_DESC, c.POM_PLUS, c.POM_MIN, b.SIZE_CODE, b.SPEC
+FROM (
+	SELECT a.MES_CHART_NO, a.ORDER_NO, b.MES_UOM, a.ADD_DATE 
+	FROM measurement_and_order a 
+	LEFT JOIN measurement_chart b ON b.MES_CHART_NO = a.MES_CHART_NO
+	WHERE a.ORDER_NO = :orderNo ORDER BY a.ADD_DATE DESC LIMIT 1 
+) a 
+LEFT JOIN measurement_chart_detail b ON a.MES_CHART_NO = b.MES_CHART_NO
+LEFT JOIN measurement_pom c ON c.MES_CHART_NO = a.MES_CHART_NO  AND b.POM_ID = c.POM_ID
+WHERE b.SIZE_CODE = :sizeCode `;
+
+export const QryGetDataMeasOut = `SELECT a.MES_CHART_NO, a.POM_ID, a.SIZE_CODE, a.MES_VALUE, a.BARCODE_SERIAL, a.MES_SEQ, a.MES_CAT, a.ORDER_NO,
+a.SCHD_ID, a.SITE_NAME, a.LINE_NAME, a.SHIFT, b.MES_UOM
+FROM measurement_qc_output a 
+LEFT JOIN measurement_chart b ON a.MES_CHART_NO = b.MES_CHART_NO
+WHERE a.BARCODE_SERIAL = :barcodeSerial  AND a.SITE_NAME = :siteName AND a.LINE_NAME = :lineName AND a.SIZE_CODE = :sizeCode`;
