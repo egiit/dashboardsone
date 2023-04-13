@@ -456,3 +456,25 @@ LEFT JOIN scan_sewing_out i ON i.BARCODE_SERIAL = a.BARCODE_SERIAL
 WHERE g.SCHD_PROD_DATE < :schDate AND a.SEWING_SCAN_LOCATION = :sitename  AND 
 e.LINE_NAME = :linename AND ISNULL(i.BARCODE_SERIAL) 
 ORDER BY  b.ORDER_SIZE, h.BUNDLE_SEQUENCE`;
+
+//qc endline undo
+export const SewingBdlReturn = db.define(
+  "scan_sewing_return",
+  {
+    BARCODE_SERIAL: {
+      type: DataTypes.STRING,
+    },
+    SCHD_ID: { type: DataTypes.INTEGER, allowNull: false },
+    USER_ID: { type: DataTypes.INTEGER, allowNull: false },
+    PLANSIZE_ID: { type: DataTypes.INTEGER },
+    SEWING_RETURN_BY: { type: DataTypes.INTEGER },
+    CONFIRM_RETURN: { type: DataTypes.INTEGER },
+    SEWING_SCAN_LOCATION: { type: DataTypes.STRING },
+    SEWING_SCAN_TIME: { type: DataTypes.DATE },
+  },
+  {
+    freezeTableName: true,
+    createdAt: "SEWING_SCAN_TIME",
+    updatedAt: false,
+  }
+);

@@ -27,6 +27,7 @@ import {
   planSizePost,
   planSizeUpdate,
   postEndlineOutput,
+  postReturnBdl,
   postUpdtEndlineRmks,
   repairedProccess,
   SetActualMp,
@@ -81,6 +82,7 @@ router.patch("/endline/plansize", planSizeUpdate);
 router.patch("/endline/repaired", repairedProccess);
 router.post("/endline/qr/transfer", sewingScanOut);
 router.post("/endline/plan/remarks", postUpdtEndlineRmks);
+router.post("/endline/qr/return", postReturnBdl);
 
 //undo
 router.patch("/endline/undo", handleUndo);

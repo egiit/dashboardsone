@@ -23,6 +23,7 @@ import {
   QueryGetListPart,
   QueryGetQrPendding,
   QueryPlanSizePending,
+  SewingBdlReturn,
 } from "../../../models/production/quality.mod.js";
 import { CuttinScanSewingIn } from "../../../models/production/cutting.mod.js";
 
@@ -674,6 +675,39 @@ export const postUpdtEndlineRmks = async (req, res) => {
     // console.log(error);
     res.status(404).json({
       message: "error processing request Qr List pendding",
+      data: error,
+    });
+  }
+};
+
+//add proposal return
+export const postReturnBdl = async (req, res) => {
+  try {
+    let dataReturn = req.body;
+
+    const checkRemark = await SewingBdlReturn.findOne({
+      attributes: ["BARCODE_SERIAL", "SCH_ID", "SCHD_ID"],
+      where: {
+        BARCODE_SERIAL: dataReturn.BARCODE_SERIAL,
+        SCH_ID: dataReturn.ID_SITELINE,
+        SCHD_ID: dataReturn.TYPE_PROD,
+      },
+    });
+
+    if (checkRemark) {
+      return res.status(202).json({
+        message: "Already Request Return",
+      });
+    }
+
+    const postReturn = await SewingBdlReturn.create(dataReturn);
+
+    if (postReturn)
+      return res.json({ message: "Success request return Bundle/Box" });
+  } catch (error) {
+    // console.log(error);
+    res.status(404).json({
+      message: "error processing request return",
       data: error,
     });
   }
