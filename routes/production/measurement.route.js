@@ -18,6 +18,7 @@ import {
 } from "../../controllers/production/quality/QcMeasurement.js";
 import {
   deleteDataMeasOut,
+  getMeasCountCheck,
   getMeasureOutput,
   getMeasureSpec,
   postDataMeasOut,
@@ -44,6 +45,10 @@ router.get("/spec-list/:orderNo/:sizeCode", getMeasureSpec);
 router.get(
   "/endline-out/:barcodeSerial/:siteName/:lineName/:sizeCode",
   getMeasureOutput
+);
+router.get(
+  "/endline/meas-count-check/:schDate/:sitename/:linename",
+  getMeasCountCheck
 );
 
 router.delete("/endline-out/:barcodeSerial/:sequance", deleteDataMeasOut);

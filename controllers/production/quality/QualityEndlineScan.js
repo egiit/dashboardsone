@@ -689,8 +689,8 @@ export const postReturnBdl = async (req, res) => {
       attributes: ["BARCODE_SERIAL", "SCH_ID", "SCHD_ID"],
       where: {
         BARCODE_SERIAL: dataReturn.BARCODE_SERIAL,
-        SCH_ID: dataReturn.ID_SITELINE,
-        SCHD_ID: dataReturn.TYPE_PROD,
+        SCH_ID: dataReturn.SCH_ID,
+        SCHD_ID: dataReturn.SCHD_ID,
       },
     });
 
@@ -705,7 +705,7 @@ export const postReturnBdl = async (req, res) => {
     if (postReturn)
       return res.json({ message: "Success request return Bundle/Box" });
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     res.status(404).json({
       message: "error processing request return",
       data: error,

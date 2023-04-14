@@ -463,9 +463,11 @@ export const SewingBdlReturn = db.define(
   {
     BARCODE_SERIAL: {
       type: DataTypes.STRING,
+      primaryKey: true,
     },
-    SCHD_ID: { type: DataTypes.INTEGER, allowNull: false },
-    USER_ID: { type: DataTypes.INTEGER, allowNull: false },
+    SCH_ID: { type: DataTypes.INTEGER },
+    SCHD_ID: { type: DataTypes.INTEGER },
+    SEWING_RETURN_BY: { type: DataTypes.INTEGER },
     PLANSIZE_ID: { type: DataTypes.INTEGER },
     SEWING_RETURN_BY: { type: DataTypes.INTEGER },
     CONFIRM_RETURN: { type: DataTypes.INTEGER },

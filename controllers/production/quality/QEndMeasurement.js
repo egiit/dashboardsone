@@ -4,6 +4,7 @@ import {
   MeasOutput,
   QryGetDataMeasOut,
   QryGetSpecQCend,
+  QryMeasCheck,
 } from "../../../models/production/measurement.mod.js";
 
 //get data For Measurement Inspect Qc End
@@ -113,6 +114,26 @@ export const deleteDataMeasOut = async (req, res) => {
     console.log(error);
     return res.status(404).json({
       message: "error processing get data for measurement",
+      data: error,
+    });
+  }
+};
+
+export const getMeasCountCheck = async (req, res) => {
+  try {
+    const { schDate, sitename, linename } = req.params;
+    const measCheck = await db.query(QryMeasCheck, {
+      type: QueryTypes.SELECT,
+      replacements: { schDate, sitename, linename },
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: measCheck,
+    });
+  } catch (error) {
+    res.status(404).json({
+      message: "error processing request Qr Meas Check",
       data: error,
     });
   }
