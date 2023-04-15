@@ -173,3 +173,41 @@ FROM (
 ) N 
 JOIN viewqcendcheckall M ON N.ENDLINE_ACT_SCHD_ID = M.ENDLINE_ACT_SCHD_ID AND M.HOUR_TIME = N.ENDLINE_TIME AND M.ENDLINE_PLAN_SIZE = N.ENDLINE_PLAN_SIZE
 GROUP BY N.ENDLINE_SCHD_DATE, N.ENDLINE_ACT_SCHD_ID,  N.ENDLINE_TIME, N.ENDLINE_PLAN_SIZE, N.ENDLINE_DEFECT_CODE, N.ENDLINE_PART_CODE`;
+
+//measurement Rerport querryyyy
+export const QueryGetDescMes = `-- QUERY QC measurement desc list
+SELECT a.MES_CHART_NO, a.ORDER_NO, c.POM_ID, a.MES_UOM, c.POM_DESC, c.POM_PLUS, c.POM_MIN
+FROM (
+	SELECT a.MES_CHART_NO, a.ORDER_NO, b.MES_UOM, a.ADD_DATE 
+	FROM measurement_and_order a 
+	LEFT JOIN measurement_chart b ON b.MES_CHART_NO = a.MES_CHART_NO
+	WHERE a.ORDER_NO = :orderNo ORDER BY a.ADD_DATE DESC LIMIT 1 
+) a 
+LEFT JOIN measurement_pom c ON c.MES_CHART_NO = a.MES_CHART_NO `;
+
+export const QueryMeasSpecRep = `SELECT a.MES_CHART_NO, a.ORDER_NO, c.POM_ID, b.SIZE_CODE, b.SPEC
+FROM (
+	SELECT a.MES_CHART_NO, a.ORDER_NO, b.MES_UOM, a.ADD_DATE 
+	FROM measurement_and_order a 
+	LEFT JOIN measurement_chart b ON b.MES_CHART_NO = a.MES_CHART_NO
+	WHERE a.ORDER_NO = :orderNo ORDER BY a.ADD_DATE DESC LIMIT 1 
+) a 
+LEFT JOIN measurement_chart_detail b ON a.MES_CHART_NO = b.MES_CHART_NO
+LEFT JOIN measurement_pom c ON c.MES_CHART_NO = a.MES_CHART_NO  AND b.POM_ID = c.POM_ID
+WHERE b.SIZE_CODE IN (
+	SELECT DISTINCT b.SIZE_CODE FROM measurement_qc_output b 
+	WHERE date(b.createdAt) = :schDate AND b.SITE_NAME = :sitename AND b.LINE_NAME = :linename
+)`;
+
+export const QueryMesValueRep = `SELECT a.MES_CHART_NO, a.POM_ID, a.SIZE_CODE, a.MES_VALUE, a.BARCODE_SERIAL, a.MES_SEQ, a.MES_CAT, a.ORDER_NO, b.MES_UOM
+FROM measurement_qc_output a 
+LEFT JOIN measurement_chart b ON a.MES_CHART_NO = b.MES_CHART_NO
+WHERE date(a.createdAt) = :schDate AND a.ORDER_NO = :orderNo AND a.SITE_NAME = :sitename AND a.LINE_NAME = :linename `;
+
+export const QryMesHederRepList = `-- query looping header measurement report 
+SELECT DISTINCT a.BARCODE_SERIAL, a.SIZE_CODE, c.BUNDLE_SEQUENCE
+FROM measurement_qc_output a 
+LEFT JOIN measurement_chart b ON a.MES_CHART_NO = b.MES_CHART_NO
+LEFT JOIN order_qr_generate c ON a.BARCODE_SERIAL = c.BARCODE_SERIAL 
+WHERE date(a.createdAt) = :schDate  AND a.ORDER_NO = :orderNo AND a.SITE_NAME = :sitename AND a.LINE_NAME = :linename
+`;

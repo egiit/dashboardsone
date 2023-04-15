@@ -1,9 +1,13 @@
 import db from "../../../config/database.js";
 import { QueryTypes, Op } from "sequelize";
 import {
+  QryMesHederRepList,
   QueryDetailEndCheck,
   QueryDtlDayDef,
   QueryDtlEndChckTblet,
+  QueryGetDescMes,
+  QueryMeasSpecRep,
+  QueryMesValueRep,
   QuerySumPartDefCodChk,
   QuerySumPartDefCodeCheck,
   QurTablPlanQcEndRep,
@@ -154,6 +158,44 @@ export const getDailyDefDetail = async (req, res) => {
     return res.status(200).json({
       success: true,
       data: detailSch,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(404).json({
+      message: "error processing get deteail defect",
+      data: error,
+    });
+  }
+};
+
+//get bulk report measurement
+export const getMeasurementRep = async (req, res) => {
+  try {
+    const { schDate, sitename, linename, orderNo } = req.params;
+
+    const desc = await db.query(QueryGetDescMes, {
+      replacements: { orderNo },
+      type: QueryTypes.SELECT,
+    });
+    //spec by size
+    const specList = await db.query(QueryMeasSpecRep, {
+      replacements: { orderNo, schDate, sitename, linename },
+      type: QueryTypes.SELECT,
+    });
+    //detail value
+    const values = await db.query(QueryMesValueRep, {
+      replacements: { orderNo, schDate, sitename, linename },
+      type: QueryTypes.SELECT,
+    });
+    //detail value
+    const headers = await db.query(QryMesHederRepList, {
+      replacements: { orderNo, schDate, sitename, linename },
+      type: QueryTypes.SELECT,
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: { desc, specList, values, headers },
     });
   } catch (error) {
     console.log(error);

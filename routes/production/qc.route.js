@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getDailyDefDetail,
+  getMeasurementRep,
   getPlanningEendReport,
   getQcEndChckTablet,
   getQcEndCheckPerHour,
@@ -111,6 +112,12 @@ router.get(
 router.get(
   "/report/detail-defect/:schDate/:sitename/:shift",
   getDailyDefDetail
+);
+
+//measurement report
+router.get(
+  "/report/measurement/:schDate/:sitename/:linename/:orderNo",
+  getMeasurementRep
 );
 
 export default router;
