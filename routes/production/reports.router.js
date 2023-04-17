@@ -5,10 +5,14 @@ import {
   getSewDayRepSize,
   getSewDayRepSizePo,
 } from "../../controllers/production/reports/SewOutDayRep.js";
-import { getWorkerDoneRep } from "../../controllers/production/reports/WorkerdoneRep.js";
+import {
+  getBlkTrace,
+  getWorkerDoneRep,
+} from "../../controllers/production/reports/WorkerdoneRep.js";
 const router = express.Router();
 
 router.get("/workerdone/:startDate/:endDate", getWorkerDoneRep);
+router.get("/bundletracking/:startDate/:endDate", getBlkTrace);
 
 // sewing dayli output report
 router.get("/sewing-day-ouput/:schDate/:sitename/:shift", getSewDayRepSchd);

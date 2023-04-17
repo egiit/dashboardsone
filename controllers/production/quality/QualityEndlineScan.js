@@ -35,6 +35,7 @@ export const SetActualMp = async (req, res) => {
     const findMp = await ManpowewrDailyDetail.findOne({
       where: {
         SCHD_ID: dataPlan.SCHD_ID,
+        SHIFT: dataPlan.SHIFT,
       },
     });
     // if founded
@@ -42,6 +43,7 @@ export const SetActualMp = async (req, res) => {
       const updateMp = await ManpowewrDailyDetail.update(dataPlan, {
         where: {
           SCHD_ID: dataPlan.SCHD_ID,
+          SHIFT: dataPlan.SHIFT,
         },
       });
       return res.status(200).json({

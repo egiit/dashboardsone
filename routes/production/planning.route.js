@@ -21,6 +21,7 @@ import {
   postSchDataHeader,
   updateDataHeader,
 } from "../../controllers/production/planning/WeeklyPlaning.js";
+import { ListSizeSewingScanIn } from "../../controllers/production/cutting/CuttingScan.js";
 
 const router = express.Router();
 router.post("/header", postSchDataHeader);
@@ -44,6 +45,11 @@ router.get("/group/:schId", getOneGroupDayliSch);
 router.get("/planning-daily/:plannDate/:sitename/:shift", getDailyPlanning);
 //daily-planning sewing in
 router.get("/planning-daily-sewin/:plannDate/:sitename", getDailySchSewIn);
+router.get(
+  "/planning-daily-sewin-size/:schDate/:sitename",
+  ListSizeSewingScanIn
+);
+
 //daily-planning qcEndLine
 router.get(
   "/planning-daily-qcend/:plannDate/:sitename/:linename/:idstieline/:shift/",

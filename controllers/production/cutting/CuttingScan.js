@@ -10,6 +10,7 @@ import {
 } from "../../../models/production/cutting.mod.js";
 import moment from "moment";
 import {
+  QryListSizeSewIn,
   QueryCheckSchdScan,
   QueryfindQrSewingIn,
 } from "../../../models/planning/dailyPlan.mod.js";
@@ -250,6 +251,25 @@ export const DelQrScanSewIN = async (req, res) => {
         message: "QR Deleted",
       });
     }
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      success: false,
+      data: error,
+      message: "error processing request",
+    });
+  }
+};
+
+export const ListSizeSewingScanIn = async (req, res) => {
+  try {
+    const { schDate, sitename } = req.params;
+    const listSizePlan = await db.query(QryListSizeSewIn, {
+      replacements: { schDate, sitename },
+      type: QueryTypes.SELECT,
+    });
+
+    return res.json(listSizePlan);
   } catch (error) {
     console.log(error);
     res.status(404).json({

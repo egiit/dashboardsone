@@ -470,6 +470,7 @@ export const SewingBdlReturn = db.define(
     SEWING_RETURN_BY: { type: DataTypes.INTEGER },
     PLANSIZE_ID: { type: DataTypes.INTEGER },
     SEWING_RETURN_BY: { type: DataTypes.INTEGER },
+    CONFIRM_RETURN_BY: { type: DataTypes.INTEGER },
     CONFIRM_RETURN: { type: DataTypes.INTEGER },
     SEWING_SCAN_LOCATION: { type: DataTypes.STRING },
     SEWING_SCAN_TIME: { type: DataTypes.DATE },

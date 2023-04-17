@@ -176,3 +176,10 @@ export const QueryDailyPlanPackIn = `SELECT *, IF(nm.PLAN_TARGET_OT,nm.PLAN_TARG
 	)n 
 ) nm
 ORDER BY nm.SITE_NAME, nm.LINE_NAME, nm.SCHD_ID`;
+
+//for sewing scan in list size
+export const QryListSizeSewIn = `SELECT a.SCH_ID, a.SCHD_ID, b.PDM_ID, c.SIZE_CODE
+FROM weekly_prod_sch_detail a
+LEFT JOIN  weekly_sch_size b  ON b.SCH_ID = a.SCH_ID
+LEFT JOIN po_matrix_delivery c ON c.PDM_ID = b.PDM_ID
+WHERE a.SCHD_PROD_DATE = :schDate AND a.SCHD_SITE = :sitename`;

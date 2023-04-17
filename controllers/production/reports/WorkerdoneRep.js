@@ -1,8 +1,11 @@
 import db from "../../../config/database.js";
 import { QueryTypes, Op } from "sequelize";
-import { QueryWorkerDone } from "../../../models/reports/workerdone.mod.js";
+import {
+  QryBundleTrack,
+  QueryWorkerDone,
+} from "../../../models/reports/workerdone.mod.js";
 
-//query get plan vs actual Manpower
+//workerdon controler
 export const getWorkerDoneRep = async (req, res) => {
   try {
     const { startDate, endDate } = req.params;
@@ -13,6 +16,25 @@ export const getWorkerDoneRep = async (req, res) => {
 
     res.status(200).json(workerdone);
   } catch (error) {
+    res.status(404).json({
+      message: "error processing request",
+      data: error,
+    });
+  }
+};
+
+//query get blk tracking
+export const getBlkTrace = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.params;
+    const bundleTrace = await db.query(QryBundleTrack, {
+      replacements: { startDate, endDate },
+      type: QueryTypes.SELECT,
+    });
+
+    res.status(200).json(bundleTrace);
+  } catch (error) {
+    console.log(error);
     res.status(404).json({
       message: "error processing request",
       data: error,
