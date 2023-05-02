@@ -183,3 +183,6 @@ FROM weekly_prod_sch_detail a
 LEFT JOIN  weekly_sch_size b  ON b.SCH_ID = a.SCH_ID
 LEFT JOIN po_matrix_delivery c ON c.PDM_ID = b.PDM_ID
 WHERE a.SCHD_PROD_DATE = :schDate AND a.SCHD_SITE = :sitename`;
+
+export const FindQrReturn = `SELECT * FROM scan_sewing_return a WHERE a.BARCODE_SERIAL = :barcodeserial AND  a.CONFIRM_STATUS = '0'`;
+export const FindOnePlanZ = `SELECT * FROM qc_endline_plansize a WHERE a.PLANSIZE_ID = :planzId`;

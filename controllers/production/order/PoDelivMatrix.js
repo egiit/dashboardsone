@@ -43,6 +43,8 @@ export const postPOMatrixDeliv = async (req, res) => {
     };
 
     let dataJson = arrayBufferToJson(dataPMD.file.data);
+    if (dataJson.length > 8000)
+      return res.status(404).json({ message: "Max 8000 rows data" });
     if (!dataJson.length)
       return res.status(404).json({ message: "No Data Worksheet" });
     //pakai cara looping
@@ -51,7 +53,7 @@ export const postPOMatrixDeliv = async (req, res) => {
     let customerOrder = "";
     // let pmdData = [];
 
-    // console.log(dataJson);
+    // console.log(dataJson.length);
     //looping, reading, parsing data
     dataJson.forEach(async (pmd, i) => {
       if (
@@ -105,6 +107,7 @@ export const postPOMatrixDeliv = async (req, res) => {
         });
         if (findPoCap) {
           const dataRecod = findPoCap.dataValues;
+          // console.log(dataPmdDetail);
           await PoMatrixDelivery.update(dataPmdDetail, {
             where: { PDM_ID: dataRecod.PDM_ID },
           });

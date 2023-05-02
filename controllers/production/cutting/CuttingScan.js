@@ -5,16 +5,27 @@ import { QueryTypes, Op } from "sequelize";
 import {
   CuttinScanSewingIn,
   QryCutScanInWithSize,
+  QryListBoxReturn,
+  QryListBoxReturnConf,
   QueryCheckQcOut,
   ScanCutting,
 } from "../../../models/production/cutting.mod.js";
 import moment from "moment";
 import {
+  FindOnePlanZ,
+  FindQrReturn,
   QryListSizeSewIn,
   QueryCheckSchdScan,
   QueryfindQrSewingIn,
 } from "../../../models/planning/dailyPlan.mod.js";
-import { GetQrlistAftrScan } from "../../../models/production/sewing.mod.js";
+import {
+  GetQrlistAftrScan,
+  ScanSewingOut,
+} from "../../../models/production/sewing.mod.js";
+import {
+  PlanSize,
+  SewingBdlReturn,
+} from "../../../models/production/quality.mod.js";
 
 // CONTROLLER SCAN CUTTING
 export const QRScanCutting = async (req, res) => {
@@ -261,6 +272,7 @@ export const DelQrScanSewIN = async (req, res) => {
   }
 };
 
+//cntrole list all size schedule for sewing scan in
 export const ListSizeSewingScanIn = async (req, res) => {
   try {
     const { schDate, sitename } = req.params;
@@ -279,3 +291,219 @@ export const ListSizeSewingScanIn = async (req, res) => {
     });
   }
 };
+
+//cntrole list all size schedule for sewing scan in
+export const ListQrReturnFrmSewing = async (req, res) => {
+  try {
+    const { sitename, startDate, endDate, status } = req.params;
+    // const newStatus =
+    //   status === "ALL"
+    //     ? `a.CONFIRM_STATUS LIKE '%%'`
+    //     : `a.CONFIRM_STATUS <> '0'`;
+
+    let newQuery = status === "ALL" ? QryListBoxReturn : QryListBoxReturnConf;
+
+    const listQr = await db.query(newQuery, {
+      replacements: { sitename, startDate, endDate },
+      type: QueryTypes.SELECT,
+    });
+
+    return res.json(listQr);
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      success: false,
+      data: error,
+      message: "error processing request",
+    });
+  }
+};
+
+//confirm return
+export const adjustPlanByReturn = async (req, res, next) => {
+  try {
+    let { barcodeserial, confirmStatus, userId } = req.body;
+    if (confirmStatus === 2) {
+      return next();
+    }
+
+    // check qrcodde
+    const checkBarcodeSerial = await db.query(QueryfindQrSewingIn, {
+      replacements: {
+        barcodeserial: barcodeserial,
+      },
+      type: QueryTypes.SELECT,
+    });
+
+    //jika tidak terdapat brcode
+    if (checkBarcodeSerial.length === 0) {
+      return res.status(200).json({
+        success: true,
+        qrstatus: "error",
+        message: "QRCode Not Found",
+      });
+    }
+
+    //check qr pada return table
+    const findQrReturn = await db.query(FindQrReturn, {
+      replacements: {
+        barcodeserial: barcodeserial,
+      },
+      type: QueryTypes.SELECT,
+    });
+
+    //jika tidak ada reject
+    if (findQrReturn.length === 0) {
+      return res.status(200).json({
+        success: true,
+        qrstatus: "duplicate",
+        message: "No QR Return Or Already Scan",
+      });
+    }
+    //jika terdapat plansize maka adzusment
+    if (findQrReturn[0].PLANSIZE_ID) {
+      const arrPlanZ = await db.query(FindOnePlanZ, {
+        replacements: {
+          planzId: findQrReturn[0].PLANSIZE_ID,
+        },
+        type: QueryTypes.SELECT,
+      });
+
+      const planZ = arrPlanZ[0];
+      const balance = planZ.QTY - (planZ.RTT + planZ.REPAIRED);
+      const qtyBarcode = checkBarcodeSerial[0].ORDER_QTY;
+
+      // console.log(planZ);
+      // console.log(balance);
+      // console.log(qtyBarcode);
+      if (balance < qtyBarcode) {
+        await autoRejectConfrm(barcodeserial, userId);
+
+        return res.status(200).json({
+          success: true,
+          qrstatus: "error",
+          message: "QR Already QC Check",
+        });
+      } else {
+        // update plan Size
+        const newBalance = planZ.QTY - qtyBarcode;
+
+        const updatePlanSize = await PlanSize.update(
+          { QTY: newBalance },
+          {
+            where: {
+              PLANSIZE_ID: planZ.PLANSIZE_ID,
+            },
+          }
+        );
+        if (!updatePlanSize) {
+          return res.status(200).json({
+            success: true,
+            qrstatus: "error",
+            message: "Error Upadate Plan Size",
+          });
+        }
+      }
+    }
+    next();
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      message: "error processing request return",
+      data: error,
+    });
+  }
+};
+
+// delete data sewing in
+export const deleteDataSewIn = async (req, res, next) => {
+  try {
+    let { barcodeserial, confirmStatus, userId } = req.body;
+    if (confirmStatus === 2) {
+      return next();
+    }
+
+    const checkQrSewingOut = await ScanSewingOut.findAll({
+      where: {
+        BARCODE_SERIAL: barcodeserial,
+      },
+    });
+
+    if (!checkQrSewingOut.length === 0) {
+      await autoRejectConfrm(barcodeserial, userId);
+      return res.json({
+        success: true,
+        qrstatus: "error",
+        message: "QR Already Sewing Out",
+      });
+    }
+
+    const deleteQr = await CuttinScanSewingIn.destroy({
+      where: {
+        BARCODE_SERIAL: barcodeserial,
+      },
+    });
+
+    if (!deleteQr)
+      return res.json({
+        success: true,
+        qrstatus: "error",
+        message: "QR Not Yet Scan IN",
+      });
+    next();
+  } catch (error) {
+    res.status(404).json({
+      message: "error processing request return",
+      data: error,
+    });
+  }
+};
+
+// update data request
+export const confrmReturn = async (req, res) => {
+  try {
+    let { barcodeserial, confirmtime, userId, confirmStatus } = req.body;
+
+    const dataUpd = {
+      CONFIRM_STATUS: confirmStatus,
+      CONFIRM_RETURN_BY: userId,
+      CONFRIM_DATE: confirmtime,
+    };
+    const updateReq = await SewingBdlReturn.update(dataUpd, {
+      where: {
+        BARCODE_SERIAL: barcodeserial,
+        CONFIRM_STATUS: 0,
+      },
+    });
+    if (updateReq)
+      return res.json({
+        success: true,
+        qrstatus: "success",
+        message: "Success Return",
+      });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      message: "error processing request return",
+      data: error,
+    });
+  }
+};
+
+async function autoRejectConfrm(barcodeserial, userId) {
+  try {
+    const dataUpd = {
+      CONFIRM_STATUS: 2,
+      CONFIRM_RETURN_BY: userId,
+      CONFRIM_DATE: moment().format("YYYY-MM-DD"),
+    };
+    return await SewingBdlReturn.update(dataUpd, {
+      where: {
+        BARCODE_SERIAL: barcodeserial,
+        CONFIRM_STATUS: 0,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}

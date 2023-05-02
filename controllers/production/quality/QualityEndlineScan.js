@@ -687,7 +687,7 @@ export const postReturnBdl = async (req, res) => {
   try {
     let dataReturn = req.body;
 
-    const checkRemark = await SewingBdlReturn.findOne({
+    const bundleremark = await SewingBdlReturn.findOne({
       attributes: ["BARCODE_SERIAL", "SCH_ID", "SCHD_ID"],
       where: {
         BARCODE_SERIAL: dataReturn.BARCODE_SERIAL,
@@ -696,7 +696,7 @@ export const postReturnBdl = async (req, res) => {
       },
     });
 
-    if (checkRemark) {
+    if (bundleremark) {
       return res.status(202).json({
         message: "Already Request Return",
       });

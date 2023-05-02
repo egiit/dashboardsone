@@ -2,7 +2,11 @@ import express from "express";
 const router = express.Router();
 
 import {
+  adjustPlanByReturn,
+  confrmReturn,
+  deleteDataSewIn,
   DelQrScanSewIN,
+  ListQrReturnFrmSewing,
   QrListAftrSewingIn,
   QRScanCutting,
   QRScanSewingIn,
@@ -25,6 +29,19 @@ router.get(
 router.post("/order/qrgenerate", newQRCutting);
 router.post("/order/scan", QRScanCutting);
 router.post("/qr/scan-sewing-in", QRScanSewingIn);
-
 router.delete("/qr/scan-sewing-in/:barcodeserial", DelQrScanSewIN);
+
+//return qr from sewing
+router.get(
+  "/qr/req-return/:sitename/:startDate/:endDate/:status",
+  ListQrReturnFrmSewing
+);
+//return qr cnfirm in preparation
+router.post(
+  "/qr/req-return/",
+  adjustPlanByReturn,
+  deleteDataSewIn,
+  confrmReturn
+);
+
 export default router;

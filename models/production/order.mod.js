@@ -185,13 +185,7 @@ export const OrderPoListing = db.define(
 Orders.removeAttribute("id");
 OrderPoListing.removeAttribute("id");
 
-// export const OrderDetailList = `SELECT a.BUYER_CODE, a.ORDER_NO, a.MO_NO, SUM(a.ORDER_QTY) QTY, a.CREATE_DATE
-// FROM order_detail a GROUP BY a.BUYER_CODE, a.ORDER_NO WHERE DATE(a.CREATE_DATE) BETWEEN :startDate AND :endDate
-// ORDER BY a.CREATE_DATE DESC`;
-
 export const OrderDetailHeader = `SELECT * FROM vieworderdetailheader WHERE UPLOAD_DATE BETWEEN :startDate AND :endDate`;
-
-//export const OrderDetailList = `SELECT * FROM ViewOrderDetailList WHERE ORDER_N=:orderNo`;
 
 export const OrderDetailList = `SELECT N.BUYER_CODE, N.ORDER_NO, N.PRODUCT_TYPE, N.BUYER_PO, N.MO_NO, N.ORDER_VERSION, N.SHIPMENT_DATE,
 N.ORDER_QTY, N.PRINT_QTY, N.ORDER_SIZE, N.ORDER_STYLE, N.ORDER_REF, N.BARCODE_SERIAL, N.SITE_LINE, 
