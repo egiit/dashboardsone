@@ -323,7 +323,8 @@ export const ListQrReturnFrmSewing = async (req, res) => {
 export const adjustPlanByReturn = async (req, res, next) => {
   try {
     let { barcodeserial, confirmStatus, userId } = req.body;
-    if (confirmStatus === 2) {
+
+    if (confirmStatus === "2") {
       return next();
     }
 
@@ -419,7 +420,7 @@ export const adjustPlanByReturn = async (req, res, next) => {
 export const deleteDataSewIn = async (req, res, next) => {
   try {
     let { barcodeserial, confirmStatus, userId } = req.body;
-    if (confirmStatus === 2) {
+    if (confirmStatus === "2") {
       return next();
     }
 
