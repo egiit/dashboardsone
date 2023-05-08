@@ -6,6 +6,7 @@ import {
 } from "../../controllers/production/planning/DailyPlanning.js";
 import {
   checkBdllBfrDel,
+  checkSchBforAdd,
   deleteSchDataDetail,
   deleteSchHeader,
   getCapacity,
@@ -27,6 +28,7 @@ const router = express.Router();
 router.post("/header", postSchDataHeader);
 router.patch("/header", updateDataHeader);
 router.delete("/header/:id", deleteSchHeader);
+router.post("/check-header", checkSchBforAdd);
 
 router.get("/capacity/:capId", getOneCapacity);
 router.get("/capacity/:startMonth/:endMonth", getCapacity);

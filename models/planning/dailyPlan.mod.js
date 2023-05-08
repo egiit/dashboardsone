@@ -41,18 +41,30 @@ n.PLAN_MP_OT*n.PLAN_WH_OT/n.PLAN_SEW_SMV PLAN_TARGET_OT
 // WHERE a.SCHD_PROD_DATE = :plannDate AND a.SCHD_SITE = :sitename
 // ORDER BY d.ID_SITELINE,  b.CUSTOMER_NAME`;
 
-export const QueryCheckSchdScan = `SELECT a.SCHD_ID, a.SCH_ID, g.PDM_ID, a.SCHD_PROD_DATE, b.CUSTOMER_NAME, 
+export const QueryCheckSchdScan = `SELECT a.SCHD_ID, a.SCH_ID, f.PDM_ID, a.SCHD_PROD_DATE, b.CUSTOMER_NAME, 
 b.ORDER_NO, b.MO_NO, d.ID_SITELINE,  d.SITE_NAME, d.LINE_NAME,
 b.CUSTOMER_NAME, b.PRODUCT_ITEM_CODE, b.ORDER_REFERENCE_PO_NO, b.ITEM_COLOR_CODE, b.ITEM_COLOR_NAME, 
-b.PRODUCT_ITEM_DESCRIPTION, b.ORDER_STYLE_DESCRIPTION, g.SIZE_CODE 
+b.PRODUCT_ITEM_DESCRIPTION, b.ORDER_STYLE_DESCRIPTION, f.SIZE_CODE 
 FROM weekly_prod_sch_detail a
 LEFT JOIN viewcapacity b ON a.SCHD_CAPACITY_ID = b.ID_CAPACITY
 LEFT JOIN item_siteline d ON a.SCHD_ID_SITELINE = d.ID_SITELINE
-LEFT JOIN weekly_sch_size f ON a.SCH_ID = f.SCH_ID
-LEFT JOIN po_matrix_delivery g ON f.PDM_ID = g.PDM_ID 
+LEFT JOIN view_weekly_sch_size f ON a.SCH_ID = f.SCH_ID
+-- LEFT JOIN po_matrix_delivery g ON f.PDM_ID = g.PDM_ID 
 WHERE a.SCHD_PROD_DATE = :plannDate AND a.SCHD_SITE = :sitename AND d.LINE_NAME = :lineName
 AND b.MO_NO = :moNo AND  b.ORDER_STYLE_DESCRIPTION = :styleDesc AND b.ITEM_COLOR_NAME = :colorCode
 AND g.SIZE_CODE = :sizeCode`;
+// export const QueryCheckSchdScan = `SELECT a.SCHD_ID, a.SCH_ID, g.PDM_ID, a.SCHD_PROD_DATE, b.CUSTOMER_NAME,
+// b.ORDER_NO, b.MO_NO, d.ID_SITELINE,  d.SITE_NAME, d.LINE_NAME,
+// b.CUSTOMER_NAME, b.PRODUCT_ITEM_CODE, b.ORDER_REFERENCE_PO_NO, b.ITEM_COLOR_CODE, b.ITEM_COLOR_NAME,
+// b.PRODUCT_ITEM_DESCRIPTION, b.ORDER_STYLE_DESCRIPTION, g.SIZE_CODE
+// FROM weekly_prod_sch_detail a
+// LEFT JOIN viewcapacity b ON a.SCHD_CAPACITY_ID = b.ID_CAPACITY
+// LEFT JOIN item_siteline d ON a.SCHD_ID_SITELINE = d.ID_SITELINE
+// LEFT JOIN weekly_sch_size f ON a.SCH_ID = f.SCH_ID
+// LEFT JOIN po_matrix_delivery g ON f.PDM_ID = g.PDM_ID
+// WHERE a.SCHD_PROD_DATE = :plannDate AND a.SCHD_SITE = :sitename AND d.LINE_NAME = :lineName
+// AND b.MO_NO = :moNo AND  b.ORDER_STYLE_DESCRIPTION = :styleDesc AND b.ITEM_COLOR_NAME = :colorCode
+// AND g.SIZE_CODE = :sizeCode`;
 
 export const QueryfindQrSewingIn = `SELECT  N.BUYER_CODE, N.ORDER_NO, N.PRODUCT_TYPE, N.BUYER_PO, N.MO_NO,N.ORDER_REF,
 N.ORDER_COLOR, N.ORDER_SIZE, N.ORDER_QTY, N.ORDER_STYLE, N.BARCODE_SERIAL, N.SITE_LINE_FX, b.SITE_NAME, b.LINE_NAME 
@@ -178,10 +190,10 @@ export const QueryDailyPlanPackIn = `SELECT *, IF(nm.PLAN_TARGET_OT,nm.PLAN_TARG
 ORDER BY nm.SITE_NAME, nm.LINE_NAME, nm.SCHD_ID`;
 
 //for sewing scan in list size
-export const QryListSizeSewIn = `SELECT a.SCH_ID, a.SCHD_ID, b.PDM_ID, c.SIZE_CODE
+export const QryListSizeSewIn = `SELECT a.SCH_ID, a.SCHD_ID, b.PDM_ID, b.SIZE_CODE
 FROM weekly_prod_sch_detail a
-LEFT JOIN  weekly_sch_size b  ON b.SCH_ID = a.SCH_ID
-LEFT JOIN po_matrix_delivery c ON c.PDM_ID = b.PDM_ID
+LEFT JOIN  view_weekly_sch_size b  ON b.SCH_ID = a.SCH_ID
+-- LEFT JOIN po_matrix_delivery c ON c.PDM_ID = b.PDM_ID
 WHERE a.SCHD_PROD_DATE = :schDate AND a.SCHD_SITE = :sitename`;
 
 export const FindQrReturn = `SELECT * FROM scan_sewing_return a WHERE a.BARCODE_SERIAL = :barcodeserial AND  a.CONFIRM_STATUS = '0'`;

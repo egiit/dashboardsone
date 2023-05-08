@@ -22,8 +22,103 @@ export const postPOMatrixDeliv = async (req, res) => {
       });
     }
 
-    //we convert array buffer to json here....
-    const arrayBufferToJson = (buff) => {
+    let dataJson = await arrayBufferToJson(dataPMD.file.data);
+    if (dataJson.length > 8000)
+      return res.status(404).json({ message: "Max 8000 rows data" });
+    if (!dataJson.length)
+      return res.status(404).json({ message: "No Data Worksheet" });
+    //pakai cara looping
+    let siteCode = "";
+    let prodMonth = "";
+    let customerOrder = "";
+    // let pmdData = [];
+
+    // console.log(dataJson.length);
+    //looping, reading, parsing data
+    const dataPoM = dataJson
+      .map((pmd, i) => {
+        if (
+          pmd["Company: PT. SUMBER BINTANG REJEKI"] &&
+          pmd["Company: PT. SUMBER BINTANG REJEKI"].indexOf("Site") > -1
+        ) {
+          siteCode = pmd["Company: PT. SUMBER BINTANG REJEKI"].replace(
+            "Site Code:",
+            ""
+          );
+        }
+        if (pmd.__EMPTY && pmd.__EMPTY.indexOf("Production Month") > -1) {
+          prodMonth = pmd.__EMPTY.replace("Production Month:", "");
+        }
+        if (pmd.__EMPTY_2) {
+          customerOrder = pmd.__EMPTY_2.replace("Customer Order: ", "");
+        }
+        if (pmd.__EMPTY_3) {
+          //find total_qty empty with object key last array
+          const lastEmpty = Object.keys(pmd).at(-1);
+
+          const dataPmdDetail = {
+            SITE_CODE: siteCode.trim(),
+            PROD_MONTH: prodMonth.trim(),
+            EX_FACTORY: pmd.__EMPTY_9,
+            BUYER_CODE: customerOrder.split("/")[0],
+            ORDER_NO: customerOrder.split("/")[1],
+            ORDER_REF_NO: pmd.__EMPTY_3,
+            ORDER_PO_STYLE_REF: pmd.__EMPTY_4,
+            COLOR_CODE: pmd.__EMPTY_6,
+            COLOR_NAME: pmd.__EMPTY_7,
+            PACKING_METHOD: pmd.__EMPTY_8,
+            SIZE_CODE: pmd.__EMPTY_10,
+            TOTAL_QTY: pmd[lastEmpty],
+          };
+
+          return dataPmdDetail;
+        }
+      })
+      .filter((dt) => dt !== undefined);
+
+    //get list of month for destroy data befor post new data
+    const listMonth = [...new Set(dataPoM.map((item) => item.PROD_MONTH))];
+
+    // if no list month for new month do bulk inster
+    if (listMonth.length === 0) {
+      await PoMatrixDelivery.bulkCreate(dataPoM).then(() => {
+        return res.status(200).json({
+          success: true,
+          message: "Data Order Retrieved Successfully create",
+        });
+      });
+    } else {
+      //if have list month do destroy befor post
+      for (const [i, month] of listMonth.entries()) {
+        await PoMatrixDelivery.destroy({
+          where: {
+            PROD_MONTH: month,
+          },
+        });
+        if (i + 1 === listMonth.length) {
+          await PoMatrixDelivery.bulkCreate(dataPoM).then(() => {
+            return res.status(200).json({
+              success: true,
+              message: "Data Order Retrieved Successfully create",
+            });
+          });
+        }
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      success: false,
+      message: "error processing request",
+      data: error,
+    });
+  }
+};
+
+//we convert array buffer to json here....
+const arrayBufferToJson = async (buff) => {
+  return new Promise((resolve, reject) => {
+    try {
       let arrBuff = toArraybuffer(buff);
       const wb = read(arrBuff, {
         cellNF: false,
@@ -38,97 +133,12 @@ export const postPOMatrixDeliv = async (req, res) => {
         });
 
         rows = CleanDates(arrBuff, rows, sheets[0], "YYYY-MM-DD", read);
-        return rows;
+        resolve(rows);
       }
-    };
-
-    let dataJson = arrayBufferToJson(dataPMD.file.data);
-    if (dataJson.length > 8000)
-      return res.status(404).json({ message: "Max 8000 rows data" });
-    if (!dataJson.length)
-      return res.status(404).json({ message: "No Data Worksheet" });
-    //pakai cara looping
-    let siteCode = "";
-    let prodMonth = "";
-    let customerOrder = "";
-    // let pmdData = [];
-
-    // console.log(dataJson.length);
-    //looping, reading, parsing data
-    dataJson.forEach(async (pmd, i) => {
-      if (
-        pmd["Company: PT. SUMBER BINTANG REJEKI"] &&
-        pmd["Company: PT. SUMBER BINTANG REJEKI"].indexOf("Site") > -1
-      ) {
-        siteCode = pmd["Company: PT. SUMBER BINTANG REJEKI"].replace(
-          "Site Code:",
-          ""
-        );
-      }
-      if (pmd.__EMPTY && pmd.__EMPTY.indexOf("Production Month") > -1) {
-        prodMonth = pmd.__EMPTY.replace("Production Month:", "");
-      }
-      if (pmd.__EMPTY_2) {
-        customerOrder = pmd.__EMPTY_2.replace("Customer Order: ", "");
-      }
-      if (pmd.__EMPTY_3) {
-        //find total_qty empty with object key last array
-        const lastEmpty = Object.keys(pmd).at(-1);
-
-        const dataPmdDetail = {
-          SITE_CODE: siteCode.trim(),
-          PROD_MONTH: prodMonth.trim(),
-          EX_FACTORY: pmd.__EMPTY_9,
-          BUYER_CODE: customerOrder.split("/")[0],
-          ORDER_NO: customerOrder.split("/")[1],
-          ORDER_REF_NO: pmd.__EMPTY_3,
-          ORDER_PO_STYLE_REF: pmd.__EMPTY_4,
-          COLOR_CODE: pmd.__EMPTY_6,
-          COLOR_NAME: pmd.__EMPTY_7,
-          PACKING_METHOD: pmd.__EMPTY_8,
-          SIZE_CODE: pmd.__EMPTY_10,
-          TOTAL_QTY: pmd[lastEmpty],
-        };
-
-        // console.log(dataPmdDetail);
-        // pmdData.push(dataPmdDetail);
-        const findPoCap = await PoMatrixDelivery.findOne({
-          where: {
-            // SITE_CODE: dataPmdDetail.SITE_CODE,
-            PROD_MONTH: dataPmdDetail.PROD_MONTH,
-            EX_FACTORY: dataPmdDetail.EX_FACTORY,
-            BUYER_CODE: dataPmdDetail.BUYER_CODE,
-            ORDER_NO: dataPmdDetail.ORDER_NO,
-            // ORDER_REF_NO: dataPmdDetail.ORDER_REF_NO,
-            PACKING_METHOD: dataPmdDetail.PACKING_METHOD,
-            COLOR_CODE: dataPmdDetail.COLOR_CODE,
-            SIZE_CODE: dataPmdDetail.SIZE_CODE,
-          },
-        });
-        if (findPoCap) {
-          const dataRecod = findPoCap.dataValues;
-          // console.log(dataPmdDetail);
-          await PoMatrixDelivery.update(dataPmdDetail, {
-            where: { PDM_ID: dataRecod.PDM_ID },
-          });
-        } else {
-          await PoMatrixDelivery.create(dataPmdDetail);
-        }
-      }
-      if (dataJson.length === i + 1) {
-        return res.status(200).json({
-          success: true,
-          message: "Data Order Retrieved Successfully create",
-        });
-      }
-    });
-  } catch (error) {
-    res.status(404).json({
-      success: false,
-      message: "error processing request",
-      data: error,
-    });
-  }
+    } catch (error) {
+      reject(error);
+    }
+  });
 };
 
 //function for clean Dates

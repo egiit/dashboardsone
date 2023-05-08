@@ -711,7 +711,7 @@ export const getPlanSizeAlocUpd = async (req, res) => {
     const { capId, schId } = req.params;
     const codeCapId = decodeURIComponent(capId);
 
-    // console.log(codeCapId);
+    console.log(codeCapId);
     const getPoDelivSize = await db.query(getSizeAlocForUpdtSch, {
       replacements: {
         capId: codeCapId,
@@ -722,6 +722,7 @@ export const getPlanSizeAlocUpd = async (req, res) => {
 
     res.status(200).json(getPoDelivSize);
   } catch (err) {
+    console.log(err);
     res.status(404).json({
       message: "Problem When Get Data PO Matrix Delivery By Capacity ID",
       data: err,
@@ -774,3 +775,41 @@ export async function checkBdllBfrDel(req, res, next) {
     });
   }
 }
+
+//check planing header exist
+export const checkSchBforAdd = async (req, res) => {
+  try {
+    const capData = req.body;
+    // const decodCapId = decodeURIComponent(capId).toString();
+    // console.log(decodCapId);
+
+    const weekSchHeadGroup = await db.query(QueryGetGroupSch, {
+      replacements: {
+        capId: capData.ID_CAPACITY,
+      },
+      type: QueryTypes.SELECT,
+    });
+
+    if (weekSchHeadGroup.length < 1) return res.json({ existStatus: false });
+
+    // console.log(weekSchHeadGroup);
+    const findSame = weekSchHeadGroup.filter(
+      (plan) =>
+        plan.PRODUCTION_MONTH === capData.PRODUCTION_MONTH &&
+        plan.SCH_SITE === capData.SITE_NAME &&
+        plan.SCH_ID_SITELINE === capData.ID_SITELINE &&
+        plan.SCH_CAPACITY_ID === capData.ID_CAPACITY
+    );
+
+    if (findSame.length > 0) {
+      return res.json({ existStatus: true });
+    } else {
+      return res.json({ existStatus: false });
+    }
+  } catch (error) {
+    res.status(404).json({
+      message: "error processing check schedule",
+      data: error,
+    });
+  }
+};
