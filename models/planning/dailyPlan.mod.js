@@ -140,7 +140,7 @@ FROM (
 	LEFT JOIN viewcapacity b ON a.SCHD_CAPACITY_ID = b.ID_CAPACITY 
 	LEFT JOIN item_smv_header c ON c.ORDER_NO = b.ORDER_NO
 		-- untuk aktual SMV
-	LEFT JOIN smv_daily_plan g ON g.SCHD_ID = a.SCHD_ID AND g.SHIFT = 'Normal_A'
+	LEFT JOIN smv_daily_plan g ON g.SCHD_ID = a.SCHD_ID AND g.SHIFT = :shift
 	LEFT JOIN item_siteline d ON a.SCHD_ID_SITELINE = d.ID_SITELINE
 	LEFT JOIN 	(
 	-- Manpower_detail di join dengan item siteline untunk mendapatkan line name dan shift
