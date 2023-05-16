@@ -244,7 +244,7 @@ export const DelQrScanSewIN = async (req, res) => {
       type: QueryTypes.SELECT,
     });
 
-    if (checkOutput)
+    if (checkOutput.length > 0)
       return res.status(202).json({
         success: false,
         message: "Can't Delete QR Already Output QC Endline",

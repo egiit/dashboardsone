@@ -9,6 +9,7 @@ import {
   getBlkTrace,
   getWorkerDoneRep,
 } from "../../controllers/production/reports/WorkerdoneRep.js";
+import { getSewRepEff } from "../../controllers/production/reports/SewDailyEffRep.js";
 const router = express.Router();
 
 router.get("/workerdone/:startDate/:endDate", getWorkerDoneRep);
@@ -25,5 +26,8 @@ router.get(
   "/sewing-day-ouput-size-bypo/:schDate/:sitename/:shift",
   getSewDayRepSizePo
 );
+
+//sewin daily eff
+router.get("/sewing-day-eff/:schDate/:sitename/:shift", getSewRepEff);
 
 export default router;

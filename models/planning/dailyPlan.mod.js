@@ -1,5 +1,9 @@
-export const QueryDailyPlann = `SELECT *, n.PLAN_MP*n.PLAN_WH/n.PLAN_SEW_SMV PLAN_TARGET,
-n.PLAN_MP_OT*n.PLAN_WH_OT/n.PLAN_SEW_SMV PLAN_TARGET_OT
+import db from "../../config/database.js";
+import { DataTypes } from "sequelize";
+
+export const QueryDailyPlann = `SELECT *, n.NORMAL_MP*n.PLAN_WH/n.PLAN_SEW_SMV PLAN_TARGET,
+n.OT_MP*n.PLAN_WH_OT/n.PLAN_SEW_SMV PLAN_TARGET_OT,
+n.OT_X_MP*n.PLAN_WH_X_OT/n.PLAN_SEW_SMV PLAN_TARGET_X_OT
  FROM (
 	SELECT a.SCHD_ID, a.SCH_ID, a.SCHD_PROD_DATE, e.ID_SITELINE,  d.SITE_NAME, d.LINE_NAME, e.SHIFT,
 	b.ORDER_REFERENCE_PO_NO, d.FOREMAN, 
@@ -7,13 +11,19 @@ n.PLAN_MP_OT*n.PLAN_WH_OT/n.PLAN_SEW_SMV PLAN_TARGET_OT
 	IF(SUBSTRING(:shift ,1,5) = 'Shift', CAST(ROUND(a.SCHD_QTY/2) AS INT), a.SCHD_QTY ) SCHD_QTY, 
 	b.ORDER_NO, b.CUSTOMER_NAME, b.CUSTOMER_PROGRAM, b.PRODUCT_ITEM_CODE, 
 	b.ITEM_COLOR_CODE,  b.ITEM_COLOR_NAME, b.PRODUCT_ITEM_DESCRIPTION,  
-	CASE WHEN ISNULL(c.ACTUAL_SEW_SMV) THEN c.PLAN_SEW_SMV ELSE c.ACTUAL_SEW_SMV END PLAN_SEW_SMV,
-	CASE WHEN ISNULL(m.PLAN_MP) THEN e.PLAN_MP ELSE m.PLAN_MP END PLAN_MP, 
+	FIND_SMV(g.SMV_PLAN, c.ACTUAL_SEW_SMV,c.PLAN_SEW_SMV ) PLAN_SEW_SMV,
+	CASE WHEN ISNULL(m.PLAN_MP) THEN e.PLAN_MP ELSE m.PLAN_MP END PLAN_MP, m.ACT_MP,
 	CASE WHEN ISNULL(f.PLAN_WH) THEN e.PLAN_WH ELSE f.PLAN_WH END PLAN_WH, 
-	m.PLAN_MP_OT, f.PLAN_WH_OT, o.PLAN_REMARK
+	m.PLAN_MP_OT, f.PLAN_WH_OT, m.PLAN_MP_X_OT, f.PLAN_WH_X_OT, 
+	FIND_ACT_MP(m.ACT_MP, m.PLAN_MP, e.PLAN_MP) NORMAL_MP, -- mp normal untuk menghitung target normal
+	FIND_ACT_MP(m.ACT_MP_OT, m.PLAN_MP_OT, NULL) OT_MP, -- mp ot untuk menghitung target overtime
+	FIND_ACT_MP(m.ACT_MP_X_OT, m.PLAN_MP_X_OT, NULL) OT_X_MP, -- mp  untuk menghitung target extra ovrtime
+	o.PLAN_REMARK
 	FROM weekly_prod_sch_detail a
 	LEFT JOIN viewcapacity b ON a.SCHD_CAPACITY_ID = b.ID_CAPACITY 
 	LEFT JOIN item_smv_header c ON c.ORDER_NO = b.ORDER_NO
+	-- untuk aktual SMV
+	LEFT JOIN smv_daily_plan g ON g.SCHD_ID = a.SCHD_ID AND g.SHIFT = :shift
 	LEFT JOIN item_siteline d ON a.SCHD_ID_SITELINE = d.ID_SITELINE
 	LEFT JOIN 	(
 	-- Manpower_detail di join dengan item siteline untunk mendapatkan line name dan shift
@@ -27,8 +37,39 @@ n.PLAN_MP_OT*n.PLAN_WH_OT/n.PLAN_SEW_SMV PLAN_TARGET_OT
 	LEFT JOIN workinghour_detail f ON f.SCHD_ID = a.SCHD_ID AND f.SHIFT = :shift
 	LEFT JOIN mp_daily_detail m ON m.SCHD_ID = a.SCHD_ID AND m.SHIFT = :shift
 	LEFT JOIN remark_detail o ON o.SCHD_ID = a.SCHD_ID AND o.SHIFT = :shift
-	WHERE a.SCHD_PROD_DATE = :plannDate  AND e.MP_DATE = :plannDate AND d.SITE_NAME = :sitename 
+	WHERE a.SCHD_PROD_DATE = :plannDate  AND e.MP_DATE = :plannDate AND d.SITE_NAME =  :sitename 
 )n `;
+// export const QueryDailyPlann = `SELECT *, n.PLAN_MP*n.PLAN_WH/n.PLAN_SEW_SMV PLAN_TARGET,
+// n.PLAN_MP_OT*n.PLAN_WH_OT/n.PLAN_SEW_SMV PLAN_TARGET_OT
+//  FROM (
+// 	SELECT a.SCHD_ID, a.SCH_ID, a.SCHD_PROD_DATE, e.ID_SITELINE,  d.SITE_NAME, d.LINE_NAME, e.SHIFT,
+// 	b.ORDER_REFERENCE_PO_NO, d.FOREMAN,
+// 	a.SCHD_CAPACITY_ID, a.SCHD_DAYS_NUMBER,
+// 	IF(SUBSTRING(:shift ,1,5) = 'Shift', CAST(ROUND(a.SCHD_QTY/2) AS INT), a.SCHD_QTY ) SCHD_QTY,
+// 	b.ORDER_NO, b.CUSTOMER_NAME, b.CUSTOMER_PROGRAM, b.PRODUCT_ITEM_CODE,
+// 	b.ITEM_COLOR_CODE,  b.ITEM_COLOR_NAME, b.PRODUCT_ITEM_DESCRIPTION,
+// 	CASE WHEN ISNULL(c.ACTUAL_SEW_SMV) THEN c.PLAN_SEW_SMV ELSE c.ACTUAL_SEW_SMV END PLAN_SEW_SMV,
+// 	CASE WHEN ISNULL(m.PLAN_MP) THEN e.PLAN_MP ELSE m.PLAN_MP END PLAN_MP,
+// 	CASE WHEN ISNULL(f.PLAN_WH) THEN e.PLAN_WH ELSE f.PLAN_WH END PLAN_WH,
+// 	m.PLAN_MP_OT, f.PLAN_WH_OT, o.PLAN_REMARK
+// 	FROM weekly_prod_sch_detail a
+// 	LEFT JOIN viewcapacity b ON a.SCHD_CAPACITY_ID = b.ID_CAPACITY
+// 	LEFT JOIN item_smv_header c ON c.ORDER_NO = b.ORDER_NO
+// 	LEFT JOIN item_siteline d ON a.SCHD_ID_SITELINE = d.ID_SITELINE
+// 	LEFT JOIN 	(
+// 	-- Manpower_detail di join dengan item siteline untunk mendapatkan line name dan shift
+// 		SELECT a.ID_MPD, a.MP_DATE, a.ID_SITELINE, b.SITE_NAME, b.LINE_NAME, b.SHIFT, a.PLAN_WH, a.PLAN_MP, a.ACT_WH, a.ACT_MP, a.OT_WH, a.OT_MP
+// 		FROM manpower_detail a
+// 		LEFT JOIN item_siteline b ON a.ID_SITELINE = b.ID_SITELINE
+// 		WHERE a.MP_DATE = :plannDate AND b.SITE_NAME = :sitename AND b.SHIFT = :shift
+// 		ORDER by a.ID_SITELINE
+// 	) e ON e.LINE_NAME = d.LINE_NAME
+// 	-- untuk working hour dan mp_daily_detail dipakaikan kolom shift untuk mengambil data jika line mempunyai shifting
+// 	LEFT JOIN workinghour_detail f ON f.SCHD_ID = a.SCHD_ID AND f.SHIFT = :shift
+// 	LEFT JOIN mp_daily_detail m ON m.SCHD_ID = a.SCHD_ID AND m.SHIFT = :shift
+// 	LEFT JOIN remark_detail o ON o.SCHD_ID = a.SCHD_ID AND o.SHIFT = :shift
+// 	WHERE a.SCHD_PROD_DATE = :plannDate  AND e.MP_DATE = :plannDate AND d.SITE_NAME = :sitename
+// )n `;
 
 // export const QueryDailySchSewIn = `SELECT a.SCHD_ID, a.SCH_ID, a.SCHD_PROD_DATE, d.ID_SITELINE,  d.SITE_NAME, d.LINE_NAME, d.SHIFT,
 // b.ORDER_REFERENCE_PO_NO, d.FOREMAN, a.SCHD_CAPACITY_ID, a.SCHD_DAYS_NUMBER, a.SCHD_QTY, e.SCH_QTY, b.MO_QTY, IF(e.SCH_QTY = b.MO_QTY , 'ALL' ,'PARTIAL') SIZE,
@@ -78,48 +119,98 @@ FROM  (
 	WHERE a.BARCODE_SERIAL = :barcodeserial
 ) N LEFT JOIN item_siteline b ON b.SITE = N.SITE AND b.LINE = N.LINE`;
 
+// with extra ot
 export const QueryQcEndlineDaily = `SELECT *,ROUND(n.PLAN_MP*n.PLAN_WH/n.PLAN_SEW_SMV) PLAN_TARGET,
 ROUND(n.PLAN_MP_OT*n.PLAN_WH_OT/n.PLAN_SEW_SMV) PLAN_TARGET_OT,
+ROUND(n.PLAN_MP_X_OT*n.PLAN_WH_X_OT/n.PLAN_SEW_SMV) PLAN_TARGET_X_OT,
 ROUND(n.ACT_MP*n.PLAN_WH/n.PLAN_SEW_SMV) ACT_TARGET,
-ROUND(n.ACT_MP_OT*n.PLAN_WH_OT/n.PLAN_SEW_SMV) ACT_TARGET_OT
+ROUND(n.ACT_MP_OT*n.PLAN_WH_OT/n.PLAN_SEW_SMV) ACT_TARGET_OT,
+ROUND(n.ACT_MP_X_OT*n.PLAN_WH_X_OT/n.PLAN_SEW_SMV) ACT_TARGET_X_OT
 FROM (
-SELECT a.SCHD_ID, a.SCH_ID, a.SCHD_PROD_DATE, e.ID_SITELINE,  d.SITE_NAME, d.LINE_NAME, e.SHIFT,
-b.ORDER_REFERENCE_PO_NO, d.FOREMAN, 
-a.SCHD_CAPACITY_ID, a.SCHD_DAYS_NUMBER, a.SCHD_QTY, b.ORDER_NO, b.CUSTOMER_NAME, b.CUSTOMER_PROGRAM, b.PRODUCT_ITEM_CODE, 
-b.ITEM_COLOR_CODE, b.ITEM_COLOR_NAME, b.PRODUCT_ITEM_DESCRIPTION,  b.ORDER_STYLE_DESCRIPTION,
-CASE WHEN ISNULL(c.ACTUAL_SEW_SMV) THEN c.PLAN_SEW_SMV ELSE c.ACTUAL_SEW_SMV END PLAN_SEW_SMV,
-CASE WHEN ISNULL(m.PLAN_MP) THEN e.PLAN_MP ELSE m.PLAN_MP END PLAN_MP, 
-CASE WHEN ISNULL(f.PLAN_WH) THEN e.PLAN_WH ELSE f.PLAN_WH END PLAN_WH, 
-m.PLAN_MP_OT, f.PLAN_WH_OT,  m.ACT_MP, m.ACT_MP_OT, o.PLAN_REMARK, p.NORMAL_OUTPUT, p.OT_OUTPUT,
-XN.NORMAL_REMARK, XN.OT_REMARK
-FROM weekly_prod_sch_detail a
-LEFT JOIN viewcapacity b ON a.SCHD_CAPACITY_ID = b.ID_CAPACITY 
-LEFT JOIN item_smv_header c ON c.ORDER_NO = b.ORDER_NO
-LEFT JOIN item_siteline d ON a.SCHD_ID_SITELINE = d.ID_SITELINE
-LEFT JOIN 	(
--- Manpower_detail di join dengan item siteline untunk mendapatkan line name dan shift
-SELECT a.ID_MPD, a.MP_DATE, a.ID_SITELINE, b.SITE_NAME, b.LINE_NAME, b.SHIFT, a.PLAN_WH, a.PLAN_MP, a.ACT_WH, a.ACT_MP, a.OT_WH, a.OT_MP
-FROM manpower_detail a 
-LEFT JOIN item_siteline b ON a.ID_SITELINE = b.ID_SITELINE
-WHERE a.MP_DATE = :plannDate  AND b.SITE_NAME = :sitename AND b.SHIFT = :shift AND b.ID_SITELINE = :idstieline
-ORDER by a.ID_SITELINE
-) e ON e.LINE_NAME = d.LINE_NAME
+	SELECT a.SCHD_ID, a.SCH_ID, a.SCHD_PROD_DATE, e.ID_SITELINE,  d.SITE_NAME, d.LINE_NAME, e.SHIFT,
+	b.ORDER_REFERENCE_PO_NO,
+	a.SCHD_CAPACITY_ID, a.SCHD_DAYS_NUMBER, a.SCHD_QTY, b.ORDER_NO, b.CUSTOMER_NAME, b.CUSTOMER_PROGRAM, b.PRODUCT_ITEM_CODE, 
+	b.ITEM_COLOR_CODE, b.ITEM_COLOR_NAME, b.PRODUCT_ITEM_DESCRIPTION,  b.ORDER_STYLE_DESCRIPTION,
+	CASE WHEN ISNULL(c.ACTUAL_SEW_SMV) THEN c.PLAN_SEW_SMV ELSE c.ACTUAL_SEW_SMV END PLAN_SEW_SMV,
+	CASE WHEN ISNULL(m.PLAN_MP) THEN e.PLAN_MP ELSE m.PLAN_MP END PLAN_MP, 
+	CASE WHEN ISNULL(f.PLAN_WH) THEN e.PLAN_WH ELSE f.PLAN_WH END PLAN_WH, 
+	m.ACT_MP, m.PLAN_MP_OT, m.ACT_MP_OT, m.ACT_MP_X_OT, f.PLAN_WH_OT, m.PLAN_MP_X_OT, f.PLAN_WH_X_OT, 
+	o.PLAN_REMARK, p.NORMAL_OUTPUT, p.OT_OUTPUT, p.X_OT_OUTPUT,	XN.NORMAL_REMARK, XN.OT_REMARK, XN.OT_X_REMARK
+	FROM weekly_prod_sch_detail a
+	LEFT JOIN viewcapacity b ON a.SCHD_CAPACITY_ID = b.ID_CAPACITY 
+	LEFT JOIN item_smv_header c ON c.ORDER_NO = b.ORDER_NO
+		-- untuk aktual SMV
+	LEFT JOIN smv_daily_plan g ON g.SCHD_ID = a.SCHD_ID AND g.SHIFT = 'Normal_A'
+	LEFT JOIN item_siteline d ON a.SCHD_ID_SITELINE = d.ID_SITELINE
+	LEFT JOIN 	(
+	-- Manpower_detail di join dengan item siteline untunk mendapatkan line name dan shift
+		SELECT a.ID_MPD, a.MP_DATE, a.ID_SITELINE, b.SITE_NAME, b.LINE_NAME, b.SHIFT, a.PLAN_WH, a.PLAN_MP, a.ACT_WH, a.ACT_MP, a.OT_WH, a.OT_MP
+		FROM manpower_detail a 
+		LEFT JOIN item_siteline b ON a.ID_SITELINE = b.ID_SITELINE
+		WHERE a.MP_DATE = :plannDate  AND b.SITE_NAME = :sitename AND b.SHIFT = :shift AND b.ID_SITELINE = :idstieline
+		ORDER by a.ID_SITELINE
+	) e ON e.LINE_NAME = d.LINE_NAME
 -- untuk working hour dan mp_daily_detail dipakaikan kolom shift untuk mengambil data jika line mempunyai shifting
-LEFT JOIN workinghour_detail f ON f.SCHD_ID = a.SCHD_ID AND f.SHIFT = :shift
-LEFT JOIN mp_daily_detail m ON m.SCHD_ID = a.SCHD_ID AND m.SHIFT = :shift
-LEFT JOIN remark_detail o ON o.SCHD_ID = a.SCHD_ID AND o.SHIFT = :shift
-LEFT JOIN qcendlineoutput p ON a.SCHD_ID = p.ENDLINE_ACT_SCHD_ID AND p.ENDLINE_ID_SITELINE = :idstieline 
-LEFT JOIN (
-	SELECT xc.SCHD_ID, xc.ID_SITELINE, 
-			CASE WHEN xc.TYPE_PROD = 'N'  THEN  xc.REMARK END AS NORMAL_REMARK,
-			CASE WHEN xc.TYPE_PROD = 'O'  THEN  xc.REMARK END AS OT_REMARK
-  	FROM (
-			SELECT a.SCHD_ID, a.ID_SITELINE, a.TYPE_PROD, a.REMARK
-			FROM qc_endline_remark a WHERE a.PROD_DATE = :plannDate  AND a.ID_SITELINE = :idstieline 
-			)xc
-) XN ON XN.SCHD_ID = a.SCHD_ID 
-WHERE a.SCHD_PROD_DATE = :plannDate   AND e.MP_DATE = :plannDate  AND d.SITE_NAME = :sitename AND d.LINE_NAME = :linename
+	LEFT JOIN workinghour_detail f ON f.SCHD_ID = a.SCHD_ID AND f.SHIFT = :shift
+	LEFT JOIN mp_daily_detail m ON m.SCHD_ID = a.SCHD_ID AND m.SHIFT = :shift
+	LEFT JOIN remark_detail o ON o.SCHD_ID = a.SCHD_ID AND o.SHIFT = :shift
+	LEFT JOIN qcendlineoutput p ON a.SCHD_ID = p.ENDLINE_ACT_SCHD_ID AND p.ENDLINE_ID_SITELINE = :idstieline
+	LEFT JOIN (
+			SELECT xc.SCHD_ID, xc.ID_SITELINE, 
+		       MAX(CASE WHEN xc.TYPE_PROD = 'N' THEN xc.REMARK END) AS NORMAL_REMARK,
+		       MAX(CASE WHEN xc.TYPE_PROD = 'O' THEN xc.REMARK END) AS OT_REMARK,
+		       MAX(CASE WHEN xc.TYPE_PROD = 'XO' THEN xc.REMARK END) AS OT_X_REMARK
+			FROM (
+			    SELECT a.SCHD_ID, a.ID_SITELINE, a.TYPE_PROD, a.REMARK
+			    FROM qc_endline_remark a 
+			    WHERE a.PROD_DATE = :plannDate AND a.ID_SITELINE = :idstieline
+			) xc
+			GROUP BY xc.SCHD_ID, xc.ID_SITELINE
+	) XN ON XN.SCHD_ID = a.SCHD_ID 
+	WHERE a.SCHD_PROD_DATE = :plannDate   AND e.MP_DATE = :plannDate  AND d.SITE_NAME = :sitename AND d.LINE_NAME = :linename
 )n `;
+// export const QueryQcEndlineDaily = `SELECT *,ROUND(n.PLAN_MP*n.PLAN_WH/n.PLAN_SEW_SMV) PLAN_TARGET,
+// ROUND(n.PLAN_MP_OT*n.PLAN_WH_OT/n.PLAN_SEW_SMV) PLAN_TARGET_OT,
+// ROUND(n.ACT_MP*n.PLAN_WH/n.PLAN_SEW_SMV) ACT_TARGET,
+// ROUND(n.ACT_MP_OT*n.PLAN_WH_OT/n.PLAN_SEW_SMV) ACT_TARGET_OT
+// FROM (
+// SELECT a.SCHD_ID, a.SCH_ID, a.SCHD_PROD_DATE, e.ID_SITELINE,  d.SITE_NAME, d.LINE_NAME, e.SHIFT,
+// b.ORDER_REFERENCE_PO_NO, d.FOREMAN,
+// a.SCHD_CAPACITY_ID, a.SCHD_DAYS_NUMBER, a.SCHD_QTY, b.ORDER_NO, b.CUSTOMER_NAME, b.CUSTOMER_PROGRAM, b.PRODUCT_ITEM_CODE,
+// b.ITEM_COLOR_CODE, b.ITEM_COLOR_NAME, b.PRODUCT_ITEM_DESCRIPTION,  b.ORDER_STYLE_DESCRIPTION,
+// CASE WHEN ISNULL(c.ACTUAL_SEW_SMV) THEN c.PLAN_SEW_SMV ELSE c.ACTUAL_SEW_SMV END PLAN_SEW_SMV,
+// CASE WHEN ISNULL(m.PLAN_MP) THEN e.PLAN_MP ELSE m.PLAN_MP END PLAN_MP,
+// CASE WHEN ISNULL(f.PLAN_WH) THEN e.PLAN_WH ELSE f.PLAN_WH END PLAN_WH,
+// m.PLAN_MP_OT, f.PLAN_WH_OT,  m.ACT_MP, m.ACT_MP_OT, o.PLAN_REMARK, p.NORMAL_OUTPUT, p.OT_OUTPUT,
+// XN.NORMAL_REMARK, XN.OT_REMARK
+// FROM weekly_prod_sch_detail a
+// LEFT JOIN viewcapacity b ON a.SCHD_CAPACITY_ID = b.ID_CAPACITY
+// LEFT JOIN item_smv_header c ON c.ORDER_NO = b.ORDER_NO
+// LEFT JOIN item_siteline d ON a.SCHD_ID_SITELINE = d.ID_SITELINE
+// LEFT JOIN 	(
+// -- Manpower_detail di join dengan item siteline untunk mendapatkan line name dan shift
+// SELECT a.ID_MPD, a.MP_DATE, a.ID_SITELINE, b.SITE_NAME, b.LINE_NAME, b.SHIFT, a.PLAN_WH, a.PLAN_MP, a.ACT_WH, a.ACT_MP, a.OT_WH, a.OT_MP
+// FROM manpower_detail a
+// LEFT JOIN item_siteline b ON a.ID_SITELINE = b.ID_SITELINE
+// WHERE a.MP_DATE = :plannDate  AND b.SITE_NAME = :sitename AND b.SHIFT = :shift AND b.ID_SITELINE = :idstieline
+// ORDER by a.ID_SITELINE
+// ) e ON e.LINE_NAME = d.LINE_NAME
+// -- untuk working hour dan mp_daily_detail dipakaikan kolom shift untuk mengambil data jika line mempunyai shifting
+// LEFT JOIN workinghour_detail f ON f.SCHD_ID = a.SCHD_ID AND f.SHIFT = :shift
+// LEFT JOIN mp_daily_detail m ON m.SCHD_ID = a.SCHD_ID AND m.SHIFT = :shift
+// LEFT JOIN remark_detail o ON o.SCHD_ID = a.SCHD_ID AND o.SHIFT = :shift
+// LEFT JOIN qcendlineoutput p ON a.SCHD_ID = p.ENDLINE_ACT_SCHD_ID AND p.ENDLINE_ID_SITELINE = :idstieline
+// LEFT JOIN (
+// 	SELECT xc.SCHD_ID, xc.ID_SITELINE,
+// 			CASE WHEN xc.TYPE_PROD = 'N'  THEN  xc.REMARK END AS NORMAL_REMARK,
+// 			CASE WHEN xc.TYPE_PROD = 'O'  THEN  xc.REMARK END AS OT_REMARK
+//   	FROM (
+// 			SELECT a.SCHD_ID, a.ID_SITELINE, a.TYPE_PROD, a.REMARK
+// 			FROM qc_endline_remark a WHERE a.PROD_DATE = :plannDate  AND a.ID_SITELINE = :idstieline
+// 			)xc
+// ) XN ON XN.SCHD_ID = a.SCHD_ID
+// WHERE a.SCHD_PROD_DATE = :plannDate   AND e.MP_DATE = :plannDate  AND d.SITE_NAME = :sitename AND d.LINE_NAME = :linename
+// )n `;
 
 //query untuk scan bundle dari preparataion ke sewing in hampir sama kaya daily plan biasa namun ada total target
 export const QueryDailySchSewIn = `SELECT *, IF(nm.PLAN_TARGET_OT,nm.PLAN_TARGET+nm.PLAN_TARGET_OT,nm.PLAN_TARGET) TOTAl_TARGET  FROM(
@@ -198,3 +289,24 @@ WHERE a.SCHD_PROD_DATE = :schDate AND a.SCHD_SITE = :sitename`;
 
 export const FindQrReturn = `SELECT * FROM scan_sewing_return a WHERE a.BARCODE_SERIAL = :barcodeserial AND  a.CONFIRM_STATUS = '0'`;
 export const FindOnePlanZ = `SELECT * FROM qc_endline_plansize a WHERE a.PLANSIZE_ID = :planzId`;
+
+export const SmvDailyPlan = db.define(
+  "smv_daily_plan",
+  {
+    SCHD_ID: { type: DataTypes.BIGINT },
+    SHIFT: { type: DataTypes.STRING },
+    LINE_NAME: { type: DataTypes.STRING },
+    SMV_PLAN: { type: DataTypes.FLOAT },
+    CREATE_BY: { type: DataTypes.INTEGER },
+    CREATE_DATE: { type: DataTypes.DATE },
+    UPDATE_BY: { type: DataTypes.INTEGER },
+    UPDATE_DATE: { type: DataTypes.DATE },
+  },
+  {
+    freezeTableName: true,
+    createdAt: "CREATE_DATE",
+    updatedAt: "UPDATE_DATE",
+  }
+);
+
+SmvDailyPlan.removeAttribute("id");

@@ -23,6 +23,10 @@ import {
   getListLineByGroup,
   getSiteList,
 } from "../../controllers/production/sewing/SiteLine.js";
+import {
+  clearMpAndWh,
+  postSmvPlan,
+} from "../../controllers/production/planning/DailyPlanning.js";
 
 // ROUTE SEWING
 router.get("/sitelist", getSiteList);
@@ -38,7 +42,10 @@ router.post("/sewing-mp/generate", postRegenerateMp);
 router.post("/sewing-wh-detail/", postDailyWh);
 router.post("/order/scan", QRScanSewing);
 router.post("/ot-mp-wh/", postWhMpOt);
+router.post("/smv-plan/", postSmvPlan);
 router.post("/daily-remark/", postRemark);
+//clear daily selected
+router.post("/clear-selected/", clearMpAndWh);
 
 router.patch("/sewing-mp/", updateManpowerDefault);
 

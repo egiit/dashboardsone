@@ -19,6 +19,7 @@ export const postDailyWh = async (req, res) => {
 
     if (!findWh) {
       const newWh = await WorkingHoursDetail.create(data);
+
       return res
         .status(200)
         .json({ message: "Success Set Working Hours", data: newWh });
@@ -64,7 +65,13 @@ export const postWhMpOt = async (req, res) => {
     });
 
     //if data Manpower exist and data before with data new same update
-    if (checkMpOt && checkMpOt.dataValues.PLAN_MP_OT !== dataPlan.PLAN_MP_OT) {
+    // if (checkMpOt && checkMpOt.dataValues.PLAN_MP_OT !== dataPlan.PLAN_MP_OT) {
+    //   const dataForPostMp = { ...dataPlan, CREATE_BY: null };
+    //   await ManpowewrDailyDetail.update(dataForPostMp, {
+    //     where: { ID_MPD: checkMpOt.dataValues.ID_MPD },
+    //   });
+    // }
+    if (checkMpOt) {
       const dataForPostMp = { ...dataPlan, CREATE_BY: null };
       await ManpowewrDailyDetail.update(dataForPostMp, {
         where: { ID_MPD: checkMpOt.dataValues.ID_MPD },
@@ -78,7 +85,13 @@ export const postWhMpOt = async (req, res) => {
     }
 
     //if data Workinghours exist and data before with data new same update
-    if (checkWhOt && checkWhOt.dataValues.PLAN_WH_OT !== dataPlan.PLAN_WH_OT) {
+    // if (checkWhOt && checkWhOt.dataValues.PLAN_WH_OT !== dataPlan.PLAN_WH_OT) {
+    //   const dataForPostwH = { ...dataPlan, CREATE_BY: null };
+    //   await WorkingHoursDetail.update(dataForPostwH, {
+    //     where: { ID_WHD: checkWhOt.dataValues.ID_WHD },
+    //   });
+    // }
+    if (checkWhOt) {
       const dataForPostwH = { ...dataPlan, CREATE_BY: null };
       await WorkingHoursDetail.update(dataForPostwH, {
         where: { ID_WHD: checkWhOt.dataValues.ID_WHD },
