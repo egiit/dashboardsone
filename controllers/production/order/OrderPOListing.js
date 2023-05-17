@@ -70,7 +70,7 @@ export const newOrderPOListing = async (req, res) => {
           ORDER_STYLE_DESCRIPTION,
           ITEM_COLOR_CODE,
           ITEM_COLOR_NAME,
-          TARGET_PCD,
+          // TARGET_PCD,
           PLAN_EXFACTORY_DATE,
           ORIGINAL_DELIVERY_DATE,
           ...newOrdr
@@ -86,6 +86,9 @@ export const newOrderPOListing = async (req, res) => {
 
         if (records.MANUFACTURING_SITE !== order.MANUFACTURING_SITE)
           joinAfterDecon.NEW_MANUFACTURING_SITE = order.MANUFACTURING_SITE;
+
+        if (records.NEW_TARGET_PCD !== order.TARGET_PCD)
+          joinAfterDecon.NEW_TARGET_PCD = order.TARGET_PCD;
 
         if (records.TARGET_PCD !== order.TARGET_PCD)
           joinAfterDecon.NEW_TARGET_PCD = order.TARGET_PCD;
