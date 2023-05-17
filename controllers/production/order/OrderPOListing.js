@@ -81,7 +81,10 @@ export const newOrderPOListing = async (req, res) => {
         //Join New Data with existing Object/Data
         const joinAfterDecon = { ...records, ...newOrdr };
         // jika new manufacture juga berbeda dengan manufacture yang baru diupload
-        if (records.NEW_MANUFACTURING_SITE !== order.MANUFACTURING_SITE)
+        if (
+          records.NEW_MANUFACTURING_SITE !== NULL &&
+          records.NEW_MANUFACTURING_SITE !== order.MANUFACTURING_SITE
+        )
           joinAfterDecon.NEW_MANUFACTURING_SITE = order.MANUFACTURING_SITE;
 
         if (records.MANUFACTURING_SITE !== order.MANUFACTURING_SITE)
