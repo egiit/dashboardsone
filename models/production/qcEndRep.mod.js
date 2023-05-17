@@ -47,7 +47,7 @@ LEFT JOIN (
         SUM(b.CHECKED) CHECKED, SUM(b.GOOD) GOOD, SUM(b.RTT) RTT, SUM(b.DEFECT) DEFECT, SUM(b.REPAIRED) REPAIRED, SUM(b.BS) BS
         FROM weekly_prod_sch_detail a
         LEFT JOIN viewqcendcheckall b ON a.SCHD_ID = b.ENDLINE_ACT_SCHD_ID 
-        LEFT JOIN item_siteline c ON a.SCHD_ID_SITELINE = c.ID_SITELINE
+        LEFT JOIN item_siteline c ON  b.ENDLINE_ID_SITELINE = c.ID_SITELINE
         WHERE a.SCHD_PROD_DATE = :schDate AND    c.SITE_NAME = :sitename AND c.SHIFT = :shift
         GROUP BY a.SCHD_PROD_DATE, b.ENDLINE_ID_SITELINE, b.ENDLINE_ACT_SCHD_ID  
 ) xs ON xs.ENDLINE_ACT_SCHD_ID = n.SCHD_ID
