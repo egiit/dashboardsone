@@ -95,7 +95,10 @@ export const getOrderByBLK = async (req, res) => {
           .filter(
             (ord) => ord.ORDER_SIZE === size && ord.ITEM_COLOR_NAME === col
           )
-          .map((order, i) => ({ ...order, SEQUENCE: i + 1 }));
+          .map((order, i) => ({
+            ...order,
+            SEQUENCE: !order.SEQUENCE ? i + 1 : order.SEQUENCE,
+          }));
         orderWithSeq.push(...newList);
       });
     });
