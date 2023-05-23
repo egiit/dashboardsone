@@ -39,7 +39,7 @@ export const SetActualMp = async (req, res) => {
       },
     });
     // if founded
-    if (findMp) {
+    if (findMp !== null) {
       const updateMp = await ManpowewrDailyDetail.update(dataPlan, {
         where: {
           SCHD_ID: dataPlan.SCHD_ID,
@@ -51,13 +51,14 @@ export const SetActualMp = async (req, res) => {
         data: updateMp,
         message: "Update Actual Manpower Successfully",
       });
+    } else {
+      const create = await ManpowewrDailyDetail.create(dataPlan);
+      return res.status(200).json({
+        success: true,
+        data: create,
+        message: "Create Actual Manpower Successfully",
+      });
     }
-    const create = await ManpowewrDailyDetail.create(dataPlan);
-    return res.status(200).json({
-      success: true,
-      data: create,
-      message: "Create Actual Manpower Successfully",
-    });
   } catch (error) {
     // console.log(error);
     res.status(404).json({
