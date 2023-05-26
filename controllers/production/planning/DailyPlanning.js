@@ -46,6 +46,7 @@ export const getDailySchSewIn = async (req, res) => {
 
     return res.json(pland);
   } catch (error) {
+    console.log(error);
     res.status(404).json({
       message: "error processing request",
       data: error,

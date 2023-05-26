@@ -82,7 +82,7 @@ export const newOrderPOListing = async (req, res) => {
         const joinAfterDecon = { ...records, ...newOrdr };
         // jika new manufacture juga berbeda dengan manufacture yang baru diupload
         if (
-          records.NEW_MANUFACTURING_SITE !== NULL &&
+          records.NEW_MANUFACTURING_SITE !== null &&
           records.NEW_MANUFACTURING_SITE !== order.MANUFACTURING_SITE
         )
           joinAfterDecon.NEW_MANUFACTURING_SITE = order.MANUFACTURING_SITE;
