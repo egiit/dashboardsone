@@ -63,7 +63,7 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.LIN
                 IF(TIMEDIFF(n.LT_OT,  n.FT_OT) >= TIME('04:00:00'),time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60-60, time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60)  ACT_WH_OT,
                 time_to_sec(TIMEDIFF(n.LT_X_OT,  n.FT_X_OT))/60  ACT_WH_X_OT
             FROM (
-                    SELECT a.SCHD_ID, a.SCH_ID, a.SCHD_PROD_DATE, a.SCHD_ID_SITELINE ID_SITELINE,  d.SITE_NAME, d.LINE_NAME, e.SHIFT, 
+                    SELECT a.SCHD_ID, a.SCH_ID, a.SCHD_PROD_DATE, e.ID_SITELINE,  d.SITE_NAME, d.LINE_NAME, e.SHIFT, 
                     IF(SUBSTRING(:shift ,1,5) = 'Shift', CAST(ROUND(a.SCHD_QTY/2) AS INT), a.SCHD_QTY ) SCHD_QTY,
                     b.ORDER_REFERENCE_PO_NO, d.FOREMAN,  a.SCHD_DAYS_NUMBER,
                     b.ORDER_NO, b.CUSTOMER_NAME, b.CUSTOMER_PROGRAM, b.PRODUCT_ITEM_CODE, 

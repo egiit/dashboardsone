@@ -65,7 +65,7 @@ LEFT JOIN item_siteline d ON a.SCHD_ID_SITELINE = d.ID_SITELINE
 LEFT JOIN view_weekly_sch_size f ON a.SCH_ID = f.SCH_ID
 -- LEFT JOIN po_matrix_delivery g ON f.PDM_ID = g.PDM_ID 
 WHERE a.SCHD_PROD_DATE = :plannDate AND a.SCHD_SITE = :sitename AND d.LINE_NAME = :lineName
-AND b.MO_NO = :moNo AND  b.ORDER_STYLE_DESCRIPTION = :styleDesc AND b.ITEM_COLOR_NAME = :colorCode
+ AND  b.ORDER_STYLE_DESCRIPTION = :styleDesc AND b.ITEM_COLOR_NAME = :colorCode
 AND f.SIZE_CODE = :sizeCode`;
 // export const QueryCheckSchdScan = `SELECT a.SCHD_ID, a.SCH_ID, g.PDM_ID, a.SCHD_PROD_DATE, b.CUSTOMER_NAME,
 // b.ORDER_NO, b.MO_NO, d.ID_SITELINE,  d.SITE_NAME, d.LINE_NAME,

@@ -29,10 +29,10 @@ const runDb = async () => {
 
 runDb();
 
-cron.schedule("1 1 * * *", () => {
-  console.log("running a task reschedule");
-  funcReschedule();
-});
+// cron.schedule(" * * * *", () => {
+//   console.log("running a task reschedule");
+//   funcReschedule();
+// });
 
 // app.use(cors());
 

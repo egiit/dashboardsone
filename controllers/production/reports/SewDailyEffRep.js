@@ -13,9 +13,9 @@ export const getSewRepEff = async (req, res) => {
 
     const today = moment().format("YYYY-MM-DD");
 
-    let queryEff = today === schDate ? QueryEffCurDate : QueryEffFromLog;
+    // let queryEff = today === schDate ? QueryEffCurDate : QueryEffFromLog;
 
-    const detailSch = await db.query(queryEff, {
+    const detailSch = await db.query(QueryEffCurDate, {
       replacements: {
         schDate: schDate,
         sitename: sitename,

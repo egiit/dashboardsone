@@ -10,14 +10,16 @@ import {
   ManpowewrDailyDetail,
   WorkingHoursDetail,
 } from "../../../models/production/sewing.mod.js";
+import { QueryEffCurDate } from "../../../models/reports/sewDayliEffRep.mod.js";
 
 export const getDailyPlanning = async (req, res) => {
   try {
     const { plannDate, sitename, shift } = req.params;
 
-    const pland = await db.query(QueryDailyPlann, {
+    const pland = await db.query(QueryEffCurDate, {
+      // const pland = await db.query(QueryDailyPlann, {
       replacements: {
-        plannDate: plannDate,
+        schDate: plannDate,
         sitename: sitename,
         shift: shift,
       },
@@ -26,6 +28,7 @@ export const getDailyPlanning = async (req, res) => {
 
     return res.json(pland);
   } catch (error) {
+    console.log(error);
     res.status(404).json({
       message: "error processing request",
       data: error,
