@@ -32,7 +32,7 @@ router.post("/check-header", checkSchBforAdd);
 
 router.get("/capacity/:capId", getOneCapacity);
 router.get("/capacity/:startMonth/:endMonth", getCapacity);
-router.get("/header/:startDate/:endDate", getHeaderWeekSch);
+router.get("/header/:startDate/:endDate/:site", getHeaderWeekSch);
 router.get("/one/header/:schId", getOneHeaderWeekSch);
 router.get("/group-header/header/:capId", getGroupHeaderWeekSch);
 router.get("/size-alocation/:capId/:schId", getPlanSizeAlocUpd);
@@ -40,7 +40,7 @@ router.get("/size-alocation/:capId/:schId", getPlanSizeAlocUpd);
 router.post("/daily", postSchDataDetail);
 router.patch("/daily", patchSchDataDetail);
 router.delete("/daily/:schId/:schdId", checkBdllBfrDel, deleteSchDataDetail);
-router.get("/daily/:startDate/:endDate/:schId", getDayliSch);
+router.get("/daily/:startDate/:endDate/:site/:schId", getDayliSch);
 router.get("/group/:schId", getOneGroupDayliSch);
 
 //daily-planning

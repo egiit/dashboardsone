@@ -66,11 +66,12 @@ export const getOneCapacity = async (req, res) => {
 
 export const getHeaderWeekSch = async (req, res) => {
   try {
-    const { startDate, endDate } = req.params;
+    const { startDate, endDate, site } = req.params;
     const weekSchHead = await db.query(QueryGetHeadWeekSch, {
       replacements: {
         startDate: startDate,
         endDate: endDate,
+        site: site,
       },
       type: QueryTypes.SELECT,
     });
@@ -133,12 +134,13 @@ export const getGroupHeaderWeekSch = async (req, res) => {
 //get daily or detail schedule/planing
 export const getDayliSch = async (req, res) => {
   try {
-    const { startDate, endDate, schId } = req.params;
+    const { startDate, endDate, schId, site } = req.params;
     const detailSch = await db.query(QueryGetDayliSch, {
       replacements: {
         startDate: startDate,
         endDate: endDate,
         schId: schId,
+        site: site,
       },
       type: QueryTypes.SELECT,
     });
