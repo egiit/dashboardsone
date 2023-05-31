@@ -42,7 +42,7 @@ export const postDailyWh = async (req, res) => {
   }
 };
 
-//sewing OT manpower and Working Hour
+//sewing manpower and Working Hour
 export const postWhMpOt = async (req, res) => {
   try {
     //get data from front end
@@ -76,10 +76,7 @@ export const postWhMpOt = async (req, res) => {
       await ManpowewrDailyDetail.update(dataForPostMp, {
         where: { ID_MPD: checkMpOt.dataValues.ID_MPD },
       });
-    }
-
-    //if not exist create
-    if (!checkMpOt) {
+    } else {
       const dataForPostMp = { ...dataPlan, UPDATE_BY: null };
       await ManpowewrDailyDetail.create(dataForPostMp);
     }
@@ -96,9 +93,7 @@ export const postWhMpOt = async (req, res) => {
       await WorkingHoursDetail.update(dataForPostwH, {
         where: { ID_WHD: checkWhOt.dataValues.ID_WHD },
       });
-    }
-    //if not exist create
-    if (!checkWhOt) {
+    } else {
       const dataForPostwH = { ...dataPlan, UPDATE_BY: null };
       await WorkingHoursDetail.create(dataForPostwH);
     }

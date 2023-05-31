@@ -135,6 +135,7 @@ export const QRScanSewingIn = async (req, res) => {
           sitename: sitename,
           lineName: lineName ? lineName : valueBarcode.LINE_NAME,
           // moNo: valueBarcode.MO_NO,
+          orderRef: valueBarcode.ORDER_REF,
           styleDesc: valueBarcode.ORDER_STYLE,
           colorCode: valueBarcode.ORDER_COLOR,
           sizeCode: valueBarcode.ORDER_SIZE,

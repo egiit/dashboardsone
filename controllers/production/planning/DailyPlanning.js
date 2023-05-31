@@ -120,6 +120,7 @@ export const postSmvPlan = async (req, res) => {
   }
 };
 
+//clear manpower and working hour by array from select checkbo
 export const clearMpAndWh = async (req, res) => {
   try {
     const listSchdule = req.body;
