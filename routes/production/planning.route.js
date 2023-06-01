@@ -3,6 +3,7 @@ import {
   getDailyPlanning,
   getDailyPlanningQCend,
   getDailySchSewIn,
+  syncLogDailyOutput,
 } from "../../controllers/production/planning/DailyPlanning.js";
 import {
   checkBdllBfrDel,
@@ -45,6 +46,7 @@ router.get("/group/:schId", getOneGroupDayliSch);
 
 //daily-planning
 router.get("/planning-daily/:plannDate/:sitename/:shift", getDailyPlanning);
+router.get("/planning-sycn-log/:schDate/:sitename/:shift", syncLogDailyOutput);
 //daily-planning sewing in
 router.get("/planning-daily-sewin/:plannDate/:sitename", getDailySchSewIn);
 router.get(

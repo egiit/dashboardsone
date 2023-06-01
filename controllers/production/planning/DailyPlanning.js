@@ -1,6 +1,8 @@
 import db from "../../../config/database.js";
 import { QueryTypes, Op } from "sequelize";
 import {
+  LogDailyOutput,
+  QryDailyResultForSyncLog,
   QueryDailyPlann,
   QueryDailySchSewIn,
   QueryQcEndlineDaily,
@@ -27,6 +29,63 @@ export const getDailyPlanning = async (req, res) => {
     });
 
     return res.json(pland);
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      message: "error processing request",
+      data: error,
+    });
+  }
+};
+
+export const syncLogDailyOutput = async (req, res) => {
+  try {
+    const { schDate, sitename, shift } = req.params;
+
+    const planWithOutput = await db.query(QryDailyResultForSyncLog, {
+      // const pland = await db.query(QueryDailyPlann, {
+      replacements: {
+        schDate: schDate,
+        sitename: sitename,
+        shift: shift,
+      },
+      type: QueryTypes.SELECT,
+    });
+
+    if (planWithOutput.length === 0)
+      return res.json({ status: false, message: "No Data Plan And Output" });
+
+    const findLog = await LogDailyOutput.findAll({
+      where: {
+        SCHD_PROD_DATE: schDate,
+        SITE_NAME: sitename,
+        SHIFT: shift,
+      },
+    });
+
+    if (findLog.length > 0) {
+      await LogDailyOutput.destroy({
+        where: {
+          SCHD_PROD_DATE: schDate,
+          SITE_NAME: sitename,
+          SHIFT: shift,
+        },
+      });
+    }
+
+    await LogDailyOutput.bulkCreate(planWithOutput)
+      .then(() => {
+        return res.status(200).json({
+          success: true,
+          message: "Recap Successfull",
+        });
+      })
+      .catch((err) => {
+        res.status(404).json({
+          message: "error processing request",
+          data: err,
+        });
+      });
   } catch (error) {
     console.log(error);
     res.status(404).json({
