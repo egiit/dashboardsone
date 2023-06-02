@@ -57,7 +57,7 @@ export const QueryGetDayliSch = `SELECT a.SCHD_ID, a.SCH_ID, a.SCHD_PROD_MONTH, 
 a.SCHD_CAPACITY_ID, a.SCHD_DAYS_NUMBER, b.SCH_QTY SCHD_HEADER_QTY, a.SCHD_STATUS_OUTPUT,  a.SCHD_HEAD_BALANCE, a.SCHD_QTY
 FROM weekly_prod_sch_detail a 
 LEFT JOIN weekly_prod_schedule b ON a.SCH_ID = b.SCH_ID
-WHERE a.SCHD_PROD_DATE BETWEEN :startDate AND :endDate AND a.SCHD_SITE = :site -- AND a.SCH_ID LIKE :schId 
+WHERE a.SCHD_PROD_DATE BETWEEN :startDate AND :endDate AND a.SCHD_SITE = :site  AND a.SCH_ID LIKE :schId 
 ORDER BY a.SCHD_DAYS_NUMBER`;
 
 export const QueryGetOneDayliSch = `SELECT a.SCHD_ID, a.SCH_ID, a.SCHD_PROD_MONTH, a.SCHD_PROD_DATE, a.SCHD_SITE, a.SCHD_ID_SITELINE,
