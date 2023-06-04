@@ -4,6 +4,7 @@ import {
   QryMesHederRepList,
   QueryDetailEndCheck,
   QueryDtlDayDef,
+  QueryDtlDayDefSum,
   QueryDtlEndChckTblet,
   QueryGetDescMes,
   QueryMeasSpecRep,
@@ -147,6 +148,32 @@ export const getDailyDefDetail = async (req, res) => {
   try {
     const { schDate, sitename, shift } = req.params;
     const detailSch = await db.query(QueryDtlDayDef, {
+      replacements: {
+        schDate: schDate,
+        sitename: sitename,
+        shift: shift,
+      },
+      type: QueryTypes.SELECT,
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: detailSch,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(404).json({
+      message: "error processing get deteail defect",
+      data: error,
+    });
+  }
+};
+
+//get list detail defect Sumary
+export const getDailyDefDetailSum = async (req, res) => {
+  try {
+    const { schDate, sitename, shift } = req.params;
+    const detailSch = await db.query(QueryDtlDayDefSum, {
       replacements: {
         schDate: schDate,
         sitename: sitename,

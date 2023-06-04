@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getDailyDefDetail,
+  getDailyDefDetailSum,
   getMeasurementRep,
   getPlanningEendReport,
   getQcEndChckTablet,
@@ -112,6 +113,10 @@ router.get(
 router.get(
   "/report/detail-defect/:schDate/:sitename/:shift",
   getDailyDefDetail
+);
+router.get(
+  "/report/detail-defect-sum/:schDate/:sitename/:shift",
+  getDailyDefDetailSum
 );
 
 //measurement report
