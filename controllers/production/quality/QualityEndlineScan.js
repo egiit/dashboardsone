@@ -342,7 +342,7 @@ export const planSizePost = async (req, res) => {
       });
     }
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     return res.status(404).json({
       message: "error processing Plan Size",
       data: error,
