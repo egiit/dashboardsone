@@ -314,7 +314,7 @@ export const planSizePost = async (req, res) => {
       },
     });
 
-    if (!checkDataPlanSize) {
+    if (!checkDataPlanSize.dataValues.PLANSIZE_ID) {
       delete dataPlanSize.PLANSIZE_MOD_ID;
       const dataplanSizePost = await PlanSize.create(dataPlanSize);
       if (dataplanSizePost) {
@@ -689,11 +689,12 @@ export const postReturnBdl = async (req, res) => {
     let dataReturn = req.body;
 
     const bundleremark = await SewingBdlReturn.findOne({
-      attributes: ["BARCODE_SERIAL", "SCH_ID", "SCHD_ID"],
+      attributes: ["BARCODE_SERIAL", "SCH_ID", "SCHD_ID", "CONFIRM_STATUS"],
       where: {
         BARCODE_SERIAL: dataReturn.BARCODE_SERIAL,
         SCH_ID: dataReturn.SCH_ID,
         SCHD_ID: dataReturn.SCHD_ID,
+        CONFIRM_STATUS: 0,
       },
     });
 
