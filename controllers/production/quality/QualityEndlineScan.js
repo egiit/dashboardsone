@@ -314,7 +314,7 @@ export const planSizePost = async (req, res) => {
       },
     });
 
-    if (!checkDataPlanSize.dataValues.PLANSIZE_ID) {
+    if (checkDataPlanSize === null) {
       delete dataPlanSize.PLANSIZE_MOD_ID;
       const dataplanSizePost = await PlanSize.create(dataPlanSize);
       if (dataplanSizePost) {
