@@ -324,22 +324,22 @@ export const planSizePost = async (req, res) => {
           data: dataplanSizePost,
         });
       }
-    }
-
-    delete dataPlanSize.PLANSIZE_ADD_ID;
-    const updatePlanSize = await PlanSize.update(dataPlanSize, {
-      where: {
-        SCHD_ID: dataPlanSize.SCHD_ID,
-        ORDER_SIZE: dataPlanSize.ORDER_SIZE,
-      },
-    });
-
-    if (updatePlanSize) {
-      return res.status(200).json({
-        status: "update",
-        message: "Update Plan Size",
-        data: updatePlanSize,
+    } else {
+      delete dataPlanSize.PLANSIZE_ADD_ID;
+      const updatePlanSize = await PlanSize.update(dataPlanSize, {
+        where: {
+          SCHD_ID: dataPlanSize.SCHD_ID,
+          ORDER_SIZE: dataPlanSize.ORDER_SIZE,
+        },
       });
+
+      if (updatePlanSize) {
+        return res.status(200).json({
+          status: "update",
+          message: "Update Plan Size",
+          data: updatePlanSize,
+        });
+      }
     }
   } catch (error) {
     console.log(error);
@@ -358,29 +358,30 @@ export const planSizeUpdate = async (req, res) => {
       return res.status(404).json({
         message: "NO Plan Size ID",
       });
-    }
-    const totalQty = parseInt(dataPlanSize.QTY);
-    const goodQty =
-      parseInt(dataPlanSize.RTT) + parseInt(dataPlanSize.REPAIRED);
-    // console.log(totalQty);
-    // console.log(goodQty);
+    } else {
+      const totalQty = parseInt(dataPlanSize.QTY);
+      const goodQty =
+        parseInt(dataPlanSize.RTT) + parseInt(dataPlanSize.REPAIRED);
+      // console.log(totalQty);
+      // console.log(goodQty);
 
-    dataPlanSize.COMPLETE_STATUS = null;
-    dataPlanSize.GOOD = goodQty;
+      dataPlanSize.COMPLETE_STATUS = null;
+      dataPlanSize.GOOD = goodQty;
 
-    if (totalQty === goodQty) {
-      dataPlanSize.COMPLETE_STATUS = "Y";
+      if (totalQty === goodQty) {
+        dataPlanSize.COMPLETE_STATUS = "Y";
+      }
+      const updatePlanSize = await PlanSize.update(dataPlanSize, {
+        where: {
+          PLANSIZE_ID: dataPlanSize.PLANSIZE_ID,
+        },
+      });
+      return res.status(200).json({
+        status: "update",
+        message: "Update Plan Size After Count",
+        data: updatePlanSize,
+      });
     }
-    const updatePlanSize = await PlanSize.update(dataPlanSize, {
-      where: {
-        PLANSIZE_ID: dataPlanSize.PLANSIZE_ID,
-      },
-    });
-    return res.status(200).json({
-      status: "update",
-      message: "Update Plan Size After Count",
-      data: updatePlanSize,
-    });
   } catch (error) {
     return res.status(404).json({
       success: false,
