@@ -40,15 +40,17 @@ export const funcReschedule = async () => {
       });
 
       //masukan darta output kedalam data group
-      const forSorting = records.map((dataUpdate) =>
-        dataUpdate.SCHD_ID === schd.SCHD_ID
-          ? {
-              ...dataUpdate,
-              SCHD_QTY: schd.TOTAL_OUTPUT,
-              SCHD_STATUS_OUTPUT: "Y",
-            }
-          : { ...dataUpdate }
-      );
+      const forSorting = records.map((dataUpdate) => {
+        if (dataUpdate.SCHD_ID === schd.SCHD_ID) {
+          return {
+            ...dataUpdate,
+            SCHD_QTY: schd.TOTAL_OUTPUT,
+            SCHD_STATUS_OUTPUT: "Y",
+          };
+        } else {
+          return { ...dataUpdate };
+        }
+      });
 
       //lalu sorting untuk menemukan urutan
       const newSdetialAftrSort = forSorting.sort(

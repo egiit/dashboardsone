@@ -198,7 +198,9 @@ export const handleUndo = async (req, res) => {
     }
 
     return res.status(404).json({
-      message: "No Data For Undo",
+      message:
+        "Tidak ada data untuk di Undo atau tidak bisa Undo Data Hari Sebelumnya",
+      // message: "No Data For Undo ",
     });
   } catch (error) {
     // console.log(error);
