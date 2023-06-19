@@ -51,6 +51,7 @@ export const getDataAllSiteDash = async (req, res, next) => {
         shifts,
         customerx
       );
+      // console.log(detailDataDash);
 
       req.dataDash = resultFilter;
       return next();
@@ -129,15 +130,19 @@ export const splitDataDashboard = async (req, res) => {
       SITE_NAME: site.SITE_NAME,
       // ID_SITELINE: site.ID_SITELINE,
       TOTAL_RTT: site.RTT + site.RTT_OT + site.RTT_X_OT,
-      TOTAL_EH: site.EH + site.EH_OT + site.EH_XOT,
-      TOTAL_AH: site.AH + site.AH_OT + site.AH_XOT,
+      TOTAL_EH: chkNilaiMin(site.EH + site.EH_OT + site.EH_XOT),
+      TOTAL_AH: chkNilaiMin(site.AH + site.AH_OT + site.AH_XOT),
       TOTAL_TARGET: site.TOTAL_TARGET,
       TOTAL_OUTPUT: site.TOTAL_OUTPUT,
-      VARIANCE: site.TOTAL_TARGET - site.RTT + site.RTT_OT + site.RTT_X_OT,
+      VARIANCE:
+        CheckNilai(site.TOTAL_TARGET) -
+        (CheckNilai(site.RTT) +
+          CheckNilai(site.RTT_OT) +
+          CheckNilai(site.RTT_X_OT)),
     }));
 
     dataBySite.sort(compare);
-    // console.log(dataBySite.sort(compare));
+    // console.log(dataBySite);
 
     //get total manpower
     //filter data yang hanya memiliki act manpower
@@ -328,6 +333,14 @@ const chkNilaInt = (nilai) => {
     return newNilai;
   }
 };
+const chkNilaiMin = (nilai) => {
+  const newNilai = chkNilaInt(nilai);
+  if (newNilai < 0) {
+    return 0;
+  } else {
+    return newNilai;
+  }
+};
 
 //for sort line
 function compare(a, b) {
@@ -416,10 +429,10 @@ function makeSumAll(dataDash) {
     TOTAL_TARGET: dataCards.TOTAL_TARGET,
     TOTAL_OUTPUT: dataCards.TOTAL_OUTPUT,
     VARIANCE:
-      dataCards.TOTAL_OUTPUT -
-      dataCards.RTT +
-      dataCards.RTT_OT +
-      dataCards.RTT_X_OT,
+      CheckNilai(dataCards.TOTAL_OUTPUT) -
+      (CheckNilai(dataCards.RTT) +
+        CheckNilai(dataCards.RTT_OT) +
+        CheckNilai(dataCards.RTT_X_OT)),
   };
 }
 
