@@ -6,6 +6,7 @@ import {
   FindTransferData,
   QueryResPackScanIn,
   ScanPackingIn,
+  TemporaryQrPackIn,
 } from "../../../models/production/packing.mod.js";
 import { QueryDailyPlanPackIn } from "../../../models/planning/dailyPlan.mod.js";
 
@@ -25,9 +26,24 @@ export const ScanPackingQrIn = async (req, res) => {
     // console.log(req.body);
 
     if (checkBarcodeSerial.length === 0) {
+      const checkSewingIn = await db.query(TemporaryQrPackIn, {
+        replacements: {
+          barcodeserial: BARCODE_SERIAL,
+        },
+        type: QueryTypes.SELECT,
+      });
+
+      if (checkSewingIn.length === 0) {
+        return res.status(200).json({
+          qrstatus: "error",
+          message: "QR Serial Not Found!",
+        });
+      }
       return res.status(200).json({
         qrstatus: "error",
-        message: "QR Serial Not Found!",
+        printed: true,
+        message: "QR Not Yet Transfer",
+        data: checkSewingIn[0],
       });
     }
 

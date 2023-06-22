@@ -2,6 +2,7 @@ import moment from "moment";
 import db from "../../../config/database.js";
 import { QueryTypes, Op } from "sequelize";
 import {
+  QueryDefRateSite,
   QuerySiteDashNow,
   QuerySiteDashPast,
 } from "../../../models/dashAnalitycs/mainDashSew.js";
@@ -44,7 +45,7 @@ export const getDataDashSite = async (req, res) => {
           if (i + 1 === findListShift.length) {
             return res.status(200).json({
               success: true,
-              data: [...dataSiteDash, ...dashSiteData],
+              data: dataSiteDash,
             });
           }
         }
@@ -73,6 +74,31 @@ export const getDataDashSite = async (req, res) => {
     res.status(404).json({
       success: false,
       message: "error processing request",
+      data: error,
+    });
+  }
+};
+
+export const getDataQcSite = async (req, res) => {
+  try {
+    const { schDate, sitename } = req.params;
+
+    const dataDefRateQc = await db.query(QueryDefRateSite, {
+      replacements: {
+        schDate: schDate,
+        sitename: sitename,
+      },
+      type: QueryTypes.SELECT,
+    });
+    return res.status(200).json({
+      success: true,
+      data: dataDefRateQc,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      success: false,
+      message: "error processing request defrate",
       data: error,
     });
   }

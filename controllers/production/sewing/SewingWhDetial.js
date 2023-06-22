@@ -26,6 +26,7 @@ export const postDailyWh = async (req, res) => {
     } else {
       await WorkingHoursDetail.update(data, {
         where: {
+          ID_WHD: findWh.ID_WHD,
           SCHD_ID: data.SCHD_ID,
           SHIFT: data.SHIFT,
         },
