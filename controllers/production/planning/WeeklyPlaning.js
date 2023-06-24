@@ -713,7 +713,7 @@ export const getPlanSizeAlocUpd = async (req, res) => {
     const { capId, schId } = req.params;
     const codeCapId = decodeURIComponent(capId);
 
-    console.log(codeCapId);
+    // console.log(codeCapId);
     const getPoDelivSize = await db.query(getSizeAlocForUpdtSch, {
       replacements: {
         capId: codeCapId,

@@ -59,10 +59,10 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.LIN
                 -- TIMEDIFF(n.LT_NORMAL, n.FT_NORMAL) TTL_TNORMAL,
                 n.FT_OT, n.LT_OT, n.FT_X_OT, LT_X_OT,
             -- 	TIMEDIFF(n.LT_OT, n.FT_OT) TTL_TOT
-                FIND_WH('Shift_A',  CURDATE() , n.FT_NORMAL, n.LT_NORMAL) ACT_WH,
+                COMPARE_WH(FIND_WH('Shift_A',  CURDATE() , n.FT_NORMAL, n.LT_NORMAL), n.PLAN_WH)  ACT_WH,
                 -- ACTUAL WH OT JIKA OVERTIME LEBIH DARI 4JAM MAKA KURANGI SATU JAM ISTIRAHAT
-                IF(TIMEDIFF(n.LT_OT,  n.FT_OT) >= TIME('04:00:00'),time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60-60, time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60)  ACT_WH_OT,
-                time_to_sec(TIMEDIFF(n.LT_X_OT,  n.FT_X_OT))/60  ACT_WH_X_OT
+                COMPARE_WH(IF(TIMEDIFF(n.LT_OT,  n.FT_OT) >= TIME('04:00:00'),time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60-60, time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60), n.PLAN_WH_OT)  ACT_WH_OT,
+                COMPARE_WH(time_to_sec(TIMEDIFF(n.LT_X_OT,  n.FT_X_OT))/60, n.PLAN_WH_X_OT)  ACT_WH_X_OT
             FROM (
                     SELECT a.SCHD_ID, a.SCH_ID, a.SCHD_PROD_DATE, e.ID_SITELINE,  d.SITE_NAME, d.LINE_NAME, e.SHIFT, 
                     IF(SUBSTRING('Normal_A' ,1,5) = 'Shift', CAST(ROUND(a.SCHD_QTY/2) AS INT), a.SCHD_QTY ) SCHD_QTY,
@@ -178,10 +178,10 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.LIN
                 -- TIMEDIFF(n.LT_NORMAL, n.FT_NORMAL) TTL_TNORMAL,
                 n.FT_OT, n.LT_OT, n.FT_X_OT, LT_X_OT,
             -- 	TIMEDIFF(n.LT_OT, n.FT_OT) TTL_TOT
-                FIND_WH('Shift_A',  CURDATE() , n.FT_NORMAL, n.LT_NORMAL) ACT_WH,
+                COMPARE_WH(FIND_WH('Shift_A',  CURDATE() , n.FT_NORMAL, n.LT_NORMAL), n.PLAN_WH)  ACT_WH,
                 -- ACTUAL WH OT JIKA OVERTIME LEBIH DARI 4JAM MAKA KURANGI SATU JAM ISTIRAHAT
-                IF(TIMEDIFF(n.LT_OT,  n.FT_OT) >= TIME('04:00:00'),time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60-60, time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60)  ACT_WH_OT,
-                time_to_sec(TIMEDIFF(n.LT_X_OT,  n.FT_X_OT))/60  ACT_WH_X_OT
+                COMPARE_WH(IF(TIMEDIFF(n.LT_OT,  n.FT_OT) >= TIME('04:00:00'),time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60-60, time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60), n.PLAN_WH_OT)  ACT_WH_OT,
+                COMPARE_WH(time_to_sec(TIMEDIFF(n.LT_X_OT,  n.FT_X_OT))/60, n.PLAN_WH_X_OT)  ACT_WH_X_OT
             FROM (
                     SELECT a.SCHD_ID, a.SCH_ID, a.SCHD_PROD_DATE, e.ID_SITELINE,  d.SITE_NAME, d.LINE_NAME, e.SHIFT, 
                     IF(SUBSTRING('Shift_A' ,1,5) = 'Shift', CAST(ROUND(a.SCHD_QTY/2) AS INT), a.SCHD_QTY ) SCHD_QTY,
@@ -297,10 +297,10 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.LIN
                 -- TIMEDIFF(n.LT_NORMAL, n.FT_NORMAL) TTL_TNORMAL,
                 n.FT_OT, n.LT_OT, n.FT_X_OT, LT_X_OT,
             -- 	TIMEDIFF(n.LT_OT, n.FT_OT) TTL_TOT
-                FIND_WH('Shift_A',  CURDATE() , n.FT_NORMAL, n.LT_NORMAL) ACT_WH,
+                COMPARE_WH(FIND_WH('Shift_A',  CURDATE() , n.FT_NORMAL, n.LT_NORMAL), n.PLAN_WH)  ACT_WH,
                 -- ACTUAL WH OT JIKA OVERTIME LEBIH DARI 4JAM MAKA KURANGI SATU JAM ISTIRAHAT
-                IF(TIMEDIFF(n.LT_OT,  n.FT_OT) >= TIME('04:00:00'),time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60-60, time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60)  ACT_WH_OT,
-                time_to_sec(TIMEDIFF(n.LT_X_OT,  n.FT_X_OT))/60  ACT_WH_X_OT
+                COMPARE_WH(IF(TIMEDIFF(n.LT_OT,  n.FT_OT) >= TIME('04:00:00'),time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60-60, time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60), n.PLAN_WH_OT)  ACT_WH_OT,
+                COMPARE_WH(time_to_sec(TIMEDIFF(n.LT_X_OT,  n.FT_X_OT))/60, n.PLAN_WH_X_OT)  ACT_WH_X_OT
             FROM (
                     SELECT a.SCHD_ID, a.SCH_ID, a.SCHD_PROD_DATE, e.ID_SITELINE,  d.SITE_NAME, d.LINE_NAME, e.SHIFT, 
                     IF(SUBSTRING('Shift_B' ,1,5) = 'Shift', CAST(ROUND(a.SCHD_QTY/2) AS INT), a.SCHD_QTY ) SCHD_QTY,
@@ -516,10 +516,10 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.LIN
                 -- TIMEDIFF(n.LT_NORMAL, n.FT_NORMAL) TTL_TNORMAL,
                 n.FT_OT, n.LT_OT, n.FT_X_OT, LT_X_OT,
             -- 	TIMEDIFF(n.LT_OT, n.FT_OT) TTL_TOT
-                FIND_WH('Shift_A',  CURDATE() , n.FT_NORMAL, n.LT_NORMAL) ACT_WH,
+                COMPARE_WH(FIND_WH('Shift_A',  CURDATE() , n.FT_NORMAL, n.LT_NORMAL), n.PLAN_WH)  ACT_WH,
                 -- ACTUAL WH OT JIKA OVERTIME LEBIH DARI 4JAM MAKA KURANGI SATU JAM ISTIRAHAT
-                IF(TIMEDIFF(n.LT_OT,  n.FT_OT) >= TIME('04:00:00'),time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60-60, time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60)  ACT_WH_OT,
-                time_to_sec(TIMEDIFF(n.LT_X_OT,  n.FT_X_OT))/60  ACT_WH_X_OT
+                COMPARE_WH(IF(TIMEDIFF(n.LT_OT,  n.FT_OT) >= TIME('04:00:00'),time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60-60, time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60), n.PLAN_WH_OT)  ACT_WH_OT,
+                COMPARE_WH(time_to_sec(TIMEDIFF(n.LT_X_OT,  n.FT_X_OT))/60, n.PLAN_WH_X_OT)  ACT_WH_X_OT
             FROM (
                     SELECT a.SCHD_ID, a.SCH_ID, a.SCHD_PROD_DATE, e.ID_SITELINE,  d.SITE_NAME, d.LINE_NAME, e.SHIFT, 
                     IF(SUBSTRING(:shift ,1,5) = 'Shift', CAST(ROUND(a.SCHD_QTY/2) AS INT), a.SCHD_QTY ) SCHD_QTY,

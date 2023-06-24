@@ -8,6 +8,7 @@ import {
 } from "../../controllers/production/dashAnalitycs/DashboardAll.js";
 import {
   getDataDashSite,
+  getDataDashSiteYestd,
   getDataQcSite,
 } from "../../controllers/production/dashAnalitycs/DashboardSite.js";
 
@@ -20,6 +21,7 @@ router.get("/topthree", getThreeTop);
 
 //site route
 router.get("/sitedash/:schDate/:sitename", getDataDashSite);
+router.get("/sitedash/yesterday/:schDate/:sitename", getDataDashSiteYestd);
 router.get("/sitedash/defrate/:schDate/:sitename", getDataQcSite);
 
 export default router;

@@ -103,3 +103,45 @@ export const getDataQcSite = async (req, res) => {
     });
   }
 };
+
+export const getDataDashSiteYestd = async (req, res) => {
+  try {
+    const { date, sitename } = req.params;
+
+    const schdDateYes = findYesDate(date);
+
+    const dataDashYest = await db.query(QuerySiteDashPast, {
+      replacements: {
+        schDate: schdDateYes,
+        sitename: sitename,
+      },
+      type: QueryTypes.SELECT,
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: dataDashYest,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      success: false,
+      message: "error processing request defrate",
+      data: error,
+    });
+  }
+};
+
+//fin date yesterdaye
+function findYesDate(tanggal) {
+  const dayName = moment(tanggal).format("dddd");
+  let newDate;
+
+  if (dayName === "Monday") {
+    newDate = moment(tanggal).subtract(2, "days");
+  } else {
+    newDate = moment(tanggal).subtract(1, "days");
+  }
+
+  return newDate.format("YYYY-MM-DD");
+}
