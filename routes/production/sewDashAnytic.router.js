@@ -10,6 +10,8 @@ import {
   getDataDashSite,
   getDataDashSiteYestd,
   getDataQcSite,
+  getRftPerhour,
+  getTopDefectPart,
 } from "../../controllers/production/dashAnalitycs/DashboardSite.js";
 
 const router = express.Router();
@@ -23,5 +25,9 @@ router.get("/topthree", getThreeTop);
 router.get("/sitedash/:schDate/:sitename", getDataDashSite);
 router.get("/sitedash/yesterday/:schDate/:sitename", getDataDashSiteYestd);
 router.get("/sitedash/defrate/:schDate/:sitename", getDataQcSite);
+
+//detil line
+router.get("/sitedash/topdefpart/:schDate/:idSiteline", getTopDefectPart);
+router.get("/sitedash/defHourShift/:schDate/:idSiteLine/:shift", getRftPerhour);
 
 export default router;

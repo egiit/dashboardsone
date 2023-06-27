@@ -232,5 +232,6 @@ export const QryCronPvsA = `SELECT a.ID_SITELINE, b.SCH_ID, b.SCHD_ID, b.SCHD_PR
 FROM item_line_running a 
 LEFT JOIN scheduel_vs_actual b ON a.ID_SITELINE = b.SCHD_ID_SITELINE 
 WHERE b.SCHD_PROD_DATE = DATE_SUB(CURDATE(), INTERVAL 1 DAY)`;
+// WHERE b.SCHD_PROD_DATE = DATE_SUB(CURDATE(), INTERVAL 1 DAY)`;
 
 export const QryChckShiftById = `SELECT a.ID_SITELINE, SUBSTRING_INDEX(a.SHIFT,"_",1) SHIFT  FROM item_siteline a WHERE a.ID_SITELINE = :idSiteline`;

@@ -3,8 +3,11 @@ import db from "../../../config/database.js";
 import { QueryTypes, Op } from "sequelize";
 import {
   QueryDefRateSite,
+  QueryQcRftPerHiour,
   QuerySiteDashNow,
   QuerySiteDashPast,
+  SQLTopDefectLine,
+  SQLTopPartLine,
 } from "../../../models/dashAnalitycs/mainDashSew.js";
 
 export const getDataDashSite = async (req, res) => {
@@ -144,4 +147,56 @@ function findYesDate(tanggal) {
   }
 
   return newDate.format("YYYY-MM-DD");
+}
+
+export const getTopDefectPart = async (req, res) => {
+  try {
+    const { schDate, idSiteline } = req.params;
+
+    const dataTop3Defect = await db.query(SQLTopDefectLine, {
+      replacements: { schDate, idSiteline },
+      type: QueryTypes.SELECT,
+    });
+    const dataTop3Part = await db.query(SQLTopPartLine, {
+      replacements: { schDate, idSiteline },
+      type: QueryTypes.SELECT,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `Get Top 3 Defect Success for Line !`,
+      data: { dataTop3Defect, dataTop3Part },
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      success: false,
+      message: "error processing request",
+      data: error,
+    });
+  }
+};
+
+//RFT PER HOUR on line dashboard 2
+export async function getRftPerhour(req, res) {
+  try {
+    const { schDate, idSiteLine, shift } = req.params;
+    // console.log({ schDate, idSiteLine, shift });
+    const result = await db.query(QueryQcRftPerHiour, {
+      replacements: { schDate, idSiteLine, shift },
+      type: QueryTypes.SELECT,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "get data RFT per Hour success!",
+      data: result,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      message: "error processing request",
+      data: error,
+    });
+  }
 }
