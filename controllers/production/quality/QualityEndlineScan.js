@@ -49,14 +49,15 @@ export const SetActualMp = async (req, res) => {
       return res.status(200).json({
         success: true,
         data: updateMp,
-        message: "Update Actual Manpower Successfully",
+        message: "Berhasil Update Actual Manpower",
       });
     } else {
       const create = await ManpowewrDailyDetail.create(dataPlan);
       return res.status(200).json({
         success: true,
         data: create,
-        message: "Create Actual Manpower Successfully",
+        message: "Berhasil set manpower",
+        // message: "Create Actual Manpower Successfully",
       });
     }
   } catch (error) {
@@ -277,7 +278,7 @@ export const repairedProccess = async (req, res) => {
     const dataRepaird = req.body;
     if (dataRepaird.length < 0)
       return res.status(404).json({
-        message: "No Data Repaird",
+        message: "Tidak ada Data Repaired",
         data: error,
       });
 
@@ -293,7 +294,7 @@ export const repairedProccess = async (req, res) => {
       // console.log(repair);
       handleAddUndo({ ...repair, ENDLINE_OUT_TYPE: "REPAIR" });
       if (i + 1 === dataRepaird.length) {
-        return res.status(200).json({ message: "Repaired Success" });
+        return res.status(200).json({ message: "Repaired Berhasil" });
       }
     });
   } catch (error) {
@@ -309,14 +310,15 @@ export const planSizePost = async (req, res) => {
   try {
     const dataPlanSize = req.body;
 
-    const checkDataPlanSize = await PlanSize.findOne({
-      where: {
-        SCHD_ID: dataPlanSize.SCHD_ID,
-        ORDER_SIZE: dataPlanSize.ORDER_SIZE,
-      },
-    });
+    // const checkDataPlanSize = await PlanSize.findOne({
+    //   where: {
+    //     PLANSIZE_ID : dataPlanSize.PLANSIZE_ID,
+    //     // SCHD_ID: dataPlanSize.SCHD_ID,
+    //     ORDER_SIZE: dataPlanSize.ORDER_SIZE,
+    //   },
+    // });
 
-    if (checkDataPlanSize === null) {
+    if (dataPlanSize.PLANSIZE_ID === null) {
       delete dataPlanSize.PLANSIZE_MOD_ID;
       const dataplanSizePost = await PlanSize.create(dataPlanSize);
       if (dataplanSizePost) {
@@ -330,7 +332,8 @@ export const planSizePost = async (req, res) => {
       delete dataPlanSize.PLANSIZE_ADD_ID;
       const updatePlanSize = await PlanSize.update(dataPlanSize, {
         where: {
-          SCHD_ID: dataPlanSize.SCHD_ID,
+          PLANSIZE_ID: dataPlanSize.PLANSIZE_ID,
+          // SCHD_ID: dataPlanSize.SCHD_ID,
           ORDER_SIZE: dataPlanSize.ORDER_SIZE,
         },
       });
@@ -358,7 +361,7 @@ export const planSizeUpdate = async (req, res) => {
     let dataPlanSize = req.body;
     if (!dataPlanSize.PLANSIZE_ID) {
       return res.status(404).json({
-        message: "NO Plan Size ID",
+        message: "Tidak ada Plan Size ID",
       });
     } else {
       const totalQty = parseInt(dataPlanSize.QTY);
@@ -551,7 +554,7 @@ export async function sewingScanOut(req, res) {
       return res.status(200).json({
         success: true,
         qrstatus: "danger",
-        message: "No QR Scan In",
+        message: "Tidak ada QR Scan In",
       });
     }
 
@@ -567,7 +570,7 @@ export async function sewingScanOut(req, res) {
       return res.status(200).json({
         success: true,
         qrstatus: "danger",
-        message: "QR Already transfer",
+        message: "QR Sudah transfer",
       });
     }
 
@@ -577,7 +580,7 @@ export async function sewingScanOut(req, res) {
       return res.status(200).json({
         success: true,
         qrstatus: "success",
-        message: "Transfer Success",
+        message: "Transfer Berhasil",
       });
     }
 
@@ -664,7 +667,7 @@ export const postUpdtEndlineRmks = async (req, res) => {
       delete dataRemark.ADD_ID;
       return res.status(200).json({
         success: true,
-        message: "Remark Updated",
+        message: "Remark berhasil diupdate",
         data: updateRmk,
       });
     }
@@ -674,7 +677,7 @@ export const postUpdtEndlineRmks = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Remark Added",
+      message: "Remark ditambahkan",
       data: addDataRemark,
     });
   } catch (error) {
@@ -703,14 +706,16 @@ export const postReturnBdl = async (req, res) => {
 
     if (bundleremark) {
       return res.status(202).json({
-        message: "Already Request Return",
+        message: "Sudah meminta pengembalian Bundle/Box",
       });
     }
 
     const postReturn = await SewingBdlReturn.create(dataReturn);
 
     if (postReturn)
-      return res.json({ message: "Success request return Bundle/Box" });
+      return res.json({
+        message: "Berhasil meminta pengembalian Bundle/Box ke preparation",
+      });
   } catch (error) {
     console.log(error);
     res.status(404).json({
