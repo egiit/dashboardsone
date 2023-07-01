@@ -87,6 +87,7 @@ export const QcUsers = db.define(
     QC_USER_PASSWORD: { type: DataTypes.STRING },
     QC_USER_REF_TOKEN: { type: DataTypes.STRING },
     QC_USER_ACTIVE: { type: DataTypes.STRING },
+    QC_BYPASS_LOGIN: { type: DataTypes.STRING },
     QC_USER_ADD_ID: { type: DataTypes.INTEGER },
     QC_USER_DEL: { type: DataTypes.INTEGER },
     QC_USER_MOD_ID: { type: DataTypes.INTEGER },
@@ -100,14 +101,15 @@ export const QcUsers = db.define(
   }
 );
 
-export const QueryGetListUserQc = `SELECT a.QC_USER_ID, a.QC_USERNAME, a.QC_NAME, a.QC_TYPE_ID, c.QC_TYPE_NAME, a.ID_SITELINE,  b.SITE_NAME, b.LINE_NAME, b.SHIFT, a.QC_USER_ACTIVE, a.QC_USER_DEL FROM qc_inspection_user a
+export const QueryGetListUserQc = `SELECT a.QC_USER_ID, a.QC_USERNAME, a.QC_NAME, a.QC_TYPE_ID, c.QC_TYPE_NAME, a.ID_SITELINE,  b.SITE_NAME, b.LINE_NAME, b.SHIFT, a.QC_USER_ACTIVE, a.QC_BYPASS_LOGIN, a.QC_USER_DEL
+FROM qc_inspection_user a
 LEFT JOIN item_siteline b ON a.ID_SITELINE = b.ID_SITELINE
 LEFT JOIN qc_inspection_type c ON c.QC_TYPE_ID = a.QC_TYPE_ID 
 WHERE a.QC_USER_DEL <> '1'
 `;
 
 export const QueryGetUserQc = `SELECT a.QC_USER_ID, a.QC_USERNAME, a.QC_NAME, a.QC_USER_PASSWORD, a.QC_USER_REF_TOKEN, a.QC_TYPE_ID,
-c.QC_TYPE_NAME, a.ID_SITELINE,  b.SITE_NAME, b.LINE_NAME, b.SHIFT, a.QC_USER_ACTIVE, a.QC_USER_DEL,
+c.QC_TYPE_NAME, a.ID_SITELINE,  b.SITE_NAME, b.LINE_NAME, b.SHIFT, a.QC_USER_ACTIVE, a.QC_BYPASS_LOGIN, a.QC_USER_DEL,
 b.START_TIME, b.END_TIME 
 FROM qc_inspection_user a
 LEFT JOIN item_siteline b ON a.ID_SITELINE = b.ID_SITELINE

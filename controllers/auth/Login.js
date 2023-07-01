@@ -108,7 +108,7 @@ export const LoginQc = async (req, res) => {
     const now = moment(now_time, format);
 
     // Periksa apakah now_time berada di antara start_time dan end_time
-    if (now.isBetween(start, end)) {
+    if (now.isBetween(start, end) || user.QC_BYPASS_LOGIN === "Y") {
       const match = await bcryptjs.compare(
         QC_USER_PASSWORD,
         user.QC_USER_PASSWORD
@@ -169,12 +169,9 @@ export const LoginQc = async (req, res) => {
       });
       res.json({ accessToken });
     } else {
-      return res
-        .status(400)
-        .json({
-          message:
-            "User anda tidak sesuai dengan rentang waktu Shift saat ini!",
-        });
+      return res.status(400).json({
+        message: "User anda tidak sesuai dengan rentang waktu Shift saat ini!",
+      });
     }
   } catch (error) {
     res.status(404).json({ message: "User Name or Password Incorrect" });
