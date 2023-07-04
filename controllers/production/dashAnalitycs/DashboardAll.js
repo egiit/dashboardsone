@@ -128,6 +128,7 @@ export const splitDataDashboard = async (req, res) => {
         .values(),
     ].map((site) => ({
       SITE_NAME: site.SITE_NAME,
+      CUS_NAME: site.CUS_NAME,
       // ID_SITELINE: site.ID_SITELINE,
       TOTAL_RTT: site.RTT + site.RTT_OT + site.RTT_X_OT,
       TOTAL_EH: chkNilaiMin(site.EH + site.EH_OT + site.EH_XOT),
