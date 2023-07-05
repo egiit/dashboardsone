@@ -494,3 +494,22 @@ export const SewingBdlReturn = db.define(
     updatedAt: false,
   }
 );
+
+export const queryTotalCheck = `SELECT a.SCH_ID, a.SCHD_ID,  i.PLANSIZE_ID, b.ORDER_SIZE, COUNT(*) BDL_TOTAL, SUM(b.ORDER_QTY) QTY_SEW_IN, k.TOTAL_CHECKED
+-- , g.SCHD_PROD_DATE
+FROM scan_sewing_in a
+LEFT JOIN order_detail b ON a.BARCODE_SERIAL = b.BARCODE_SERIAL 
+-- LEFT JOIN weekly_prod_sch_detail g ON a.SCHD_ID = g.SCHD_ID
+-- LEFT JOIN viewcapacity f ON f.ID_CAPACITY = g.SCHD_CAPACITY_ID
+-- LEFT JOIN item_siteline e ON e.ID_SITELINE = g.SCHD_ID_SITELINE
+LEFT JOIN order_qr_generate h ON  h.BARCODE_SERIAL = a.BARCODE_SERIAL
+LEFT JOIN qc_endline_plansize i ON i.SCHD_ID = a.SCHD_ID AND i.ORDER_SIZE = b.ORDER_SIZE
+LEFT JOIN (
+	SELECT a.ENDLINE_SCHD_ID, ENDLINE_PLAN_SIZE, SUM(a.ENDLINE_OUT_QTY) AS TOTAL_CHECKED 
+	FROM   qc_endline_output a
+	WHERE a.ENDLINE_SCHD_ID = :schdid AND a.ENDLINE_PLAN_SIZE = :size 
+	AND a.ENDLINE_OUT_UNDO IS NULL
+) k ON k.ENDLINE_SCHD_ID = a.SCHD_ID AND  k.ENDLINE_PLAN_SIZE = b.ORDER_SIZE
+WHERE a.SCHD_ID = :schdid AND  b.ORDER_SIZE = :size  
+GROUP BY a.SCH_ID, a.SCHD_ID, b.BUYER_CODE, 
+b.ORDER_NO, b.MO_NO, b.ORDER_COLOR, b.ORDER_STYLE, b.ORDER_SIZE`;

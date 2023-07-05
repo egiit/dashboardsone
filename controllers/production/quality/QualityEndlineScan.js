@@ -23,9 +23,11 @@ import {
   QueryGetListPart,
   QueryGetQrPendding,
   QueryPlanSizePending,
+  queryTotalCheck,
   SewingBdlReturn,
 } from "../../../models/production/quality.mod.js";
 import { CuttinScanSewingIn } from "../../../models/production/cutting.mod.js";
+import { CheckNilai } from "../../util/Utility.js";
 
 // Update Actual Manpower Normal / OT
 export const SetActualMp = async (req, res) => {
@@ -132,11 +134,36 @@ export const getListDefect = async (req, res) => {
 export const postEndlineOutput = async (req, res) => {
   try {
     const dataGood = req.body;
+
+    const checkQty = await db.query(queryTotalCheck, {
+      replacements: {
+        schdid: dataGood.ENDLINE_SCHD_ID,
+        size: dataGood.ENDLINE_PLAN_SIZE,
+      },
+      type: QueryTypes.SELECT,
+    });
+
+    if (checkQty.length > 0) {
+      //tambahkan total check dengan qty yang akan di post
+      const newTotCheck =
+        parseInt(CheckNilai(dataGood.ENDLINE_OUT_QTY)) +
+        parseInt(CheckNilai(checkQty[0].TOTAL_CHECKED));
+
+      const sewingIn = parseInt(CheckNilai(checkQty[0].QTY_SEW_IN));
+
+      //check jika total new check melebihi sewing in reject
+      if (newTotCheck > sewingIn) {
+        return res.status(404).json({
+          message: "QC Output Tidak Bisa Melebihi Total QTY Loading",
+        });
+      }
+    }
+
     const postDataGood = await QcEndlineOutput.create(dataGood);
     handleAddUndo(dataGood);
     return res.json(postDataGood);
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     return res.status(404).json({
       message: "error processing request",
       data: error,
@@ -310,15 +337,16 @@ export const planSizePost = async (req, res) => {
   try {
     const dataPlanSize = req.body;
 
-    // const checkDataPlanSize = await PlanSize.findOne({
-    //   where: {
-    //     PLANSIZE_ID : dataPlanSize.PLANSIZE_ID,
-    //     // SCHD_ID: dataPlanSize.SCHD_ID,
-    //     ORDER_SIZE: dataPlanSize.ORDER_SIZE,
-    //   },
-    // });
+    const checkDataPlanSize = await PlanSize.findOne({
+      attributes: ["PLANSIZE_ID", "SCHD_ID", "ORDER_SIZE"],
+      where: {
+        PLANSIZE_ID: dataPlanSize.PLANSIZE_ID,
+        SCHD_ID: dataPlanSize.SCHD_ID,
+        ORDER_SIZE: dataPlanSize.ORDER_SIZE,
+      },
+    });
 
-    if (dataPlanSize.PLANSIZE_ID === null) {
+    if (!checkDataPlanSize.PLANSIZE_ID) {
       delete dataPlanSize.PLANSIZE_MOD_ID;
       const dataplanSizePost = await PlanSize.create(dataPlanSize);
       if (dataplanSizePost) {
