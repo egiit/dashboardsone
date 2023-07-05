@@ -62,7 +62,7 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.CUS
                 -- TIMEDIFF(n.LT_NORMAL, n.FT_NORMAL) TTL_TNORMAL,
                 n.FT_OT, n.LT_OT, n.FT_X_OT, LT_X_OT,
             -- 	TIMEDIFF(n.LT_OT, n.FT_OT) TTL_TOT
-                COMPARE_WH(FIND_WH('Normal_A',  CURDATE() , n.FT_NORMAL, n.LT_NORMAL), n.PLAN_WH)  ACT_WH,
+                COMPARE_WH(FIND_WH_NEW('Normal_A',  CURDATE() , n.FT_NORMAL, n.LT_NORMAL, n.SHIFT_END_HOUR, n.PLAN_WH), n.PLAN_WH)  ACT_WH,
                 -- ACTUAL WH OT JIKA OVERTIME LEBIH DARI 4JAM MAKA KURANGI SATU JAM ISTIRAHAT
                 COMPARE_WH(IF(TIMEDIFF(n.LT_OT,  n.FT_OT) >= TIME('04:00:00'),time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60-60, time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60), n.PLAN_WH_OT)  ACT_WH_OT,
                 COMPARE_WH(time_to_sec(TIMEDIFF(n.LT_X_OT,  n.FT_X_OT))/60, n.PLAN_WH_X_OT)  ACT_WH_X_OT
@@ -82,7 +82,7 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.CUS
                     l.SEQ_NORMAL, l.SEQ_OT, IF(l.SEQ_NORMAL = 1, e.START_TIME, l.FIRST_TIME_NORMAL) AS FT_NORMAL, 
                     l.LAST_TIME_NORMAL LT_NORMAL,  IF(l.SEQ_OT = 1, k.SHIFT_END_HOUR, l.FIRST_TIME_OT) AS FT_OT, 
                     l.LAST_TIME_OT LT_OT, IF(l.SEQ_X_OT = 1, l.LAST_TIME_OT, l.FIRST_TIME_X_OT) AS FT_X_OT,
-                    l.LAST_TIME_X_OT LT_X_OT
+                    l.LAST_TIME_X_OT LT_X_OT, k.SHIFT_END_HOUR
                      -- CASE WHEN l.SEQ_NORMAL = 1 THEN d.START_TIME 
                     FROM weekly_prod_sch_detail a
                     LEFT JOIN viewcapacity b ON a.SCHD_CAPACITY_ID = b.ID_CAPACITY 
@@ -184,7 +184,7 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.LIN
                 -- TIMEDIFF(n.LT_NORMAL, n.FT_NORMAL) TTL_TNORMAL,
                 n.FT_OT, n.LT_OT, n.FT_X_OT, LT_X_OT,
             -- 	TIMEDIFF(n.LT_OT, n.FT_OT) TTL_TOT
-                COMPARE_WH(FIND_WH('Shift_A',  CURDATE() , n.FT_NORMAL, n.LT_NORMAL), n.PLAN_WH)  ACT_WH,
+                COMPARE_WH(FIND_WH_NEW('Shift_A',  CURDATE() , n.FT_NORMAL, n.LT_NORMAL, n.SHIFT_END_HOUR, n.PLAN_WH), n.PLAN_WH)  ACT_WH,
                 -- ACTUAL WH OT JIKA OVERTIME LEBIH DARI 4JAM MAKA KURANGI SATU JAM ISTIRAHAT
                 COMPARE_WH(IF(TIMEDIFF(n.LT_OT,  n.FT_OT) >= TIME('04:00:00'),time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60-60, time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60), n.PLAN_WH_OT)  ACT_WH_OT,
                 COMPARE_WH(time_to_sec(TIMEDIFF(n.LT_X_OT,  n.FT_X_OT))/60, n.PLAN_WH_X_OT)  ACT_WH_X_OT
@@ -204,7 +204,7 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.LIN
                     l.SEQ_NORMAL, l.SEQ_OT, IF(l.SEQ_NORMAL = 1, e.START_TIME, l.FIRST_TIME_NORMAL) AS FT_NORMAL, 
                     l.LAST_TIME_NORMAL LT_NORMAL,  IF(l.SEQ_OT = 1, k.SHIFT_END_HOUR, l.FIRST_TIME_OT) AS FT_OT, 
                     l.LAST_TIME_OT LT_OT, IF(l.SEQ_X_OT = 1, l.LAST_TIME_OT, l.FIRST_TIME_X_OT) AS FT_X_OT,
-                    l.LAST_TIME_X_OT LT_X_OT
+                    l.LAST_TIME_X_OT LT_X_OT, k.SHIFT_END_HOUR
                      -- CASE WHEN l.SEQ_NORMAL = 1 THEN d.START_TIME 
                     FROM weekly_prod_sch_detail a
                     LEFT JOIN viewcapacity b ON a.SCHD_CAPACITY_ID = b.ID_CAPACITY 
@@ -306,7 +306,7 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.LIN
                 -- TIMEDIFF(n.LT_NORMAL, n.FT_NORMAL) TTL_TNORMAL,
                 n.FT_OT, n.LT_OT, n.FT_X_OT, LT_X_OT,
             -- 	TIMEDIFF(n.LT_OT, n.FT_OT) TTL_TOT
-                COMPARE_WH(FIND_WH('Shift_B',  CURDATE() , n.FT_NORMAL, n.LT_NORMAL), n.PLAN_WH)  ACT_WH,
+                COMPARE_WH(FIND_WH_NEW('Shift_B',  CURDATE() , n.FT_NORMAL, n.LT_NORMAL, n.SHIFT_END_HOUR, n.PLAN_WH), n.PLAN_WH)  ACT_WH,
                 -- ACTUAL WH OT JIKA OVERTIME LEBIH DARI 4JAM MAKA KURANGI SATU JAM ISTIRAHAT
                 COMPARE_WH(IF(TIMEDIFF(n.LT_OT,  n.FT_OT) >= TIME('04:00:00'),time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60-60, time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60), n.PLAN_WH_OT)  ACT_WH_OT,
                 COMPARE_WH(time_to_sec(TIMEDIFF(n.LT_X_OT,  n.FT_X_OT))/60, n.PLAN_WH_X_OT)  ACT_WH_X_OT
@@ -326,7 +326,7 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.LIN
                     l.SEQ_NORMAL, l.SEQ_OT, IF(l.SEQ_NORMAL = 1, e.START_TIME, l.FIRST_TIME_NORMAL) AS FT_NORMAL, 
                     l.LAST_TIME_NORMAL LT_NORMAL,  IF(l.SEQ_OT = 1, k.SHIFT_END_HOUR, l.FIRST_TIME_OT) AS FT_OT, 
                     l.LAST_TIME_OT LT_OT, IF(l.SEQ_X_OT = 1, l.LAST_TIME_OT, l.FIRST_TIME_X_OT) AS FT_X_OT,
-                    l.LAST_TIME_X_OT LT_X_OT
+                    l.LAST_TIME_X_OT LT_X_OT, k.SHIFT_END_HOUR
                      -- CASE WHEN l.SEQ_NORMAL = 1 THEN d.START_TIME 
                     FROM weekly_prod_sch_detail a
                     LEFT JOIN viewcapacity b ON a.SCHD_CAPACITY_ID = b.ID_CAPACITY 
@@ -530,7 +530,7 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.CUS
                 -- TIMEDIFF(n.LT_NORMAL, n.FT_NORMAL) TTL_TNORMAL,
                 n.FT_OT, n.LT_OT, n.FT_X_OT, LT_X_OT,
             -- 	TIMEDIFF(n.LT_OT, n.FT_OT) TTL_TOT
-                COMPARE_WH(FIND_WH(:shift,  CURDATE() , n.FT_NORMAL, n.LT_NORMAL), n.PLAN_WH)  ACT_WH,
+                COMPARE_WH(FIND_WH_NEW(:shift,  CURDATE() , n.FT_NORMAL, n.LT_NORMAL, n.SHIFT_END_HOUR, n.PLAN_WH), n.PLAN_WH)  ACT_WH,
                 -- ACTUAL WH OT JIKA OVERTIME LEBIH DARI 4JAM MAKA KURANGI SATU JAM ISTIRAHAT
                 COMPARE_WH(IF(TIMEDIFF(n.LT_OT,  n.FT_OT) >= TIME('04:00:00'),time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60-60, time_to_sec(TIMEDIFF(n.LT_OT,  n.FT_OT))/60), n.PLAN_WH_OT)  ACT_WH_OT,
                 COMPARE_WH(time_to_sec(TIMEDIFF(n.LT_X_OT,  n.FT_X_OT))/60, n.PLAN_WH_X_OT)  ACT_WH_X_OT
@@ -550,7 +550,7 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.CUS
                     l.SEQ_NORMAL, l.SEQ_OT, IF(l.SEQ_NORMAL = 1, e.START_TIME, l.FIRST_TIME_NORMAL) AS FT_NORMAL, 
                     l.LAST_TIME_NORMAL LT_NORMAL,  IF(l.SEQ_OT = 1, k.SHIFT_END_HOUR, l.FIRST_TIME_OT) AS FT_OT, 
                     l.LAST_TIME_OT LT_OT, IF(l.SEQ_X_OT = 1, l.LAST_TIME_OT, l.FIRST_TIME_X_OT) AS FT_X_OT,
-                    l.LAST_TIME_X_OT LT_X_OT
+                    l.LAST_TIME_X_OT LT_X_OT, k.SHIFT_END_HOUR
                      -- CASE WHEN l.SEQ_NORMAL = 1 THEN d.START_TIME 
                     FROM weekly_prod_sch_detail a
                     LEFT JOIN viewcapacity b ON a.SCHD_CAPACITY_ID = b.ID_CAPACITY 
