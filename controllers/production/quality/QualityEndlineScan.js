@@ -142,7 +142,7 @@ export const postEndlineOutput = async (req, res) => {
       },
       type: QueryTypes.SELECT,
     });
-
+    // console.log(checkQty);
     if (checkQty.length > 0) {
       //tambahkan total check dengan qty yang akan di post
       const newTotCheck =
@@ -336,7 +336,6 @@ export const repairedProccess = async (req, res) => {
 export const planSizePost = async (req, res) => {
   try {
     const dataPlanSize = req.body;
-    console.log(dataPlanSize);
     const checkDataPlanSize = await PlanSize.findOne({
       attributes: ["PLANSIZE_ID", "SCHD_ID", "ORDER_SIZE"],
       where: {
@@ -345,7 +344,6 @@ export const planSizePost = async (req, res) => {
         ORDER_SIZE: dataPlanSize.ORDER_SIZE,
       },
     });
-    console.log(checkDataPlanSize);
 
     if (!checkDataPlanSize?.PLANSIZE_ID) {
       delete dataPlanSize.PLANSIZE_MOD_ID;
