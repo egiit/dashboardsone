@@ -89,14 +89,14 @@ export const postWhMpOt = async (req, res) => {
     //     where: { ID_WHD: checkWhOt.dataValues.ID_WHD },
     //   });
     // }
-    if (checkWhOt) {
+    if (!checkWhOt) {
+      const dataForPostwH = { ...dataPlan, UPDATE_BY: null };
+      await WorkingHoursDetail.create(dataForPostwH);
+    } else {
       const dataForPostwH = { ...dataPlan, CREATE_BY: null };
       await WorkingHoursDetail.update(dataForPostwH, {
         where: { ID_WHD: checkWhOt.dataValues.ID_WHD },
       });
-    } else {
-      const dataForPostwH = { ...dataPlan, UPDATE_BY: null };
-      await WorkingHoursDetail.create(dataForPostwH);
     }
 
     res.status(200).json({
