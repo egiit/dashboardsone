@@ -1,5 +1,10 @@
 import express from "express";
-import { PackInScanInDayRep } from "../../controllers/production/packing/PackingReport.js";
+import {
+  PackInScanInDayRep,
+  PackInScanInDayRepPo,
+  PackInScanInDaySize,
+  PackInScanInDaySizePo,
+} from "../../controllers/production/packing/PackingReport.js";
 import {
   getDailyPlanPackIn,
   QrListAftrPackingIn,
@@ -16,5 +21,8 @@ router.get("/scanin/daily-schedule/:schDate", getDailyPlanPackIn);
 router.post("/qr/scanin", ScanPackingQrIn);
 
 //packing in report
-router.get("/daily/scanin/:scandate/:linename", PackInScanInDayRep);
+router.get("/daily/scaninRep/:scanDate", PackInScanInDayRep);
+router.get("/daily/scaninRepSize/:scanDate", PackInScanInDaySize);
+router.get("/daily/scaninRepPo/:scanDate", PackInScanInDayRepPo);
+router.get("/daily/scaninRepSizePo/:scanDate", PackInScanInDaySizePo);
 export default router;
