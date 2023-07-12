@@ -153,12 +153,7 @@ export const postSmvPlan = async (req, res) => {
       },
     });
 
-    if (!findSmv) {
-      delete data.UPDATE_BY;
-      delete data.UPDATE_DATE;
-      const newWh = await SmvDailyPlan.create(data);
-      return res.status(200).json({ message: "Success Set SMV", data: newWh });
-    } else {
+    if (findSmv) {
       delete data.CREATE_BY;
       delete data.CREATE_DATE;
       await SmvDailyPlan.update(data, {
@@ -167,9 +162,13 @@ export const postSmvPlan = async (req, res) => {
           SHIFT: data.SHIFT,
         },
       });
+      return res.status(200).json({ message: "Success Set Smv" });
+    } else {
+      delete data.UPDATE_BY;
+      delete data.UPDATE_DATE;
+      const newWh = await SmvDailyPlan.create(data);
+      return res.status(200).json({ message: "Success Set SMV", data: newWh });
     }
-
-    return res.status(200).json({ message: "Success Set Smv" });
   } catch (error) {
     console.log(error);
     res.status(404).json({
@@ -204,6 +203,7 @@ export const clearMpAndWh = async (req, res) => {
           const dataUpdt = { PLAN_MP_OT: null, PLAN_MP_X_OT: null };
           await ManpowewrDailyDetail.update(dataUpdt, {
             where: {
+              ID_MPD: findMpDetail.ID_MPD,
               SCHD_ID: schd.SCHD_ID,
               SHIFT: schd.SHIFT,
             },
@@ -226,6 +226,7 @@ export const clearMpAndWh = async (req, res) => {
         if (findWh) {
           await WorkingHoursDetail.update(dataUpdtWh, {
             where: {
+              ID_WHD: findWh.ID_WHD,
               SCHD_ID: schd.SCHD_ID,
               SHIFT: schd.SHIFT,
             },

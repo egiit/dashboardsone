@@ -41,7 +41,7 @@ export const SetActualMp = async (req, res) => {
       },
     });
     // if founded
-    if (findMp !== null) {
+    if (findMp) {
       const updateMp = await ManpowewrDailyDetail.update(dataPlan, {
         where: {
           SCHD_ID: dataPlan.SCHD_ID,
