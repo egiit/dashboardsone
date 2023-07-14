@@ -5,6 +5,7 @@ import {
   getEffYtdOverAll,
   getThreeTop,
   splitDataDashboard,
+  sumByLine,
 } from "../../controllers/production/dashAnalitycs/DashboardAll.js";
 import {
   getDataDashSite,
@@ -16,7 +17,7 @@ import {
 
 const router = express.Router();
 
-router.get("/allsite", getDataAllSiteDash, splitDataDashboard);
+router.get("/allsite", getDataAllSiteDash, sumByLine, splitDataDashboard);
 router.get("/effYesAll", getEffYtdOverAll);
 router.get("/defRate", getDefRate);
 router.get("/topthree", getThreeTop);

@@ -7,7 +7,7 @@ import {
   QueryMainSewDash,
   QueryMainSewDashPast,
 } from "../../../models/dashAnalitycs/mainDashSew.js";
-import { CheckNilai, totalCol } from "../../util/Utility.js";
+import { CheckNilai, findRTT, totalCol } from "../../util/Utility.js";
 import moment from "moment/moment.js";
 
 //query get data All size dash
@@ -53,7 +53,7 @@ export const getDataAllSiteDash = async (req, res, next) => {
       );
       // console.log(detailDataDash);
 
-      req.dataDash = resultFilter;
+      req.resultFilter = resultFilter;
       return next();
     } else {
       return res.status(200).json({
@@ -62,6 +62,127 @@ export const getDataAllSiteDash = async (req, res, next) => {
         dataBySite: [],
       });
     }
+  } catch (error) {
+    console.log(error);
+    return res.status(404).json({
+      message: "error processing get data sewing daily eff",
+      data: error,
+    });
+  }
+};
+
+function compareLine(a, b) {
+  if (a.ID_SITELINE < b.ID_SITELINE) {
+    return -1;
+  }
+  if (a.ID_SITELINE > b.ID_SITELINE) {
+    return 1;
+  }
+  return 0;
+}
+
+//get data summary by line, untuk mencari nilai RTT tiap line sehingga bisa mencari eff berdasarkan line
+export const sumByLine = async (req, res, next) => {
+  try {
+    const dataDash = req.resultFilter;
+    const dataByLine = [
+      ...dataDash
+        .reduce((distLine, current) => {
+          const { ID_SITELINE } = current;
+          const grouped = distLine.get(ID_SITELINE);
+          // console.log(grouped);
+          if (!grouped) {
+            distLine.set(ID_SITELINE, {
+              ...current,
+              RTT: chkNilaFlt(current.RTT),
+              RTT_OT: chkNilaFlt(current.RTT_OT),
+              RTT_X_OT: chkNilaFlt(current.RTT_X_OT),
+              ACTUAL_EH: chkNilaFlt(current.ACTUAL_EH),
+              ACTUAL_EH_OT: chkNilaFlt(current.ACTUAL_EH_OT),
+              ACTUAL_EH_X_OT: chkNilaFlt(current.ACTUAL_EH_X_OT),
+              ACTUAL_AH: chkNilaFlt(current.ACTUAL_AH),
+              ACTUAL_AH_OT: chkNilaFlt(current.ACTUAL_AH_OT),
+              ACTUAL_AH_X_OT: chkNilaFlt(current.ACTUAL_AH_X_OT),
+              ACT_TARGET: chkNilaFlt(current.ACT_TARGET),
+              TPPM_NORMAL: chkNilaFlt(current.TPPM_NORMAL),
+              TOTAL_TARGET: chkNilaFlt(current.TOTAL_TARGET),
+              TOTAL_OUTPUT: chkNilaFlt(current.TOTAL_OUTPUT),
+            });
+          } else {
+            distLine.set(ID_SITELINE, {
+              ...grouped,
+              RTT: chkNilaFlt(grouped.RTT) + chkNilaFlt(current.RTT),
+              RTT_OT: chkNilaFlt(grouped.RTT_OT) + chkNilaFlt(current.RTT_OT),
+              RTT_X_OT:
+                chkNilaFlt(grouped.RTT_X_OT) + chkNilaFlt(current.RTT_X_OT),
+              ACTUAL_EH:
+                chkNilaFlt(grouped.ACTUAL_EH) + chkNilaFlt(current.ACTUAL_EH),
+              ACTUAL_EH_OT:
+                chkNilaFlt(grouped.ACTUAL_EH_OT) +
+                chkNilaFlt(current.ACTUAL_EH_OT),
+              ACTUAL_EH_X_OT:
+                chkNilaFlt(grouped.ACTUAL_EH_X_OT) +
+                chkNilaFlt(current.ACTUAL_EH_X_OT),
+              ACTUAL_AH:
+                chkNilaFlt(grouped.ACTUAL_AH) + chkNilaFlt(current.ACTUAL_AH),
+              ACTUAL_AH_OT:
+                chkNilaFlt(grouped.ACTUAL_AH_OT) +
+                chkNilaFlt(current.ACTUAL_AH_OT),
+              ACTUAL_AH_X_OT:
+                chkNilaFlt(grouped.ACTUAL_AH_X_OT) +
+                chkNilaFlt(current.ACTUAL_AH_X_OT),
+              ACT_TARGET:
+                chkNilaFlt(grouped.ACT_TARGET) + chkNilaFlt(current.ACT_TARGET),
+              TPPM_NORMAL:
+                chkNilaFlt(grouped.TPPM_NORMAL) +
+                chkNilaFlt(current.TPPM_NORMAL),
+              TOTAL_TARGET:
+                chkNilaFlt(grouped.TOTAL_TARGET) +
+                chkNilaFlt(current.TOTAL_TARGET),
+              TOTAL_OUTPUT:
+                chkNilaFlt(grouped.TOTAL_OUTPUT) +
+                chkNilaFlt(current.TOTAL_OUTPUT),
+            });
+          }
+
+          return distLine;
+        }, new Map())
+        .values(),
+    ];
+
+    const dataDasrboard = dataByLine.map((site) => ({
+      ...site,
+      // EH: chkNilaFlt(site.ACTUAL_EH),
+      // EH_OT: chkNilaFlt(site.ACTUAL_EH_OT),
+      // EH_XOT: chkNilaFlt(site.ACTUAL_EH_X_OT),
+      // AH: chkNilaFlt(site.ACTUAL_AH),
+      // AH_OT: chkNilaFlt(site.ACTUAL_AH_OT),
+      // AH_XOT: chkNilaFlt(site.ACTUAL_AH_X_OT),
+      RTT: findRTT(
+        site.SHIFT,
+        site.STARTH,
+        site.ENDH,
+        site.SCHD_PROD_DATE,
+        site.ACT_TARGET,
+        site.TPPM_NORMAL
+      ),
+    }));
+
+    //get total manpower
+    //filter data yang hanya memiliki act manpower
+    const filterOnlyActMp = dataDash.filter((line) => line.ACT_MP !== null);
+    //distinc atau ambil data tunggal tiap line
+    let distSiteline = [
+      ...new Map(
+        filterOnlyActMp.map((item) => [item["ID_SITELINE"], item])
+      ).values(),
+    ];
+    //lalu jumlahkan manpower
+    const actlMp = totalCol(distSiteline, "ACT_MP");
+    const planMp = totalCol(distSiteline, "PLAN_MP");
+    req.ttlMP = { actlMp, planMp };
+    req.dataDash = dataDasrboard;
+    next();
   } catch (error) {
     console.log(error);
     return res.status(404).json({
@@ -145,24 +266,11 @@ export const splitDataDashboard = async (req, res) => {
     dataBySite.sort(compare);
     // console.log(dataBySite);
 
-    //get total manpower
-    //filter data yang hanya memiliki act manpower
-    const filterOnlyActMp = dataDash.filter((line) => line.ACT_MP !== null);
-    //distinc atau ambil data tunggal tiap line
-    let distSiteline = [
-      ...new Map(
-        filterOnlyActMp.map((item) => [item["ID_SITELINE"], item])
-      ).values(),
-    ];
-    //lalu jumlahkan manpower
-    const actlMp = totalCol(distSiteline, "ACT_MP");
-    const planMp = totalCol(distSiteline, "PLAN_MP");
-
     return res.status(200).json({
       success: true,
       dataCards: resultCards,
       dataBySite: dataBySite,
-      ttlMP: { actlMp, planMp },
+      ttlMP: req.ttlMP,
     });
   } catch (error) {
     console.log(error);
