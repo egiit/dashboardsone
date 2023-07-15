@@ -152,7 +152,6 @@ export const postSmvPlan = async (req, res) => {
         SHIFT: data.SHIFT,
       },
     });
-
     if (findSmv) {
       delete data.CREATE_BY;
       delete data.CREATE_DATE;

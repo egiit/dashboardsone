@@ -245,7 +245,7 @@ export const FindOnePlanZ = `SELECT * FROM qc_endline_plansize a WHERE a.PLANSIZ
 export const SmvDailyPlan = db.define(
   "smv_daily_plan",
   {
-    SMV_DAY_ID: { type: DataTypes.BIGINT },
+    SMV_DAY_ID: { type: DataTypes.BIGINT, primaryKey: true },
     SCHD_ID: { type: DataTypes.BIGINT },
     SHIFT: { type: DataTypes.STRING },
     LINE_NAME: { type: DataTypes.STRING },
