@@ -41,17 +41,17 @@ router.delete("/chart-delete/:chartNo", deleteMeasChart);
 router.delete("/chart-to-order/:MES_CHART_NO/:ORDER_NO", removeChartInOrder);
 
 //qc end measurement qc endline
-// router.get("/spec-list/:orderNo/:sizeCode", getMeasureSpec);
-// router.get(
-//   "/endline-out/:barcodeSerial/:siteName/:lineName/:sizeCode",
-//   getMeasureOutput
-// );
-// router.get(
-//   "/endline/meas-count-check/:schDate/:sitename/:linename",
-//   getMeasCountCheck
-// );
+router.get("/spec-list/:orderNo/:sizeCode", getMeasureSpec);
+router.get(
+  "/endline-out/:barcodeSerial/:siteName/:lineName/:sizeCode",
+  getMeasureOutput
+);
+router.get(
+  "/endline/meas-count-check/:schDate/:sitename/:linename",
+  getMeasCountCheck
+);
 
-// router.delete("/endline-out/:barcodeSerial/:sequance", deleteDataMeasOut);
+router.delete("/endline-out/:barcodeSerial/:sequance", deleteDataMeasOut);
 
-// router.post("/endline/", postDataMeasOut);
+router.post("/endline/", postDataMeasOut);
 export default router;
