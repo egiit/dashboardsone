@@ -140,6 +140,7 @@ export const QRScanSewingIn = async (req, res) => {
           colorCode: valueBarcode.ORDER_COLOR,
           sizeCode: valueBarcode.ORDER_SIZE,
           prodMonth: valueBarcode.PRODUCTION_MONTH,
+          planExFty: valueBarcode.PLAN_EXFACTORY_DATE,
         },
         type: QueryTypes.SELECT,
       });
