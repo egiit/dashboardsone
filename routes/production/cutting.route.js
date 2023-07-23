@@ -16,6 +16,7 @@ import {
   getCuttingOrder,
   getOrderByBLK,
 } from "../../controllers/production/cutting/CuttingGetOrder.js";
+import { getBaseRepCutLoad } from "../../controllers/production/cutting/CuttingLoadinRep.js";
 
 // ROUTE CUTTING
 
@@ -43,5 +44,8 @@ router.post(
   deleteDataSewIn,
   confrmReturn
 );
+
+//cutting loading report
+router.get("/baseReport/:startDate/:endDate/:site", getBaseRepCutLoad);
 
 export default router;
