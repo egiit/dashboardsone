@@ -57,35 +57,18 @@ export const postDataMeasOut = async (req, res) => {
       return res.status(404).json({ message: "No Data Measurement to Post" });
     // console.log(datas);
 
-    //looping data from Front End
-    for (const [i, data] of datas.entries()) {
-      const checkExist = await MeasOutput.findAll({
-        where: {
-          MES_CHART_NO: data.MES_CHART_NO,
-          POM_ID: data.POM_ID,
-          SIZE_CODE: data.SIZE_CODE,
-          MES_SEQ: data.MES_SEQ,
-          BARCODE_SERIAL: data.BARCODE_SERIAL,
-        },
-      });
-      if (checkExist.length > 0) {
-        await MeasOutput.update(data, {
-          where: {
-            MES_CHART_NO: data.MES_CHART_NO,
-            POM_ID: data.POM_ID,
-            SIZE_CODE: data.SIZE_CODE,
-            MES_SEQ: data.MES_SEQ,
-            BARCODE_SERIAL: data.BARCODE_SERIAL,
-          },
-        });
-      } else {
-        await MeasOutput.create(data);
-      }
+    const { BARCODE_SERIAL, MES_SEQ } = datas[0];
+    await MeasOutput.destroy({
+      where: {
+        BARCODE_SERIAL: BARCODE_SERIAL,
+        MES_SEQ: MES_SEQ,
+      },
+    });
 
-      if (datas.length === i + 1) {
-        return res.json({ message: "Success Post Measurement" });
-      }
-    }
+    //looping data from Front End
+    await MeasOutput.bulkCreate(datas).then(() => {
+      return res.status(200).json({ message: "Success Post Measurement" });
+    });
   } catch (error) {
     console.log(error);
     return res.status(404).json({
