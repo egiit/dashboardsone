@@ -27,6 +27,7 @@ import {
   clearMpAndWh,
   postSmvPlan,
 } from "../../controllers/production/planning/DailyPlanning.js";
+import { getMasterWipMonitor } from "../../controllers/production/reports/SewWipMonitor.js";
 
 // ROUTE SEWING
 router.get("/sitelist", getSiteList);
@@ -48,5 +49,11 @@ router.post("/daily-remark/", postRemark);
 router.post("/clear-selected/", clearMpAndWh);
 
 router.patch("/sewing-mp/", updateManpowerDefault);
+
+//sewing wip monitoring
+router.get(
+  "/wip-monitoring/:startDate/:endDate/:sitename",
+  getMasterWipMonitor
+);
 
 export default router;
