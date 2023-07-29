@@ -27,7 +27,10 @@ import {
   clearMpAndWh,
   postSmvPlan,
 } from "../../controllers/production/planning/DailyPlanning.js";
-import { getMasterWipMonitor } from "../../controllers/production/reports/SewWipMonitor.js";
+import {
+  getMasterWipMonSize,
+  getMasterWipMonitor,
+} from "../../controllers/production/reports/SewWipMonitor.js";
 
 // ROUTE SEWING
 router.get("/sitelist", getSiteList);
@@ -54,6 +57,10 @@ router.patch("/sewing-mp/", updateManpowerDefault);
 router.get(
   "/wip-monitoring/:startDate/:endDate/:sitename",
   getMasterWipMonitor
+);
+router.get(
+  "/wip-monitoring-size/:startDate/:endDate/:sitename",
+  getMasterWipMonSize
 );
 
 export default router;
