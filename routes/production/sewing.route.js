@@ -30,6 +30,7 @@ import {
 import {
   getMasterWipMonSize,
   getMasterWipMonitor,
+  trackingByWipMontioring,
 } from "../../controllers/production/reports/SewWipMonitor.js";
 
 // ROUTE SEWING
@@ -61,6 +62,10 @@ router.get(
 router.get(
   "/wip-monitoring-size/:startDate/:endDate/:sitename",
   getMasterWipMonSize
+);
+router.get(
+  "/wip-monitoring-tracking/:schId/:orderSize",
+  trackingByWipMontioring
 );
 
 export default router;
