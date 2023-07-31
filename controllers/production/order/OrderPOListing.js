@@ -3,6 +3,7 @@ import { QueryTypes, Op } from "sequelize";
 import {
   findNewCapId,
   OrderPoListing,
+  OrderPoListingSize,
 } from "../../../models/production/order.mod.js";
 import {
   SchSizeAloc,
@@ -199,3 +200,46 @@ async function updateIdCapacity(prodMonth) {
     });
   }
 }
+
+// CONTROLLER CREATE NEW ORDER PO LISTING DATA with sizes
+export const newOrderPOListingSizes = async (req, res) => {
+  try {
+    // let existData = [];
+    const dataOrder = req.body;
+
+    if (!dataOrder.length) {
+      return res.status(404).json({
+        success: false,
+        message: "no data upload!",
+        data: dataOrder,
+      });
+    }
+
+    //get list of month for destroy data befor post new data
+    const listMonth = [
+      ...new Set(dataOrder.map((item) => item.PRODUCTION_MONTH)),
+    ];
+    for (const [i, month] of listMonth.entries()) {
+      await OrderPoListingSize.destroy({
+        where: {
+          PRODUCTION_MONTH: month,
+        },
+      });
+      if (i + 1 === listMonth.length) {
+        await OrderPoListingSize.bulkCreate(dataOrder).then(() => {
+          return res.status(200).json({
+            success: true,
+            message: "Data Order Retrieved Successfully create",
+          });
+        });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      success: false,
+      message: "error processing request",
+      data: error,
+    });
+  }
+};

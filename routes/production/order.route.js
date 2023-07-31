@@ -11,6 +11,7 @@ import {
 import {
   getOrderPOListing,
   newOrderPOListing,
+  newOrderPOListingSizes,
 } from "../../controllers/production/order/OrderPOListing.js";
 import {
   getMatrixPoDelivSize,
@@ -26,6 +27,8 @@ router.delete("/detail/delete/:barcodeserial", deleteOrder);
 
 router.get("/polisting", getOrderPOListing);
 router.post("/polisting", newOrderPOListing);
+
+router.post("/polisting-sizes", newOrderPOListingSizes);
 
 router.post("/pomatrixdeliv", postPOMatrixDeliv);
 router.get("/pomatrixdeliv/:capId", getMatrixPoDelivSize);
