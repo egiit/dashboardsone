@@ -5,6 +5,8 @@ import { QueryTypes, Op } from "sequelize";
 
 // import moment from "moment";
 import {
+  CheckQrExist,
+  CheckWipBfrOut,
   ManpowewrDailyDetail,
   QuerySewingInQr,
   ScanSewingOut,
@@ -568,11 +570,9 @@ export async function sewingScanOut(req, res) {
   try {
     const dataQr = req.body;
     // console.log(dataQr);
-
-    const checkQrScanIn = await CuttinScanSewingIn.findAll({
-      where: {
-        BARCODE_SERIAL: dataQr.BARCODE_SERIAL,
-      },
+    const checkQrScanIn = await db.query(CheckQrExist, {
+      type: QueryTypes.SELECT,
+      replacements: { barcodeSerial: dataQr.BARCODE_SERIAL },
     });
     // console.log(checkQrScanIn);
 
@@ -601,14 +601,31 @@ export async function sewingScanOut(req, res) {
       });
     }
 
-    const transferQr = await ScanSewingOut.create(dataQr);
+    const detailQr = checkQrScanIn[0];
+    //check wip
+    const checkWipVsOutput = await db.query(CheckWipBfrOut, {
+      type: QueryTypes.SELECT,
+      replacements: {
+        schdId: detailQr.SCHD_ID,
+        orderSize: detailQr.ORDER_SIZE,
+      },
+    });
 
-    if (transferQr) {
+    if (parseInt(checkWipVsOutput[0].BALANCE) < detailQr.ORDER_QTY) {
       return res.status(200).json({
         success: true,
-        qrstatus: "success",
-        message: "Transfer Berhasil",
+        qrstatus: "danger",
+        message: "BALANCE Good tidak mencukupi mohon refresh dan coba kembali",
       });
+    } else {
+      const transferQr = await ScanSewingOut.create(dataQr);
+      if (transferQr) {
+        return res.status(200).json({
+          success: true,
+          qrstatus: "success",
+          message: "Transfer Berhasil",
+        });
+      }
     }
 
     return res.status(404).json({
