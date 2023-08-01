@@ -150,23 +150,18 @@ export const sumByLine = async (req, res, next) => {
         .values(),
     ];
 
-    const dataDasrboard = dataByLine.map((site) => ({
-      ...site,
-      // EH: chkNilaFlt(site.ACTUAL_EH),
-      // EH_OT: chkNilaFlt(site.ACTUAL_EH_OT),
-      // EH_XOT: chkNilaFlt(site.ACTUAL_EH_X_OT),
-      // AH: chkNilaFlt(site.ACTUAL_AH),
-      // AH_OT: chkNilaFlt(site.ACTUAL_AH_OT),
-      // AH_XOT: chkNilaFlt(site.ACTUAL_AH_X_OT),
-      RTT: findRTT(
-        site.SHIFT,
-        site.STARTH,
-        site.ENDH,
-        site.SCHD_PROD_DATE,
-        site.ACT_TARGET,
-        site.TPPM_NORMAL
-      ),
-    }));
+    //maping untuk mencari RTT
+    // const dataDasrboard = dataByLine.map((site) => ({
+    //   ...site,
+    //   RTT: findRTT(
+    //     site.SHIFT,
+    //     site.STARTH,
+    //     site.ENDH,
+    //     site.SCHD_PROD_DATE,
+    //     site.ACT_TARGET,
+    //     site.TPPM_NORMAL
+    //   ),
+    // }));
 
     //get total manpower
     //filter data yang hanya memiliki act manpower
@@ -181,7 +176,7 @@ export const sumByLine = async (req, res, next) => {
     const actlMp = totalCol(distSiteline, "ACT_MP");
     const planMp = totalCol(distSiteline, "PLAN_MP");
     req.ttlMP = { actlMp, planMp };
-    req.dataDash = dataDasrboard;
+    req.dataDash = dataByLine;
     next();
   } catch (error) {
     console.log(error);
