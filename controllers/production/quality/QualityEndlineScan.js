@@ -599,24 +599,6 @@ export async function sewingScanOut(req, res) {
         qrstatus: "danger",
         message: "QR Sudah transfer",
       });
-    }
-
-    const detailQr = checkQrScanIn[0];
-    //check wip
-    const checkWipVsOutput = await db.query(CheckWipBfrOut, {
-      type: QueryTypes.SELECT,
-      replacements: {
-        schdId: detailQr.SCHD_ID,
-        orderSize: detailQr.ORDER_SIZE,
-      },
-    });
-
-    if (parseInt(checkWipVsOutput[0].BALANCE) < detailQr.ORDER_QTY) {
-      return res.status(200).json({
-        success: true,
-        qrstatus: "danger",
-        message: "BALANCE Good tidak mencukupi mohon refresh dan coba kembali",
-      });
     } else {
       const transferQr = await ScanSewingOut.create(dataQr);
       if (transferQr) {
@@ -627,6 +609,33 @@ export async function sewingScanOut(req, res) {
         });
       }
     }
+
+    // const detailQr = checkQrScanIn[0];
+    // //check wip
+    // const checkWipVsOutput = await db.query(CheckWipBfrOut, {
+    //   type: QueryTypes.SELECT,
+    //   replacements: {
+    //     schdId: detailQr.SCHD_ID,
+    //     orderSize: detailQr.ORDER_SIZE,
+    //   },
+    // });
+
+    // if (parseInt(checkWipVsOutput[0].BALANCE) < detailQr.ORDER_QTY) {
+    //   return res.status(200).json({
+    //     success: true,
+    //     qrstatus: "danger",
+    //     message: "BALANCE Good tidak mencukupi mohon refresh dan coba kembali",
+    //   });
+    // } else {
+    //   const transferQr = await ScanSewingOut.create(dataQr);
+    //   if (transferQr) {
+    //     return res.status(200).json({
+    //       success: true,
+    //       qrstatus: "success",
+    //       message: "Transfer Berhasil",
+    //     });
+    //   }
+    // }
 
     return res.status(404).json({
       success: false,
