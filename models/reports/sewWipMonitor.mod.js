@@ -48,7 +48,15 @@ FROM (
         FROM weekly_prod_schedule a  
         LEFT JOIN viewcapacity b ON a.SCH_CAPACITY_ID = b.ID_CAPACITY
         LEFT JOIN item_siteline c ON a.SCH_ID_SITELINE = c.ID_SITELINE
-        LEFT JOIN weekly_sch_size d ON d.SCH_ID = a.SCH_ID
+        LEFT JOIN (
+            SELECT p.SCH_ID, p.SIZE_CODE, SUM(p.SCH_SIZE_QTY) SCH_SIZE_QTY
+            FROM  weekly_sch_size p 
+            WHERE p.SCH_ID IN (
+                SELECT DISTINCT a.SCH_ID  FROM weekly_prod_sch_detail a 
+                WHERE a.SCHD_PROD_DATE BETWEEN :startDate AND :endDate
+            ) 
+            GROUP BY p.SCH_ID, p.SIZE_CODE
+        ) d ON d.SCH_ID = a.SCH_ID
         LEFT JOIN (
         SELECT 
             A1.SCH_ID AS SCH_ID,
@@ -130,7 +138,15 @@ d.SIZE_CODE, d.SCH_SIZE_QTY,
 FROM weekly_prod_schedule a  
 LEFT JOIN viewcapacity b ON a.SCH_CAPACITY_ID = b.ID_CAPACITY
 LEFT JOIN item_siteline c ON a.SCH_ID_SITELINE = c.ID_SITELINE
-LEFT JOIN weekly_sch_size d ON d.SCH_ID = a.SCH_ID
+LEFT JOIN (
+    SELECT p.SCH_ID, p.SIZE_CODE, SUM(p.SCH_SIZE_QTY) SCH_SIZE_QTY
+    FROM  weekly_sch_size p 
+    WHERE p.SCH_ID IN (
+        SELECT DISTINCT a.SCH_ID  FROM weekly_prod_sch_detail a 
+        WHERE a.SCHD_PROD_DATE BETWEEN :startDate AND :endDate
+    ) 
+    GROUP BY p.SCH_ID, p.SIZE_CODE
+) d ON d.SCH_ID = a.SCH_ID
 LEFT JOIN (
 SELECT 
     A1.SCH_ID AS SCH_ID,
