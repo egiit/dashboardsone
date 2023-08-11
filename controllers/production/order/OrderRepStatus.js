@@ -11,8 +11,10 @@ import {
 export const getOrderStatusMo = async (req, res) => {
   try {
     const { listMonth } = req.params;
+    console.log(listMonth);
 
     const months = listMonth.split("-");
+    console.log(months);
     const pland = await db.query(QueryGetOrderRepMo, {
       // const pland = await db.query(QueryDailyPlann, {
       replacements: {
@@ -20,7 +22,6 @@ export const getOrderStatusMo = async (req, res) => {
       },
       type: QueryTypes.SELECT,
     });
-    // console.log(listMonth);
     return res.json(pland);
   } catch (error) {
     console.log(error);
