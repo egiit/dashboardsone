@@ -30,15 +30,15 @@ const runDb = async () => {
 
 runDb();
 
-cron.schedule(" 1 1 * * *", () => {
-  console.log("running a task reschedule");
-  funcReschedule();
-});
+// cron.schedule(" 1 1 * * *", () => {
+//   console.log("running a task reschedule");
+//   funcReschedule();
+// });
 
-cron.schedule(" 1 * * * * *", () => {
-  console.log("running a task log");
-  cronLogDialyOut();
-});
+// cron.schedule(" 1 * * * * *", () => {
+//   console.log("running a task log");
+//   cronLogDialyOut();
+// });
 // app.use(cors());
 
 function logOriginalUrl(req, res, next) {

@@ -17,6 +17,13 @@ import {
   getMatrixPoDelivSize,
   postPOMatrixDeliv,
 } from "../../controllers/production/order/PoDelivMatrix.js";
+import {
+  getDetailOneCap,
+  getDetailOneCapSize,
+  getOrderByCapacity,
+  getOrderStatusMo,
+  getOrderStatusSize,
+} from "../../controllers/production/order/OrderRepStatus.js";
 
 router.get("/detail", getOrder);
 router.get("/detail/barcodeserial/:barcodeserial", getOrderByBarcodeSerial);
@@ -32,5 +39,15 @@ router.post("/polisting-sizes", newOrderPOListingSizes);
 
 router.post("/pomatrixdeliv", postPOMatrixDeliv);
 router.get("/pomatrixdeliv/:capId", getMatrixPoDelivSize);
+
+//report order status
+router.get("/order-status-po/:listMonth", getOrderStatusMo);
+router.get(
+  "/order-status-size/:prodMonth/:capSite/:orderRefPoNo/:color",
+  getOrderStatusSize
+);
+router.get("/order-status-capacity/:listMonth", getOrderByCapacity);
+router.get("/order-status-capacity-detail/:idCapacity", getDetailOneCap);
+router.get("/order-status-capacity-size/:schId", getDetailOneCapSize);
 
 export default router;
