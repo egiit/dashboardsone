@@ -15,23 +15,10 @@ tedious.Connection;
 //     timezone: "local",
 //   },
 // });
-// const db = new Sequelize("db_sumbiri_one", "root", "", {
-//   dialect: "mysql",
-//   logging: false,
-//   timezone: "+07:00",
-//   dialectOptions: {
-//     timezone: "local",
-//   },
-//   pool: {
-//     max: 30,
-//     min: 0,
-//     acquire: 60000,
-//     idle: 5000,
-//   },
-// });
 
 const db = new Sequelize("db_sumbiri_one", "sumbirispm", "Asd54321`", {
-  host: "192.168.1.168",
+  host: "192.168.1.236",
+  port: "3306",
   dialect: "mysql",
   logging: false,
   timezone: "+07:00",
@@ -39,16 +26,5 @@ const db = new Sequelize("db_sumbiri_one", "sumbirispm", "Asd54321`", {
     timezone: "local",
   },
 });
-
-// const db = new Sequelize("db_sumbiri_one", "sumbirispm", "Asd54321`", {
-//   host: "123.255.200.62",
-//   port: "44170",
-//   dialect: "mysql",
-//   logging: false,
-//   timezone: "+07:00",
-//   dialectOptions: {
-//     timezone: "local",
-//   },
-// });
 
 export default db;
