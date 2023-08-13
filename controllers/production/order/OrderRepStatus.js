@@ -11,7 +11,7 @@ import {
 export const getOrderStatusMo = async (req, res) => {
   try {
     const { listMonth } = req.params;
-    console.log(listMonth);
+    // console.log(listMonth);
 
     const months = listMonth
       .split("-")
