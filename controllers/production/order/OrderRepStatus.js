@@ -13,8 +13,10 @@ export const getOrderStatusMo = async (req, res) => {
     const { listMonth } = req.params;
     console.log(listMonth);
 
-    const months = listMonth.split("-");
-    console.log(months);
+    const months = listMonth
+      .split("-")
+      .map((month) => decodeURIComponent(month));
+
     const pland = await db.query(QueryGetOrderRepMo, {
       // const pland = await db.query(QueryDailyPlann, {
       replacements: {
@@ -64,7 +66,9 @@ export const getOrderByCapacity = async (req, res) => {
   try {
     const { listMonth } = req.params;
 
-    const months = listMonth.split("-");
+    const months = listMonth
+      .split("-")
+      .map((month) => decodeURIComponent(month));
     const pland = await db.query(QryGetOrderByCapacity, {
       // const pland = await db.query(QueryDailyPlann, {
       replacements: {
@@ -89,7 +93,7 @@ export const getDetailOneCap = async (req, res) => {
     const capDetail = await db.query(QuerydetailOneCap, {
       // const pland = await db.query(QueryDailyPlann, {
       replacements: {
-        idCapacity: idCapacity,
+        idCapacity: decodeURIComponent(idCapacity),
       },
       type: QueryTypes.SELECT,
     });
