@@ -110,8 +110,10 @@ export const createNewSchdl = async (newDet, datas) => {
     });
 
     //tntukan hari libur untuk shift
-    const shift =
-      chcekShift[0].SHIFT === "Shift" ? ["Saturday", "Sunday"] : ["Sunday"];
+
+    // const shift =
+    //   chcekShift[0].SHIFT === "Shift" ? ["Saturday", "Sunday"] : ["Sunday"]; //6hari kerja shift normal
+    const shift = ["Saturday", "Sunday"];
     const arryHoliday = listHoliday.map((hdet) => hdet.calendar_date); // array holiday
     let currDate = moment(newDet.SCHD_PROD_DATE, "YYYY-MM-DD").add(1, "days"); //hari dari props ditambah 1
     //gunakan while loop sampai ketemu hari yang tidak termasuk shift ataupun array holiday
