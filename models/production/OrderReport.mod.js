@@ -554,7 +554,8 @@ FROM (
 						SELECT  
 						a.ENDLINE_SCH_ID, 
 						a.ENDLINE_PLAN_SIZE, 
-						SUM(a.ENDLINE_OUT_QTY) AS TTL_QC_QTY
+						SUM(a.ENDLINE_OUT_QTY) AS TTL_QC_QTY,
+						 MIN(DATE(a.ENDLINE_ADD_TIME)) START_PROD_DATE, MAX(DATE(a.ENDLINE_ADD_TIME)) END_PROD_DATE
 						FROM qc_endline_output a 
 						WHERE   
 							a.ENDLINE_SCH_ID = :schId AND 
@@ -564,7 +565,7 @@ FROM (
 							)
 						GROUP BY 
 							a.ENDLINE_SCH_ID, 
-							a.ENDLINE_PLAN_SIZE;
+							a.ENDLINE_PLAN_SIZE
 	        ) f ON(a.SCH_ID = f.ENDLINE_SCH_ID AND f.ENDLINE_PLAN_SIZE = a.SIZE_CODE  )
 	        LEFT JOIN (
 						SELECT a.SCH_ID, b.ORDER_SIZE, SUM(b.ORDER_QTY) TTL_SEWING_OUT
