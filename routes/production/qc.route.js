@@ -35,7 +35,6 @@ import {
   SetActualMp,
   sewingScanOut,
 } from "../../controllers/production/quality/QualityEndlineScan.js";
-import { QueryEndlinePlanSize } from "../../models/production/quality.mod.js";
 const router = express.Router();
 
 // QC Route

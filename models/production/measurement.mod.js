@@ -161,31 +161,15 @@ WHERE a.BARCODE_SERIAL = :barcodeSerial  AND a.SITE_NAME = :siteName AND a.LINE_
 
 export const QryMeasCheck = `SELECT n.BARCODE_SERIAL, COUNT(n.BARCODE_SERIAL) CHECK_COUNT
 FROM (
-	SELECT a.BARCODE_SERIAL, a.MES_SEQ FROM measurement_qc_output a WHERE a.BARCODE_SERIAL IN (
-		SELECT a.BARCODE_SERIAL
-		FROM scan_sewing_in a
-		LEFT JOIN order_detail b ON a.BARCODE_SERIAL = b.BARCODE_SERIAL 
-		LEFT JOIN weekly_prod_sch_detail g ON a.SCHD_ID = g.SCHD_ID
-		LEFT JOIN item_siteline e ON e.ID_SITELINE = g.SCHD_ID_SITELINE
-		WHERE g.SCHD_PROD_DATE = :schDate AND a.SEWING_SCAN_LOCATION = :sitename  AND 
-		e.LINE_NAME LIKE :linename --  AND a.BARCODE_SERIAL LIKE :barcodeserial
-		ORDER BY  b.ORDER_SIZE
-	) GROUP BY a.BARCODE_SERIAL, a.MES_SEQ
-	UNION ALL 
-	SELECT a.BARCODE_SERIAL, a.MES_SEQ FROM measurement_qc_output a WHERE a.BARCODE_SERIAL IN (
-		SELECT a.BARCODE_SERIAL
-		FROM scan_sewing_in a
-		LEFT JOIN order_detail b ON a.BARCODE_SERIAL = b.BARCODE_SERIAL 
-		LEFT JOIN (
-		  SELECT DISTINCT a.SCHD_ID, a.SCH_ID, a.ID_SITELINE, a.SITE_NAME, a.LINE_NAME, a.SCHD_PROD_DATE
-		  FROM log_daily_output a 
-			WHERE a.SCHD_PROD_DATE < :schDate AND a.SITE_NAME = :sitename   AND a.LINE_NAME = :linename
-		) g ON a.SCHD_ID = g.SCHD_ID 
-		LEFT JOIN weekly_prod_schedule gg ON g.SCH_ID = gg.SCH_ID
-		LEFT JOIN item_siteline e ON e.ID_SITELINE = gg.SCH_ID_SITELINE
-		LEFT JOIN scan_sewing_out i ON i.BARCODE_SERIAL = a.BARCODE_SERIAL
-		WHERE g.SCHD_PROD_DATE < :schDate AND a.SEWING_SCAN_LOCATION = :sitename  AND 
-		e.LINE_NAME = :linename AND ISNULL(i.BARCODE_SERIAL) 
-		ORDER BY  b.ORDER_SIZE
-	) GROUP BY a.BARCODE_SERIAL, a.MES_SEQ
+	SELECT DISTINCT a.BARCODE_SERIAL, a.MES_SEQ 
+	FROM measurement_qc_output a 
+	WHERE a.SCHD_ID IN (
+		SELECT DISTINCT a.SCHD_ID
+		FROM scan_sewing_in a WHERE a.SCH_ID IN (
+			SELECT g.SCH_ID FROM weekly_prod_sch_detail g 
+			LEFT JOIN item_siteline ga ON ga.ID_SITELINE = g.SCHD_ID_SITELINE
+			WHERE  g.SCHD_PROD_DATE = :schDate AND g.SCHD_SITE = :sitename  AND 
+			ga.LINE_NAME = :linename 
+		) 
+	) 	GROUP BY a.BARCODE_SERIAL, a.MES_SEQ
 ) n GROUP BY n.BARCODE_SERIAL`;
