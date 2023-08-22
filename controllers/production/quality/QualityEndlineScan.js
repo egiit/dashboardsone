@@ -643,7 +643,7 @@ export async function sewingScanOut(req, res) {
       message: "error transfer QR",
     });
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     return res.status(404).json({
       success: false,
       data: error,
