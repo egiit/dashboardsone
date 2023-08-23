@@ -30,7 +30,7 @@ const runDb = async () => {
 
 runDb();
 
-// cron.schedule(" 1 1 * * *", () => {
+// cron.schedule(" 34 1 * * *", () => {
 //   console.log("running a task reschedule");
 //   funcReschedule();
 // });
@@ -39,6 +39,7 @@ runDb();
 //   console.log("running a task log");
 //   cronLogDialyOut();
 // });
+
 // app.use(cors());
 
 function logOriginalUrl(req, res, next) {
@@ -49,6 +50,9 @@ function logOriginalUrl(req, res, next) {
 var whitelist = [
   "http://localhost:3000",
   "http://localhost:3001",
+  "http://192.168.1.192:3001",
+  "http://192.168.60.152:3000",
+  "http://192.168.1.192:3000",
   "https://spmqc.sumbiri.com",
   "https://spm.sumbiri.com",
   "https://api.sumbiri.com",
