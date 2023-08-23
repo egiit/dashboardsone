@@ -10,8 +10,10 @@ export const cronLogDialyOut = async () => {
     const curtime = moment();
     const dayName = curtime.format("dddd");
     const currDate = curtime.format("YYYY-MM-DD");
+    const times = curtime.format("HH");
+    const listHour = ["00", "01"];
 
-    if (dayName !== "Sunday") {
+    if (dayName !== "Sunday" && !listHour.includes(times)) {
       const getDataLog = await db.query(getForRecapLog, {
         //   replacements: {
         //     schDate: date,
