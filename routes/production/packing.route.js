@@ -10,6 +10,11 @@ import {
   QrListAftrPackingIn,
   ScanPackingQrIn,
 } from "../../controllers/production/packing/PackingScan.js";
+import {
+  generateSplitByScan,
+  getPackingQrSplitList,
+  qrSplitGenerate,
+} from "../../controllers/production/packing/PackingQrSplit.js";
 const router = express.Router();
 
 router.get(
@@ -17,6 +22,10 @@ router.get(
   QrListAftrPackingIn
 );
 router.get("/scanin/daily-schedule/:schDate", getDailyPlanPackIn);
+router.get("/qr-split-list/:startDate/:endDate/:site", getPackingQrSplitList);
+
+router.post("/qr-split-print/", qrSplitGenerate);
+router.post("/qr-split-print-by-scan/", generateSplitByScan);
 
 router.post("/qr/scanin", ScanPackingQrIn);
 

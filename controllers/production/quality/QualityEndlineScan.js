@@ -600,7 +600,8 @@ export async function sewingScanOut(req, res) {
         message: "QR Sudah transfer",
       });
     } else {
-      const transferQr = await ScanSewingOut.create(dataQr);
+      const qrwithMain = { ...dataQr, BARCODE_MAIN: dataQr.BARCODE_SERIAL };
+      const transferQr = await ScanSewingOut.create(qrwithMain);
       if (transferQr) {
         return res.status(200).json({
           success: true,

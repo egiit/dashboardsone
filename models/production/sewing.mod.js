@@ -199,8 +199,42 @@ export const ScanSewingOut = db.define(
       type: DataTypes.STRING,
       primaryKey: true,
     },
+    BARCODE_MAIN: {
+      type: DataTypes.STRING,
+    },
     SCH_ID: { type: DataTypes.BIGINT },
     SCHD_ID: { type: DataTypes.BIGINT },
+    SEWING_SCAN_BY: { type: DataTypes.BIGINT },
+    SEWING_SCAN_LOCATION: { type: DataTypes.STRING },
+    SEWING_SCAN_TIME: { type: DataTypes.DATE },
+  },
+  {
+    freezeTableName: true,
+    createdAt: "SEWING_SCAN_TIME",
+    updatedAt: false,
+  }
+);
+
+export const ScanSewingQrSplit = db.define(
+  "scan_sewing_qr_split",
+  {
+    BARCODE_SERIAL: {
+      type: DataTypes.STRING,
+      primaryKey: true,
+    },
+    BARCODE_MAIN: {
+      type: DataTypes.STRING,
+    },
+    BARCODE_SEQ: {
+      type: DataTypes.INTEGER,
+    },
+    NEW_QTY: {
+      type: DataTypes.INTEGER,
+    },
+    SCH_ID: { type: DataTypes.BIGINT },
+    SCHD_ID: { type: DataTypes.BIGINT },
+    PRINT_STATUS: { type: DataTypes.INTEGER },
+    PRINT_BY: { type: DataTypes.BIGINT },
     SEWING_SCAN_BY: { type: DataTypes.BIGINT },
     SEWING_SCAN_LOCATION: { type: DataTypes.STRING },
     SEWING_SCAN_TIME: { type: DataTypes.DATE },

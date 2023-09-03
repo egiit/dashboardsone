@@ -9,11 +9,26 @@ import {
   TemporaryQrPackIn,
 } from "../../../models/production/packing.mod.js";
 import { QueryDailyPlanPackIn } from "../../../models/planning/dailyPlan.mod.js";
+import { ScanSewingQrSplit } from "../../../models/production/sewing.mod.js";
 
 // CONTROLLER SCAN PACKING
 export const ScanPackingQrIn = async (req, res) => {
   try {
     const { BARCODE_SERIAL } = req.body;
+
+    //check split
+    const checkSplit = await ScanSewingQrSplit.findOne({
+      where: {
+        BARCODE_MAIN: BARCODE_SERIAL,
+      },
+    });
+
+    if (checkSplit) {
+      return res.status(200).json({
+        qrstatus: "error",
+        message: "QR Sudah displit",
+      });
+    }
 
     //check barcode serial sudah transfer atau belum
     const checkBarcodeSerial = await db.query(FindTransferData, {
@@ -23,27 +38,25 @@ export const ScanPackingQrIn = async (req, res) => {
       type: QueryTypes.SELECT,
     });
 
-    // console.log(req.body);
-
     if (checkBarcodeSerial.length === 0) {
-      const checkSewingIn = await db.query(TemporaryQrPackIn, {
-        replacements: {
-          barcodeserial: BARCODE_SERIAL,
-        },
-        type: QueryTypes.SELECT,
-      });
+      // const checkSewingIn = await db.query(TemporaryQrPackIn, {
+      //   replacements: {
+      //     barcodeserial: BARCODE_SERIAL,
+      //   },
+      //   type: QueryTypes.SELECT,
+      // });
 
-      if (checkSewingIn.length === 0) {
-        return res.status(200).json({
-          qrstatus: "error",
-          message: "QR Serial Not Found!",
-        });
-      }
+      // if (checkSewingIn.length === 0) {
+      //   return res.status(200).json({
+      //     qrstatus: "error",
+      //     message: "QR Serial Not Found!",
+      //   });
+      // }
       return res.status(200).json({
         qrstatus: "error",
-        printed: true,
+        printed: false,
         message: "QR Not Yet Transfer",
-        data: checkSewingIn[0],
+        // data: checkSewingIn[0],
       });
     }
 
