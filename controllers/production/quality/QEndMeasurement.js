@@ -1,5 +1,5 @@
 import db from "../../../config/database.js";
-import { db2 } from "../../../config/database.js";
+import db2 from "../../../config/database.js";
 
 import { QueryTypes, Op } from "sequelize";
 import {
@@ -107,7 +107,7 @@ export const deleteDataMeasOut = async (req, res) => {
 export const getMeasCountCheck = async (req, res) => {
   try {
     const { schDate, sitename, linename } = req.params;
-    const measCheck = await db2.query(QryMeasCheck, {
+    const measCheck = await db.query(QryMeasCheck, {
       type: QueryTypes.SELECT,
       replacements: { schDate, sitename, linename },
     });
