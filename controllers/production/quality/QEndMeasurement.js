@@ -1,4 +1,6 @@
 import db from "../../../config/database.js";
+import { db2 } from "../../../config/database.js";
+
 import { QueryTypes, Op } from "sequelize";
 import {
   MeasOutput,
@@ -11,7 +13,7 @@ import {
 export const getMeasureSpec = async (req, res) => {
   try {
     const { orderNo, sizeCode } = req.params;
-    const specSizeMeas = await db.query(QryGetSpecQCend, {
+    const specSizeMeas = await db2.query(QryGetSpecQCend, {
       replacements: { orderNo, sizeCode },
       type: QueryTypes.SELECT,
     });
@@ -32,7 +34,7 @@ export const getMeasureSpec = async (req, res) => {
 export const getMeasureOutput = async (req, res) => {
   try {
     const { barcodeSerial, siteName, lineName, sizeCode } = req.params;
-    const measureOut = await db.query(QryGetDataMeasOut, {
+    const measureOut = await db2.query(QryGetDataMeasOut, {
       replacements: { barcodeSerial, siteName, lineName, sizeCode },
       type: QueryTypes.SELECT,
     });
@@ -105,7 +107,7 @@ export const deleteDataMeasOut = async (req, res) => {
 export const getMeasCountCheck = async (req, res) => {
   try {
     const { schDate, sitename, linename } = req.params;
-    const measCheck = await db.query(QryMeasCheck, {
+    const measCheck = await db2.query(QryMeasCheck, {
       type: QueryTypes.SELECT,
       replacements: { schDate, sitename, linename },
     });

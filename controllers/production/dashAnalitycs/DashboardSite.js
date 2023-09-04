@@ -1,5 +1,5 @@
 import moment from "moment";
-import db2 from "../../../config/database.js";
+import { db2 } from "../../../config/database.js";
 import { QueryTypes, Op } from "sequelize";
 import {
   QueryDefRateSite,

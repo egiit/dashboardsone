@@ -1,4 +1,6 @@
-import db from "../../../config/database.js";
+// import db2 from "../../../config/database.js";
+import { db2 } from "../../../config/database.js";
+
 import { QueryTypes, Op } from "sequelize";
 import {
   QryMesHederRepList,
@@ -18,7 +20,7 @@ import {
 export const getPlanningEendReport = async (req, res) => {
   try {
     const { schDate, sitename, shift } = req.params;
-    const detailSch = await db.query(QurTablPlanQcEndRep, {
+    const detailSch = await db2.query(QurTablPlanQcEndRep, {
       replacements: {
         schDate: schDate,
         sitename: sitename,
@@ -44,7 +46,7 @@ export const getPlanningEendReport = async (req, res) => {
 export const getQcEndCheckPerHour = async (req, res) => {
   try {
     const { schDate, idSiteLine, schdId } = req.params;
-    const checkPerHour = await db.query(QueryDetailEndCheck, {
+    const checkPerHour = await db2.query(QueryDetailEndCheck, {
       replacements: {
         schDate: schDate,
         idSiteLine: idSiteLine,
@@ -70,7 +72,7 @@ export const getQcEndCheckPerHour = async (req, res) => {
 export const getQcEndSumPartDefCode = async (req, res) => {
   try {
     const { schDate, idSiteLine, schdId } = req.params;
-    const checkPerHour = await db.query(QuerySumPartDefCodeCheck, {
+    const checkPerHour = await db2.query(QuerySumPartDefCodeCheck, {
       replacements: {
         schDate: schDate,
         idSiteLine: idSiteLine,
@@ -96,7 +98,7 @@ export const getQcEndSumPartDefCode = async (req, res) => {
 export const getQcEndChckTablet = async (req, res) => {
   try {
     const { schDate, idSiteLine } = req.params;
-    const checkPerHour = await db.query(QueryDtlEndChckTblet, {
+    const checkPerHour = await db2.query(QueryDtlEndChckTblet, {
       replacements: {
         schDate: schDate,
         idSiteLine: idSiteLine,
@@ -122,7 +124,7 @@ export const getQcEndChckTablet = async (req, res) => {
 export const getQcEndDefReprTblt = async (req, res) => {
   try {
     const { schDate, idSiteLine } = req.params;
-    const checkPerHour = await db.query(QuerySumPartDefCodChk, {
+    const checkPerHour = await db2.query(QuerySumPartDefCodChk, {
       replacements: {
         schDate: schDate,
         idSiteLine: idSiteLine,
@@ -147,7 +149,7 @@ export const getQcEndDefReprTblt = async (req, res) => {
 export const getDailyDefDetail = async (req, res) => {
   try {
     const { schDate, sitename, shift } = req.params;
-    const detailSch = await db.query(QueryDtlDayDef, {
+    const detailSch = await db2.query(QueryDtlDayDef, {
       replacements: {
         schDate: schDate,
         sitename: sitename,
@@ -173,7 +175,7 @@ export const getDailyDefDetail = async (req, res) => {
 export const getDailyDefDetailSum = async (req, res) => {
   try {
     const { schDate, sitename, shift } = req.params;
-    const detailSch = await db.query(QueryDtlDayDefSum, {
+    const detailSch = await db2.query(QueryDtlDayDefSum, {
       replacements: {
         schDate: schDate,
         sitename: sitename,
@@ -200,22 +202,22 @@ export const getMeasurementRep = async (req, res) => {
   try {
     const { schDate, sitename, linename, orderNo } = req.params;
 
-    const desc = await db.query(QueryGetDescMes, {
+    const desc = await db2.query(QueryGetDescMes, {
       replacements: { orderNo },
       type: QueryTypes.SELECT,
     });
     //spec by size
-    const specList = await db.query(QueryMeasSpecRep, {
+    const specList = await db2.query(QueryMeasSpecRep, {
       replacements: { orderNo, schDate, sitename, linename },
       type: QueryTypes.SELECT,
     });
     //detail value
-    const values = await db.query(QueryMesValueRep, {
+    const values = await db2.query(QueryMesValueRep, {
       replacements: { orderNo, schDate, sitename, linename },
       type: QueryTypes.SELECT,
     });
     //detail value
-    const headers = await db.query(QryMesHederRepList, {
+    const headers = await db2.query(QryMesHederRepList, {
       replacements: { orderNo, schDate, sitename, linename },
       type: QueryTypes.SELECT,
     });
