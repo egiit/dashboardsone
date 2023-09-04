@@ -1,4 +1,4 @@
-import { db2 } from "../../../config/database.js";
+import db from "../../../config/database.js";
 import { QueryTypes, Op } from "sequelize";
 import {
   LogDailyOutput,
@@ -18,8 +18,8 @@ export const getDailyPlanning = async (req, res) => {
   try {
     const { plannDate, sitename, shift } = req.params;
 
-    const pland = await db2.query(QueryEffCurDate, {
-      // const pland = await db2.query(QueryDailyPlann, {
+    const pland = await db.query(QueryEffCurDate, {
+      // const pland = await db.query(QueryDailyPlann, {
       replacements: {
         schDate: plannDate,
         sitename: sitename,
@@ -42,8 +42,8 @@ export const syncLogDailyOutput = async (req, res) => {
   try {
     const { schDate, sitename, shift } = req.params;
 
-    const planWithOutput = await db2.query(QryDailyResultForSyncLog, {
-      // const pland = await db2.query(QueryDailyPlann, {
+    const planWithOutput = await db.query(QryDailyResultForSyncLog, {
+      // const pland = await db.query(QueryDailyPlann, {
       replacements: {
         schDate: schDate,
         sitename: sitename,
@@ -98,7 +98,7 @@ export const syncLogDailyOutput = async (req, res) => {
 export const getDailySchSewIn = async (req, res) => {
   try {
     const { plannDate, sitename } = req.params;
-    const pland = await db2.query(QueryDailySchSewIn, {
+    const pland = await db.query(QueryDailySchSewIn, {
       replacements: {
         plannDate: plannDate,
         sitename: sitename,
@@ -121,7 +121,7 @@ export const getDailyPlanningQCend = async (req, res) => {
   try {
     const { plannDate, sitename, linename, idstieline, shift } = req.params;
 
-    const pland = await db2.query(QueryQcEndlineDaily, {
+    const pland = await db.query(QueryQcEndlineDaily, {
       replacements: {
         plannDate: plannDate,
         sitename: sitename,

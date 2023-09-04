@@ -1,6 +1,6 @@
 import { Orders } from "../../../models/production/order.mod.js";
 // import { ScanQuality } from "../../../models/setup/production/quality.mod";
-import db2 from "../../../config/database.js";
+import db from "../../../config/database.js";
 import { QueryTypes, Op } from "sequelize";
 
 // import moment from "moment";
@@ -80,7 +80,7 @@ export const GetQrSewingIn = async (req, res) => {
     //line name disini tidak dipakai tapi dipakai untuk tablet
     const { schDate, sitename, linename, barcodeserial } = req.params;
 
-    const listQrAfterScan = await db2.query(QuerySewingInQr, {
+    const listQrAfterScan = await db.query(QuerySewingInQr, {
       replacements: { schDate, sitename, linename, barcodeserial },
       type: QueryTypes.SELECT,
     });
@@ -104,7 +104,7 @@ export const GetQrSewingIn = async (req, res) => {
 //getlist Part
 export const getListPart = async (req, res) => {
   try {
-    const getListPart = await db2.query(QueryGetListPart, {
+    const getListPart = await db.query(QueryGetListPart, {
       type: QueryTypes.SELECT,
     });
 
@@ -119,7 +119,7 @@ export const getListPart = async (req, res) => {
 //getlist Part
 export const getListDefect = async (req, res) => {
   try {
-    const listDefect = await db2.query(QueryGetListDefect, {
+    const listDefect = await db.query(QueryGetListDefect, {
       type: QueryTypes.SELECT,
     });
 
@@ -137,7 +137,7 @@ export const postEndlineOutput = async (req, res) => {
   try {
     const dataGood = req.body;
 
-    const checkQty = await db2.query(queryTotalCheck, {
+    const checkQty = await db.query(queryTotalCheck, {
       replacements: {
         schdid: dataGood.ENDLINE_SCHD_ID,
         size: dataGood.ENDLINE_PLAN_SIZE,
@@ -183,7 +183,7 @@ export const handleUndo = async (req, res) => {
         ? QueryGetLastRepaird
         : QueryGetLastRttDefBS;
 
-    const findLastPost = await db2.query(queryFind, {
+    const findLastPost = await db.query(queryFind, {
       replacements: {
         schdid: dataUndo.SCHD_ID,
         type: dataUndo.ENDLINE_OUT_TYPE, //defect ttype
@@ -245,7 +245,7 @@ export const handleUndo = async (req, res) => {
 export const getPlanningEendBySize = async (req, res) => {
   try {
     const { schDate, sitename, linename, userId } = req.params;
-    const dataPlanBysize = await db2.query(QueryEndlinePlanSize, {
+    const dataPlanBysize = await db.query(QueryEndlinePlanSize, {
       replacements: { schDate, sitename, linename, userId },
       type: QueryTypes.SELECT,
     });
@@ -267,7 +267,7 @@ export const getPlanningEendBySize = async (req, res) => {
 export const getDataQcEndSizeResult = async (req, res) => {
   try {
     const { schdid, size } = req.params;
-    const getQREndlineQty = await db2.query(getEndllineQROutput, {
+    const getQREndlineQty = await db.query(getEndllineQROutput, {
       replacements: { schdid, size },
       type: QueryTypes.SELECT,
     });
@@ -286,7 +286,7 @@ export const getDataQcEndSizeResult = async (req, res) => {
 export const getDefForRepair = async (req, res) => {
   try {
     const { schdid, size } = req.params;
-    const getDefList = await db2.query(QueryGetDefForRepair, {
+    const getDefList = await db.query(QueryGetDefForRepair, {
       replacements: { schdid, size },
       type: QueryTypes.SELECT,
     });
@@ -570,7 +570,7 @@ export async function sewingScanOut(req, res) {
   try {
     const dataQr = req.body;
     // console.log(dataQr);
-    const checkQrScanIn = await db2.query(CheckQrExist, {
+    const checkQrScanIn = await db.query(CheckQrExist, {
       type: QueryTypes.SELECT,
       replacements: { barcodeSerial: dataQr.BARCODE_SERIAL },
     });
@@ -613,7 +613,7 @@ export async function sewingScanOut(req, res) {
 
     // const detailQr = checkQrScanIn[0];
     // //check wip
-    // const checkWipVsOutput = await db2.query(CheckWipBfrOut, {
+    // const checkWipVsOutput = await db.query(CheckWipBfrOut, {
     //   type: QueryTypes.SELECT,
     //   replacements: {
     //     schdId: detailQr.SCHD_ID,
@@ -657,7 +657,7 @@ export async function sewingScanOut(req, res) {
 export const getPlanSizePendding = async (req, res) => {
   try {
     const { schDate, sitename, linename, userId } = req.params;
-    const planSizePendding = await db2.query(QueryPlanSizePending, {
+    const planSizePendding = await db.query(QueryPlanSizePending, {
       type: QueryTypes.SELECT,
       replacements: { schDate, sitename, linename, userId },
     });
@@ -678,7 +678,7 @@ export const getPlanSizePendding = async (req, res) => {
 export const getQrListPendding = async (req, res) => {
   try {
     const { schDate, sitename, linename } = req.params;
-    const qrlistPendding = await db2.query(QueryGetQrPendding, {
+    const qrlistPendding = await db.query(QueryGetQrPendding, {
       type: QueryTypes.SELECT,
       replacements: { schDate, sitename, linename },
     });

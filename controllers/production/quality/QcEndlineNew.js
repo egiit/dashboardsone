@@ -1,4 +1,4 @@
-import db2 from "../../../config/database.js";
+import db from "../../../config/database.js";
 import { QueryTypes, Op } from "sequelize";
 import {
   EndlineUndoNew,
@@ -25,7 +25,7 @@ import { WeekSchDetail } from "../../../models/planning/weekLyPlan.mod.js";
 export const getEndlineSchSize = async (req, res) => {
   try {
     const { schDate, sitename, linename } = req.params;
-    const dataPlanBysize = await db2.query(QueryEndSumSchSize, {
+    const dataPlanBysize = await db.query(QueryEndSumSchSize, {
       replacements: { schDate, sitename, linename },
       type: QueryTypes.SELECT,
     });
@@ -46,7 +46,7 @@ export const getEndlineSchSize = async (req, res) => {
 export const getQrListActive = async (req, res) => {
   try {
     const { schDate, sitename, linename } = req.params;
-    const dataPlanBysize = await db2.query(QueryQrEndlineActive, {
+    const dataPlanBysize = await db.query(QueryQrEndlineActive, {
       replacements: { schDate, sitename, linename },
       type: QueryTypes.SELECT,
     });
@@ -68,7 +68,7 @@ export const getQrListActive = async (req, res) => {
 export const getQrListPenddingNew = async (req, res) => {
   try {
     const { schDate, sitename, linename } = req.params;
-    const dataPlanBysize = await db2.query(QueryGetQrPendNew, {
+    const dataPlanBysize = await db.query(QueryGetQrPendNew, {
       replacements: { schDate, sitename, linename },
       type: QueryTypes.SELECT,
     });
@@ -89,7 +89,7 @@ export const getQrListPenddingNew = async (req, res) => {
 export const getQrSelected = async (req, res) => {
   try {
     const { barcodeSerial } = req.params;
-    const dataPlanBysize = await db2.query(QryQrSelectCheckResult, {
+    const dataPlanBysize = await db.query(QryQrSelectCheckResult, {
       replacements: { barcodeSerial },
       type: QueryTypes.SELECT,
     });
@@ -110,7 +110,7 @@ export const getQrSelected = async (req, res) => {
 export const getQrDefectList = async (req, res) => {
   try {
     const { barcodeSerial } = req.params;
-    const qrDefectList = await db2.query(QryListQrDefect, {
+    const qrDefectList = await db.query(QryListQrDefect, {
       replacements: { barcodeSerial },
       type: QueryTypes.SELECT,
     });
@@ -130,7 +130,7 @@ export const postEndlineQc = async (req, res) => {
   try {
     const dataGood = req.body;
 
-    const checkQty = await db2.query(QryCheckTtlCheck, {
+    const checkQty = await db.query(QryCheckTtlCheck, {
       replacements: {
         barcodeSerial: dataGood.BARCODE_SERIAL,
       },
@@ -310,7 +310,7 @@ export const handleExeUndo = async (req, res) => {
         ? QueryGetLastRepairdNew
         : QueryGetLastRttDefBSNew;
 
-    const findLastPost = await db2.query(queryFind, {
+    const findLastPost = await db.query(queryFind, {
       replacements: {
         barcodeSerial: dataUndo.BARCODE_SERIAL,
         type: dataUndo.ENDLINE_OUT_TYPE, //defect ttype
@@ -459,7 +459,7 @@ export const getListQrSplit = async (req, res) => {
   try {
     const { barcodeSerial } = req.params;
 
-    const lisqQRsplit = await db2.query(getListSplitQr, {
+    const lisqQRsplit = await db.query(getListSplitQr, {
       replacements: {
         barcodeSerial: barcodeSerial,
       },
@@ -538,7 +538,7 @@ export const getLogInputQcEndline = async (req, res) => {
   try {
     const { schDate, sitename, linename } = req.params;
 
-    const lisqQRsplit = await db2.query(QueryGetLogEndline, {
+    const lisqQRsplit = await db.query(QueryGetLogEndline, {
       replacements: { schDate, sitename, linename },
       type: QueryTypes.SELECT,
     });
