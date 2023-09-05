@@ -1,5 +1,5 @@
 import moment from "moment";
-import { db2 } from "../../../config/database.js";
+import db from "../../../config/database.js";
 import { QueryTypes, Op } from "sequelize";
 import {
   QueryDefRateSite,
@@ -14,12 +14,12 @@ export const getDataDashSite = async (req, res) => {
   try {
     const { schDate, sitename } = req.params;
 
-    const findListShift = await db2.query(
+    const findListShift = await db.query(
       `
     SELECT DISTINCT a.SHIFT FROM item_siteline a WHERE a.SITE_NAME = :sitename GROUP BY a.SITE_NAME, a.SHIFT
     `,
       {
-        // const pland = await db2.query(QueryDailyPlann, {
+        // const pland = await db.query(QueryDailyPlann, {
         replacements: {
           sitename: sitename,
         },
@@ -34,8 +34,8 @@ export const getDataDashSite = async (req, res) => {
         let dataSiteDash = [];
 
         for (const [i, shift] of findListShift.entries()) {
-          const dashSiteData = await db2.query(QuerySiteDashNow, {
-            // const pland = await db2.query(QueryDailyPlann, {
+          const dashSiteData = await db.query(QuerySiteDashNow, {
+            // const pland = await db.query(QueryDailyPlann, {
             replacements: {
               schDate: schDate,
               sitename: sitename,
@@ -59,8 +59,8 @@ export const getDataDashSite = async (req, res) => {
         });
       }
     } else {
-      const dashSiteData = await db2.query(QuerySiteDashPast, {
-        // const pland = await db2.query(QueryDailyPlann, {
+      const dashSiteData = await db.query(QuerySiteDashPast, {
+        // const pland = await db.query(QueryDailyPlann, {
         replacements: {
           schDate: schDate,
           sitename: sitename,
@@ -86,7 +86,7 @@ export const getDataQcSite = async (req, res) => {
   try {
     const { schDate, sitename } = req.params;
 
-    const dataDefRateQc = await db2.query(QueryDefRateSite, {
+    const dataDefRateQc = await db.query(QueryDefRateSite, {
       replacements: {
         schDate: schDate,
         sitename: sitename,
@@ -113,7 +113,7 @@ export const getDataDashSiteYestd = async (req, res) => {
 
     const schdDateYes = findYesDate(date);
 
-    const dataDashYest = await db2.query(QuerySiteDashPast, {
+    const dataDashYest = await db.query(QuerySiteDashPast, {
       replacements: {
         schDate: schdDateYes,
         sitename: sitename,
@@ -153,11 +153,11 @@ export const getTopDefectPart = async (req, res) => {
   try {
     const { schDate, idSiteline } = req.params;
 
-    const dataTop3Defect = await db2.query(SQLTopDefectLine, {
+    const dataTop3Defect = await db.query(SQLTopDefectLine, {
       replacements: { schDate, idSiteline },
       type: QueryTypes.SELECT,
     });
-    const dataTop3Part = await db2.query(SQLTopPartLine, {
+    const dataTop3Part = await db.query(SQLTopPartLine, {
       replacements: { schDate, idSiteline },
       type: QueryTypes.SELECT,
     });
@@ -182,7 +182,7 @@ export async function getRftPerhour(req, res) {
   try {
     const { schDate, idSiteLine, shift } = req.params;
     // console.log({ schDate, idSiteLine, shift });
-    const result = await db2.query(QueryQcRftPerHiour, {
+    const result = await db.query(QueryQcRftPerHiour, {
       replacements: { schDate, idSiteLine, shift },
       type: QueryTypes.SELECT,
     });

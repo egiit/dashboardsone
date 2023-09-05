@@ -161,15 +161,14 @@ WHERE a.BARCODE_SERIAL = :barcodeSerial  AND a.SITE_NAME = :siteName AND a.LINE_
 
 export const QryMeasCheck = `SELECT n.BARCODE_SERIAL, COUNT(n.BARCODE_SERIAL) CHECK_COUNT
 FROM (
-	SELECT DISTINCT a.BARCODE_SERIAL, a.MES_SEQ 
-	FROM measurement_qc_output a 
+	SELECT a.BARCODE_SERIAL
+	FROM measurement_qc_output a
 	WHERE a.SCHD_ID IN (
-		SELECT DISTINCT a.SCHD_ID
-		FROM scan_sewing_in a WHERE a.SCH_ID IN (
-			SELECT g.SCH_ID FROM weekly_prod_sch_detail g 
-			LEFT JOIN item_siteline ga ON ga.ID_SITELINE = g.SCHD_ID_SITELINE
-			WHERE  g.SCHD_PROD_DATE = :schDate AND g.SCHD_SITE = :sitename  AND 
-			ga.LINE_NAME = :linename 
-		) 
-	) 	GROUP BY a.BARCODE_SERIAL, a.MES_SEQ
+	   SELECT a.SCHD_ID FROM scan_sewing_in a
+		LEFT JOIN weekly_prod_sch_detail g ON a.SCHD_ID = g.SCHD_ID 
+		LEFT JOIN item_siteline e ON e.ID_SITELINE = g.SCHD_ID_SITELINE
+		LEFT JOIN scan_sewing_out i ON i.BARCODE_SERIAL = a.BARCODE_SERIAL
+		WHERE g.SCHD_PROD_DATE <= :schDate AND a.SEWING_SCAN_LOCATION = :sitename  AND 
+		e.LINE_NAME = :linename AND ISNULL(i.BARCODE_SERIAL) 
+	) GROUP BY a.BARCODE_SERIAL, a.MES_SEQ
 ) n GROUP BY n.BARCODE_SERIAL`;

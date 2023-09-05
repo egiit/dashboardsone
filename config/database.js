@@ -38,7 +38,7 @@ const db = new Sequelize("db_sumbiri_one", "sumbirispm", "Asd54321`", {
   },
 });
 
-export const db2 = new Sequelize("db_sumbiri_one", "sumbirispm", "Asd54321`", {
+const db2 = new Sequelize("db_sumbiri_one", "sumbirispm", "Asd54321`", {
   host: "192.168.1.252",
   port: 3306,
   dialect: "mysql",

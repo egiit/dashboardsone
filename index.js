@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import db from "./config/database.js";
+import db2 from "./config/database.js";
 
 dotenv.config();
 import cookieParser from "cookie-parser";
@@ -22,6 +23,7 @@ const app = express();
 const runDb = async () => {
   try {
     await db.authenticate();
+    await db2.authenticate();
     console.log("DB Connected");
   } catch (err) {
     console.log("Unable to connect to the database SPM:", err);
@@ -30,9 +32,9 @@ const runDb = async () => {
 
 runDb();
 
-// cron.schedule(" 34 1 * * *", () => {
+// cron.schedule(" 30 * * * *", () => {
 //   console.log("running a task reschedule");
-//   funcReschedule();
+// funcReschedule();
 // });
 
 // cron.schedule(" 1 * * * * *", () => {
@@ -54,6 +56,7 @@ var whitelist = [
   "http://192.168.60.152:3000",
   "http://192.168.1.192:3000",
   "https://spmqc.sumbiri.com",
+  "https://spmqc1.sumbiri.com",
   "https://spm.sumbiri.com",
   "https://api.sumbiri.com",
 ];
