@@ -2,6 +2,7 @@ import express from "express";
 import {
   addAndTransferSplit,
   checkSchdId,
+  getDailyPlanningQCendNew,
   getEndlineSchSize,
   getListQrSplit,
   getLogInputQcEndline,
@@ -18,6 +19,10 @@ import {
 const router = express.Router();
 
 //planning size endline
+router.get(
+  "/dailyplanning/:plannDate/:sitename/:linename/:idstieline/:shift/",
+  getDailyPlanningQCendNew
+);
 router.get("/schedule-size/:schDate/:sitename/:linename", getEndlineSchSize);
 router.get("/schedule-size-qr/:schDate/:sitename/:linename", getQrListActive);
 router.get("/qr-pendding/:schDate/:sitename/:linename", getQrListPenddingNew);

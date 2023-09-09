@@ -10,6 +10,7 @@ import {
   QueryGetLastRttDefBSNew,
   QueryGetLogEndline,
   QueryGetQrPendNew,
+  QueryQcEndlineDailyNew,
   QueryQrEndlineActive,
   getListSplitQr,
 } from "../../../models/production/qcEndlineNew.mod.js";
@@ -20,6 +21,7 @@ import {
   ScanSewingQrSplit,
 } from "../../../models/production/sewing.mod.js";
 import { WeekSchDetail } from "../../../models/planning/weekLyPlan.mod.js";
+import moment from "moment";
 
 //get list schedule size
 export const getEndlineSchSize = async (req, res) => {
@@ -68,8 +70,11 @@ export const getQrListActive = async (req, res) => {
 export const getQrListPenddingNew = async (req, res) => {
   try {
     const { schDate, sitename, linename } = req.params;
+    const startDate = moment().subtract(1, "days").format("YYYY-MM-DD");
+    const endDate = moment().subtract(60, "days").format("YYYY-MM-DD");
+
     const dataPlanBysize = await db.query(QueryGetQrPendNew, {
-      replacements: { schDate, sitename, linename },
+      replacements: { startDate, endDate, sitename, linename },
       type: QueryTypes.SELECT,
     });
 
@@ -570,6 +575,32 @@ export const checkSchdId = async (req, res) => {
     console.log(error);
     return res.status(404).json({
       message: "Error saat check Schedule",
+      data: error,
+    });
+  }
+};
+
+//schedule untuk tablet qc Endline
+export const getDailyPlanningQCendNew = async (req, res) => {
+  try {
+    const { plannDate, sitename, linename, idstieline, shift } = req.params;
+
+    const pland = await db.query(QueryQcEndlineDailyNew, {
+      replacements: {
+        plannDate: plannDate,
+        sitename: sitename,
+        linename: linename,
+        idstieline: idstieline,
+        shift: shift,
+      },
+      type: QueryTypes.SELECT,
+    });
+
+    return res.json(pland);
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      message: "error processing request",
       data: error,
     });
   }

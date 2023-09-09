@@ -6,6 +6,7 @@ import {
   checkPomBfrUpdate,
   CreatMesChart,
   deleteMeasChart,
+  getAllMeasurChart,
   getDataBlkForMeasur,
   getDataChartDtl,
   getListBuyer,
@@ -27,6 +28,7 @@ import {
 router.get("/buyerlist", getListBuyer);
 router.get("/stylelist", getListStyleByBuyer);
 router.get("/getchart/:buyer/:style", getMeasurChart);
+router.get("/getchart-all", getAllMeasurChart);
 router.get("/orderlist/:startMonth/:endMonth", getDataBlkForMeasur);
 router.get("/check-chart-no/:MES_CHART_NO", CheckChartNo);
 router.get("/chart-detail/:chartNo", getDataChartDtl);

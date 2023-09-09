@@ -1,10 +1,13 @@
 import { DataTypes } from "sequelize";
 import db from "../../config/database.js";
 
-export const QueryBlkForMeasur = `SELECT a.PROD_MONTH, a.CUSTOMER_NAME, a.ORDER_NO, a.PRODUCT_ID, 
+export const QueryBlkForMeasur = `SELECT a.PROD_MONTH, a.PRODUCTION_MONTH, a.CUSTOMER_NAME, a.ORDER_NO, a.PRODUCT_ID, 
 a.PRODUCT_ITEM_ID, a.ORDER_REFERENCE_PO_NO,
-a.PRODUCT_CATEGORY, a.PRODUCT_ITEM_CODE, a.PRODUCT_ITEM_DESCRIPTION, a.ORDER_STYLE_DESCRIPTION 
-FROM viewblk a WHERE a.PROD_MONTH BETWEEN :startMonth AND :endMonth 
+a.PRODUCT_CATEGORY, a.PRODUCT_ITEM_CODE, a.PRODUCT_ITEM_DESCRIPTION, a.ORDER_STYLE_DESCRIPTION,
+b.MES_CHART_NO
+FROM viewblk a 
+LEFT JOIN measurement_and_order  b ON b.ORDER_NO = a.ORDER_NO
+WHERE a.PROD_MONTH BETWEEN :startMonth AND :endMonth 
 ORDER BY a.PROD_MONTH, a.CUSTOMER_NAME`;
 
 export const QueryListBuyer = `SELECT a.ID id, a.CUSTOMER_NAME name FROM view_list_buyer a`;

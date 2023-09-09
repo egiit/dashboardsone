@@ -188,7 +188,7 @@ FROM (
 			) xc
 			GROUP BY xc.SCHD_ID, xc.ID_SITELINE
 	) XN ON XN.SCHD_ID = a.SCHD_ID 
-	WHERE a.SCHD_PROD_DATE = :plannDate   AND e.MP_DATE = :plannDate  AND d.SITE_NAME = :sitename AND d.LINE_NAME = :linename
+	WHERE a.ENDLINE_VER IS NULL AND a.SCHD_PROD_DATE = :plannDate   AND e.MP_DATE = :plannDate  AND d.SITE_NAME = :sitename AND d.LINE_NAME = :linename
 )n`;
 // export const QueryQcEndlineDaily = `SELECT *,ROUND(n.PLAN_MP*n.PLAN_WH/n.PLAN_SEW_SMV) PLAN_TARGET,
 // ROUND(n.PLAN_MP_OT*n.PLAN_WH_OT/n.PLAN_SEW_SMV) PLAN_TARGET_OT,

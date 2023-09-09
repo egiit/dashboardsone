@@ -612,3 +612,21 @@ export async function removeChartInOrder(req, res) {
     });
   }
 }
+
+export const getAllMeasurChart = async (req, res) => {
+  try {
+    const mesChart = await MeasurementChart.findAll();
+
+    if (mesChart.length === 0) {
+      return res.status(202).json({ message: "No Chart Data", data: mesChart });
+    }
+
+    return res.status(200).json({ data: mesChart });
+  } catch (error) {
+    console.log(error);
+    return res.status(404).json({
+      message: "error get data chart",
+      data: error,
+    });
+  }
+};
