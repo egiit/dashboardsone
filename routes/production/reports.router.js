@@ -7,6 +7,7 @@ import {
 } from "../../controllers/production/reports/SewOutDayRep.js";
 import {
   getBlkTrace,
+  getTrackQrSplit,
   getWorkerDoneRep,
 } from "../../controllers/production/reports/WorkerdoneRep.js";
 import { getSewRepEff } from "../../controllers/production/reports/SewDailyEffRep.js";
@@ -14,6 +15,7 @@ const router = express.Router();
 
 router.get("/workerdone/:startDate/:endDate", getWorkerDoneRep);
 router.get("/bundletracking/:startDate/:endDate", getBlkTrace);
+router.get("/bundletracking-split/:barcodeserial", getTrackQrSplit);
 
 // sewing dayli output report
 router.get("/sewing-day-ouput/:schDate/:sitename/:shift", getSewDayRepSchd);
