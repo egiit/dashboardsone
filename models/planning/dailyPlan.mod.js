@@ -66,9 +66,15 @@ export const QueryCheckSchdScan = `	SELECT * FROM (
 	LEFT JOIN item_siteline d ON a.SCHD_ID_SITELINE = d.ID_SITELINE
 	LEFT JOIN view_weekly_sch_size f ON a.SCH_ID = f.SCH_ID
 	-- LEFT JOIN po_matrix_delivery g ON f.PDM_ID = g.PDM_ID 
-	WHERE a.SCHD_PROD_DATE = :plannDate AND a.SCHD_SITE = :sitename AND d.LINE_NAME = :lineName
-	AND  b.ORDER_STYLE_DESCRIPTION = :styleDesc AND b.ITEM_COLOR_NAME = :colorCode
-	AND b.ORDER_REFERENCE_PO_NO = :orderRef AND f.SIZE_CODE = :sizeCode AND b.PRODUCTION_MONTH = :prodMonth  
+	WHERE a.SCHD_PROD_DATE = :plannDate
+	AND a.SCHD_SITE = :sitename
+	AND d.LINE_NAME = :lineName
+	AND b.ORDER_NO = :orderNo  
+	AND b.ORDER_STYLE_DESCRIPTION = :styleDesc
+	AND b.ITEM_COLOR_NAME = :colorCode
+	AND b.ORDER_REFERENCE_PO_NO = :orderRef 
+	AND f.SIZE_CODE = :sizeCode 
+	AND b.PRODUCTION_MONTH = :prodMonth 
 ) N WHERE N.PLAN_EXFACTORY_DATE = :planExFty AND N.SCH_SIZE_QTY <> 0`;
 // export const QueryCheckSchdScan = `SELECT a.SCHD_ID, a.SCH_ID, g.PDM_ID, a.SCHD_PROD_DATE, b.CUSTOMER_NAME,
 // b.ORDER_NO, b.MO_NO, d.ID_SITELINE,  d.SITE_NAME, d.LINE_NAME,
