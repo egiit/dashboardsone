@@ -12,11 +12,15 @@ import {
 
 //menuRole
 export const getUserAcces = async (req, res) => {
-  const userAcces = await db.query(MenuAccessRole, {
-    replacements: { id: req.params.id },
-    type: QueryTypes.SELECT,
-  });
-  res.json(userAcces);
+  try {
+    const userAcces = await db.query(MenuAccessRole, {
+      replacements: { id: req.params.id },
+      type: QueryTypes.SELECT,
+    });
+    res.json(userAcces);
+  } catch (error) {
+    res.json({ message: error.message });
+  }
 };
 
 //Update User Access
@@ -59,11 +63,15 @@ export const updateOrCreateUserAccess = async (req, res) => {
 //
 //menu Access View
 export const getViewAccess = async (req, res) => {
-  const menuViewAccess = await db.query(QueryMenuView, {
-    replacements: { userid: req.params.id },
-    type: QueryTypes.SELECT,
-  });
-  if (menuViewAccess.length === 0)
-    return res.status(400).json({ message: "Anda Belum Mendapatkan Aksess" });
-  res.json(menuViewAccess);
+  try {
+    const menuViewAccess = await db.query(QueryMenuView, {
+      replacements: { userid: req.params.id },
+      type: QueryTypes.SELECT,
+    });
+    if (menuViewAccess.length === 0)
+      return res.status(400).json({ message: "Anda Belum Mendapatkan Aksess" });
+    res.json(menuViewAccess);
+  } catch (error) {
+    res.json({ message: error.message });
+  }
 };

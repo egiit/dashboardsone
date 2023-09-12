@@ -166,9 +166,9 @@ export const QryMeasCheck = `SELECT n.BARCODE_SERIAL, COUNT(n.BARCODE_SERIAL) CH
 FROM (
 	SELECT a.BARCODE_SERIAL
 	FROM measurement_qc_output a
-	WHERE a.SCHD_ID IN (
-	   SELECT a.SCHD_ID FROM scan_sewing_in a
-		LEFT JOIN weekly_prod_sch_detail g ON a.SCHD_ID = g.SCHD_ID 
+	WHERE a.BARCODE_SERIAL IN (
+	  	SELECT DISTINCT a.BARCODE_SERIAL FROM scan_sewing_in a
+		LEFT JOIN weekly_prod_sch_detail g ON a.SCH_ID = g.SCH_ID 
 		LEFT JOIN item_siteline e ON e.ID_SITELINE = g.SCHD_ID_SITELINE
 		LEFT JOIN scan_sewing_out i ON i.BARCODE_SERIAL = a.BARCODE_SERIAL
 		WHERE g.SCHD_PROD_DATE <= :schDate AND a.SEWING_SCAN_LOCATION = :sitename  AND 
