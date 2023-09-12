@@ -376,7 +376,7 @@ FROM (
 			  GROUP BY a.BARCODE_SERIAL
 	) f ON f.BARCODE_SERIAL = a.BARCODE_SERIAL
 	LEFT JOIN order_po_listing h ON h.MO_NO = a.MO_NO
-	WHERE a.ORDER_QTY <> a.TRANSFER_QTY AND a.SCAN_DATE <= CURDATE()
+	WHERE a.ORDER_QTY <> a.TRANSFER_QTY AND a.SCAN_DATE <= :schDate
 ) M`;
 
 export const QueryGetLogEndline = `-- LOG INPUT

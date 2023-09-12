@@ -70,11 +70,11 @@ export const getQrListActive = async (req, res) => {
 export const getQrListPenddingNew = async (req, res) => {
   try {
     const { schDate, sitename, linename } = req.params;
-    const startDate = moment().subtract(1, "days").format("YYYY-MM-DD");
-    const endDate = moment().subtract(60, "days").format("YYYY-MM-DD");
+    const endDate = moment().subtract(1, "days").format("YYYY-MM-DD");
+    const startDate = moment().subtract(60, "days").format("YYYY-MM-DD");
 
     const dataPlanBysize = await db.query(QueryGetQrPendNew, {
-      replacements: { startDate, endDate, sitename, linename },
+      replacements: { schDate, startDate, endDate, sitename, linename },
       type: QueryTypes.SELECT,
     });
 
