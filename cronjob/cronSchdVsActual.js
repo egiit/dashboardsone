@@ -15,6 +15,7 @@ import moment from "moment";
 
 export const funcReschedule = async () => {
   try {
+    console.log("running a task reschedule");
     // ambil data schedule detail vs ouput hari sebelumnya
     const schdVsOutput = await db.query(QryCronPvsA, {
       //   replacements: {
