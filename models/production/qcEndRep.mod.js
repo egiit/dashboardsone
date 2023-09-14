@@ -133,7 +133,7 @@ LEFT JOIN (
 			        END AS REPAIRED
 			    FROM qc_endline_output a
 			    LEFT JOIN item_siteline b ON b.ID_SITELINE = a.ENDLINE_ID_SITELINE
-			    WHERE DATE(a.ENDLINE_ADD_TIME) = :schDate AND b.ENDLINE_ID_SITELINE = :idSiteLine 
+			    WHERE DATE(a.ENDLINE_ADD_TIME) = :schDate AND a.ENDLINE_ID_SITELINE = :idSiteLine 
 			    AND (a.ENDLINE_OUT_TYPE = 'RTT' OR (a.ENDLINE_OUT_TYPE = 'DEFECT' AND a.ENDLINE_REPAIR = 'Y') OR a.ENDLINE_OUT_TYPE = 'BS'
 			    OR (a.ENDLINE_OUT_TYPE = 'DEFECT' AND a.ENDLINE_REPAIR = 'Y' AND DATE(a.ENDLINE_MOD_TIME) = :schDate))
 			) c
