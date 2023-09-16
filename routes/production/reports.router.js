@@ -30,6 +30,6 @@ router.get(
 );
 
 //sewin daily eff
-router.get("/sewing-day-eff/:schDate/:sitename/:shift", getSewRepEff);
+router.get("/sewing-day-eff/:schDate/:sitename", getSewRepEff);
 
 export default router;
