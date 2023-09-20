@@ -101,26 +101,40 @@ LEFT JOIN (
 					) GROUP BY b.MO_NO,  b.ORDER_COLOR
 					UNION ALL
 					-- SEWING OUT
-					SELECT b.MO_NO, b.ORDER_COLOR,  b.ORDER_SIZE,
-					0 QR_QTY,  0 CUT_GENERATE, 0 LOADING_QTY, SUM(b.ORDER_QTY) SEWING_OUT, 0 PACKING_IN
-					FROM scan_sewing_out a 
-					LEFT JOIN view_order_detail b ON a.BARCODE_SERIAL = b.BARCODE_SERIAL
-					WHERE b.MO_NO IN (
-							SELECT DISTINCT a.MO_NO FROM order_po_listing_size a 
+					SELECT a.MO_NO, a.ORDER_COLOR,  a.ORDER_SIZE,
+					0 QR_QTY,  0 CUT_GENERATE, 0 LOADING_QTY, SUM(a.ORDER_QTY) SEWING_OUT, 0 PACKING_IN
+					FROM (
+					  SELECT DISTINCT  b.MO_NO, b.ORDER_COLOR,  b.ORDER_SIZE, a.SCH_ID, 
+					  a.BARCODE_MAIN AS BARCODE_SERIAL,
+					  CASE WHEN  c.BARCODE_SERIAL IS NOT NULL THEN SUM(c.NEW_QTY) ELSE b.ORDER_QTY END AS ORDER_QTY
+					  FROM scan_sewing_out a 
+					  LEFT JOIN view_order_detail b ON a.BARCODE_MAIN = b.BARCODE_SERIAL
+					  LEFT JOIN scan_sewing_qr_split c ON c.BARCODE_SERIAL = a.BARCODE_SERIAL
+					  WHERE  b.MO_NO IN  (
+						  SELECT DISTINCT a.MO_NO FROM order_po_listing_size a 
 							WHERE a.PRODUCTION_MONTH IN (:listMonth) 
 							GROUP BY a.MO_NO
-					) GROUP BY b.MO_NO,  b.ORDER_COLOR
+					  ) 
+					  GROUP BY a.SCH_ID, b.ORDER_SIZE, a.BARCODE_MAIN
+					) a GROUP BY a.MO_NO,  a.ORDER_COLOR
 					UNION ALL 
 					-- packing in
-					SELECT b.MO_NO,  b.ORDER_COLOR, b.ORDER_SIZE,
-					0 QR_QTY,  0 CUT_GENERATE, 0 LOADING_QTY, 0 SEWING_OUT, SUM(b.ORDER_QTY) PACKING_IN
+					SELECT a.MO_NO, a.ORDER_COLOR,  a.ORDER_SIZE,
+					0 QR_QTY,  0 CUT_GENERATE, 0 LOADING_QTY, 0 SEWING_OUT, SUM(a.ORDER_QTY) PACKING_IN
+					FROM (
+					SELECT DISTINCT  b.MO_NO, b.ORDER_COLOR,  b.ORDER_SIZE, a.SCH_ID, 
+					a.BARCODE_MAIN AS BARCODE_SERIAL,
+					CASE WHEN  c.BARCODE_SERIAL IS NOT NULL THEN SUM(c.NEW_QTY) ELSE b.ORDER_QTY END AS ORDER_QTY
 					FROM scan_packing_in a 
-					LEFT JOIN view_order_detail b ON a.BARCODE_SERIAL = b.BARCODE_SERIAL
-					WHERE b.MO_NO IN (
-							SELECT DISTINCT a.MO_NO FROM order_po_listing_size a 
-							WHERE a.PRODUCTION_MONTH IN (:listMonth) 
+					LEFT JOIN view_order_detail b ON a.BARCODE_MAIN = b.BARCODE_SERIAL
+					LEFT JOIN scan_sewing_qr_split c ON c.BARCODE_SERIAL = a.BARCODE_SERIAL
+					WHERE  b.MO_NO IN  (
+						SELECT DISTINCT a.MO_NO FROM order_po_listing_size a 
+							WHERE a.PRODUCTION_MONTH IN ('September/2023') 
 							GROUP BY a.MO_NO
-					) GROUP BY b.MO_NO,  b.ORDER_COLOR
+					) 
+					GROUP BY a.SCH_ID, b.ORDER_SIZE, a.BARCODE_MAIN
+					) a GROUP BY a.MO_NO,  a.ORDER_COLOR
 				) n 
 			GROUP BY n.MO_NO, n.ORDER_COLOR
        -- bawah
