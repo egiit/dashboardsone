@@ -16,7 +16,10 @@ import {
 } from "../../../models/planning/weekLyPlan.mod.js";
 import moment from "moment";
 import { totalCol, CheckNilai } from "../../util/Utility.js";
-import { PlanSize } from "../../../models/production/quality.mod.js";
+import {
+  PlanSize,
+  QcEndlineOutput,
+} from "../../../models/production/quality.mod.js";
 import { CuttinScanSewingIn } from "../../../models/production/cutting.mod.js";
 
 export const getCapacity = async (req, res) => {
@@ -244,17 +247,17 @@ export const deleteSchHeader = async (req, res) => {
           "Can't Delete, Schedule already have bundle or box scan Sewing IN",
       });
 
-    //check apakah sudah ada plan size
-    const findCheck = await PlanSize.findOne({
+    //check apakah sudah ada output
+    const findCheck = await QcEndlineOutput.findOne({
       where: {
-        SCH_ID: schId,
+        ENDLINE_SCH_ID: schId,
       },
     });
 
     //jika tidak ada return
     if (findCheck)
       return res.status(405).json({
-        message: "Can't Delete, Already QC Endline Planing Size Check",
+        message: "Can't Delete, Already QC Endline Output",
       });
 
     //cari daily or detail schedule
@@ -755,7 +758,8 @@ export async function checkBdllBfrDel(req, res, next) {
     if (findBundle)
       return res.status(405).json({
         message:
-          "Can't Delete, Schedule already have bundle or box scan Sewing IN",
+          "TIdak Bisa di delete schedule, karena sudah dilakukan loading scan Sewing IN",
+        // "Can't Delete, Schedule already have bundle or box scan Sewing IN",
       });
 
     //check if any output with schd id
@@ -767,12 +771,14 @@ export async function checkBdllBfrDel(req, res, next) {
     //if already output reject delete
     if (checkOutput.length > 0)
       return res.status(405).json({
-        message: "Can't Delete, Already Sewing Output",
+        message: "Sudah Terdapat Output, tidak bisa didelete",
+        // message: "Can't Delete, Already Sewing Output",
       });
     next();
   } catch (error) {
     res.status(404).json({
-      message: "Problem When Delete Schedule Detail",
+      message: "Masalah ketika Delete Schedule Detail",
+      // message: "Problem When Delete Schedule Detail",
       data: err,
     });
   }
