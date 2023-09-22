@@ -13,8 +13,9 @@ import {
 export const getMeasureSpec = async (req, res) => {
   try {
     const { orderNo, sizeCode } = req.params;
+    const decodeSize = decodeURIComponent(sizeCode);
     const specSizeMeas = await db2.query(QryGetSpecQCend, {
-      replacements: { orderNo, sizeCode },
+      replacements: { orderNo, sizeCode: decodeSize },
       type: QueryTypes.SELECT,
     });
 
