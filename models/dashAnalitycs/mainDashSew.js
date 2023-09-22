@@ -530,7 +530,7 @@ LEFT JOIN (
     GROUP BY a.SITE_NAME 
 ) f ON f.SITE_NAME = a.SITE_NAME
 LEFT JOIN item_working_shift gl ON gl.SHIFT_ID = a.SHIFT AND INSTR(gl.SHIFT_DAYS, DAYNAME(:schDate)) > 1
-WHERE a.SCHD_PROD_DATE =:schDate-- AND a.SITE_NAME = :sitename AND a.SHIFT = :shift
+WHERE a.SCHD_PROD_DATE =:schDate -- AND a.SITE_NAME = :sitename AND a.SHIFT = :shift
 ORDER BY a.ID_SITELINE`;
 
 export const QueryDefRetDash = `SELECT a.ENDLINE_SCHD_DATE, a.ENDLINE_ID_SITELINE, e.SITE_NAME, e.SHIFT, d.CUSTOMER_NAME,
