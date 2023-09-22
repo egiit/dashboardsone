@@ -35,8 +35,10 @@ export const getMeasureSpec = async (req, res) => {
 export const getMeasureOutput = async (req, res) => {
   try {
     const { barcodeSerial, siteName, lineName, sizeCode } = req.params;
+    const decodeSize = decodeURIComponent(sizeCode);
+
     const measureOut = await db2.query(QryGetDataMeasOut, {
-      replacements: { barcodeSerial, siteName, lineName, sizeCode },
+      replacements: { barcodeSerial, siteName, lineName, sizeCode: decodeSize },
       type: QueryTypes.SELECT,
     });
 
