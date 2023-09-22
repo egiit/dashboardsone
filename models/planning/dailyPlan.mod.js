@@ -332,7 +332,7 @@ export const LogDailyOutput = db.define(
 	CUSTOMER_NAME: {type: DataTypes.STRING},
 	ORDER_REFERENCE_PO_NO: {type: DataTypes.STRING},
 	PRODUCT_ITEM_CODE: {type: DataTypes.STRING},
-	ORDER_STYLE_DESCRIPTION: {TYPE: DataTypes.STRING},
+	ORDER_STYLE_DESCRIPTION: {type: DataTypes.STRING},
 	ITEM_COLOR_CODE: {type: DataTypes.STRING},
 	ITEM_COLOR_NAME: {type: DataTypes.STRING},
 	PRODUCTION_MONTH: {type: DataTypes.STRING},
