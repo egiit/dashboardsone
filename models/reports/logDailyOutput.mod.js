@@ -97,11 +97,7 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.LIN
                     ) e ON e.LINE_NAME = d.LINE_NAME AND a.SCHD_SITE = e.SITE_NAME
                     -- untuk working hour dan mp_daily_detail dipakaikan kolom shift untuk mengambil data jika line mempunyai shifting
                     LEFT JOIN workinghour_detail f ON f.SCHD_ID = a.SCHD_ID AND f.SHIFT = 'Normal_A'
-                    LEFT JOIN (
-                        SELECT DISTINCT a.SCHD_ID, a.LINE_NAME, a.SHIFT, a.PLAN_MP, a.ACT_MP, a.PLAN_MP_OT, a.ACT_MP_OT, a.PLAN_MP_X_OT, a.ACT_MP_X_OT 
-                        FROM   mp_daily_detail a  WHERE a.SHIFT = 'Normal_A' AND DATE(a.CREATE_DATE) = CURDATE()
-                        GROUP BY a.SCHD_ID, a.LINE_NAME, a.SHIFT
-                    ) m  ON m.SCHD_ID = a.SCHD_ID AND m.SHIFT = 'Normal_A' 
+                    LEFT JOIN mp_daily_detail m  ON m.SCHD_ID = a.SCHD_ID AND m.SHIFT = 'Normal_A' 
                     -- left join ciew qcendlineoutput untuk mendapatkan output
                     LEFT JOIN (
                             								 SELECT N.ENDLINE_ACT_SCHD_ID, N.ENDLINE_SCHD_DATE,  N.ENDLINE_SCH_ID, N.ENDLINE_ID_SITELINE, N.ENDLINE_LINE_NAME,
@@ -269,11 +265,7 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.LIN
                     ) e ON e.LINE_NAME = d.LINE_NAME AND a.SCHD_SITE = e.SITE_NAME
                     -- untuk working hour dan mp_daily_detail dipakaikan kolom shift untuk mengambil data jika line mempunyai shifting
                     LEFT JOIN workinghour_detail f ON f.SCHD_ID = a.SCHD_ID AND f.SHIFT = 'Shift_A'
-                    LEFT JOIN (
-                        SELECT DISTINCT a.SCHD_ID, a.LINE_NAME, a.SHIFT, a.PLAN_MP, a.ACT_MP, a.PLAN_MP_OT, a.ACT_MP_OT, a.PLAN_MP_X_OT, a.ACT_MP_X_OT 
-                        FROM   mp_daily_detail a  WHERE a.SHIFT = 'Shift_A' AND DATE(a.CREATE_DATE) = CURDATE()
-                        GROUP BY a.SCHD_ID, a.LINE_NAME, a.SHIFT
-                    ) m  ON m.SCHD_ID = a.SCHD_ID AND m.SHIFT = 'Shift_A' 
+                    LEFT JOIN mp_daily_detail m  ON m.SCHD_ID = a.SCHD_ID AND m.SHIFT = 'Shift_A' 
                     -- left join ciew qcendlineoutput untuk mendapatkan output
                     LEFT JOIN (
                             								 SELECT N.ENDLINE_ACT_SCHD_ID, N.ENDLINE_SCHD_DATE,  N.ENDLINE_SCH_ID, N.ENDLINE_ID_SITELINE, N.ENDLINE_LINE_NAME,
@@ -441,11 +433,7 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.LIN
                     ) e ON e.LINE_NAME = d.LINE_NAME AND a.SCHD_SITE = e.SITE_NAME
                     -- untuk working hour dan mp_daily_detail dipakaikan kolom shift untuk mengambil data jika line mempunyai shifting
                     LEFT JOIN workinghour_detail f ON f.SCHD_ID = a.SCHD_ID AND f.SHIFT = 'Shift_B'
-                    LEFT JOIN (
-                        SELECT DISTINCT a.SCHD_ID, a.LINE_NAME, a.SHIFT, a.PLAN_MP, a.ACT_MP, a.PLAN_MP_OT, a.ACT_MP_OT, a.PLAN_MP_X_OT, a.ACT_MP_X_OT 
-                        FROM   mp_daily_detail a  WHERE a.SHIFT = 'Shift_B' AND DATE(a.CREATE_DATE) = CURDATE()
-                        GROUP BY a.SCHD_ID, a.LINE_NAME, a.SHIFT
-                    ) m  ON m.SCHD_ID = a.SCHD_ID AND m.SHIFT = 'Shift_B' 
+                    LEFT JOIN mp_daily_detail m  ON m.SCHD_ID = a.SCHD_ID AND m.SHIFT = 'Shift_B' 
                     -- left join ciew qcendlineoutput untuk mendapatkan output
                     LEFT JOIN (
                             								 SELECT N.ENDLINE_ACT_SCHD_ID, N.ENDLINE_SCHD_DATE,  N.ENDLINE_SCH_ID, N.ENDLINE_ID_SITELINE, N.ENDLINE_LINE_NAME,
