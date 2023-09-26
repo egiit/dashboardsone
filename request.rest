@@ -70,6 +70,11 @@ Content-Type: application/json
 
 {"SCH_ID":7,"SCHD_PROD_MONTH":"2022-11-22","SCHD_PROD_DATE":"2022-11-21","SCHD_SITE":"SBR_01","SCHD_ID_SITELINE":"SLD0000001","SCHD_CAPACITY_ID":"SBR_01.C&A.7989320360519001;002 USIM: 2190348.MD2498 Pippa Bralette.128042.20221129","SCHD_HEADER_QTY":7634,"SCHD_QTY":"3","SCHD_ADD_ID":127}
 ###
+POST http://localhost:5001/qc/endline/qr/transfer
+Content-Type: application/json
+
+{"BARCODE_SERIAL": "200000851925"}
+###
 PATCH  http://localhost:5001/planning/daily
 Content-Type: application/json
 
@@ -91,3 +96,12 @@ GET http://localhost:5001/pocapacity/list-cap-style/2022-11-00/2022-11-00/SBR_02
 GET http://localhost:5001/planning/planning-daily/2022-12-19/SBR_01
 ###
 GET http://localhost:5001/planning/group-header/header/SBR_02A.VANITY%20VAIR%20BRANDS%2C%20LP.355327.2103375%2F72037.Damask%20Neutral.20221214
+
+###
+GET http://localhost:5001/sewdashboard/allsite?date=2023-07-13
+###
+GET http://localhost:5001/order/order-status-mo/asdadad
+###
+GET http://localhost:5001/sewdashboard/ytd/list-we/2023
+###
+GET http://localhost:5001/sewdashboard/ytd/weekly

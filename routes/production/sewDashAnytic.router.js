@@ -14,6 +14,10 @@ import {
   getRftPerhour,
   getTopDefectPart,
 } from "../../controllers/production/dashAnalitycs/DashboardSite.js";
+import {
+  getDataWeekly,
+  getYtdListWe,
+} from "../../controllers/production/dashAnalitycs/DashYtd.js";
 
 const router = express.Router();
 
@@ -30,5 +34,9 @@ router.get("/sitedash/defrate/:schDate/:sitename", getDataQcSite);
 //detil line
 router.get("/sitedash/topdefpart/:schDate/:idSiteline", getTopDefectPart);
 router.get("/sitedash/defHourShift/:schDate/:idSiteLine/:shift", getRftPerhour);
+
+//YTD route
+router.get("/ytd/list-we/:year", getYtdListWe);
+router.get("/ytd/weekly", getDataWeekly);
 
 export default router;

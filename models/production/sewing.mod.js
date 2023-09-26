@@ -145,6 +145,7 @@ export const ManpowewrDailyDetail = db.define(
     CREATE_DATE: { type: DataTypes.DATE },
     UPDATE_BY: { type: DataTypes.INTEGER },
     UPDATE_DATE: { type: DataTypes.DATE },
+    date_create_date: { type: DataTypes.DATE },
   },
   {
     freezeTableName: true,

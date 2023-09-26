@@ -541,7 +541,7 @@ function makeSumAll(dataDash) {
 }
 
 //function filters
-function filtersData(data, sites, shifts, customerx) {
+export function filtersData(data, sites, shifts, customerx) {
   if (data.length > 0) {
     if (sites && shifts && customerx) {
       const dataFilters = data.filter(

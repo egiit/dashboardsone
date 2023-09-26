@@ -114,3 +114,38 @@ export const findRTT = (shift, startH, endH, schDate, target, tppm) => {
 //   1.19
 // );
 // console.log(test);
+
+export const ChkNilaFlt = (nilai) => {
+  const newNilai = parseFloat(nilai);
+  if (!newNilai || isNaN(newNilai)) {
+    return 0;
+  } else {
+    return newNilai;
+  }
+};
+
+//untuk sort
+export function CompareBy(a, b, key) {
+  if (a[key] < b[key]) {
+    return -1;
+  }
+  if (a[key] > b[key]) {
+    return 1;
+  }
+  return 0;
+}
+
+// hitung eff
+export function JmlEff(eh, ah) {
+  const Eff = (CheckNilai(eh) / CheckNilai(ah)) * 100;
+  if (!Number.isFinite(Eff)) return 0;
+  return Eff;
+}
+
+//sumby colom
+export const SumByColoum = (dataTable, namecol) => {
+  return dataTable.reduce(
+    (sum, item) => CheckNilai(sum) + CheckNilai(item[namecol]),
+    0
+  );
+};
