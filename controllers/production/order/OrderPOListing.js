@@ -47,9 +47,7 @@ export const newOrderPOListing = async (req, res) => {
       const checkOrderPOData = await OrderPoListing.findOne({
         where: {
           ORDER_NO: order.ORDER_NO,
-          // ORDER_STYLE_DESCRIPTION: order.ORDER_STYLE_DESCRIPTION,
           ORDER_PO_ID: order.ORDER_PO_ID,
-          // MO_NO: order.MO_NO,
         },
       });
 

@@ -87,6 +87,15 @@ export const getDataWeekly = async (req, res) => {
     const totalNormal = SumByColoum(weeklyData, "NORMAL_OUTPUT");
     const totalOt = SumByColoum(weeklyData, "OT_OUTPUT");
     const totalXot = SumByColoum(weeklyData, "X_OT_OUTPUT");
+    const totalNormalEh = SumByColoum(weeklyData, "ACTUAL_EH");
+    const totalOtEh = SumByColoum(weeklyData, "ACTUAL_EH_OT");
+    const totalXotEh = SumByColoum(weeklyData, "ACTUAL_EH_X_OT");
+    const totalNormalAh = SumByColoum(weeklyData, "ACTUAL_AH");
+    const totalOtAh = SumByColoum(weeklyData, "ACTUAL_AH_OT");
+    const totalXotAh = SumByColoum(weeklyData, "ACTUAL_AH_X_OT");
+    const totalNormalEff = JmlEff(totalNormalEh, totalNormalAh);
+    const totalOtEff = JmlEff(totalOtEh, totalOtAh);
+    const totalXOtEff = JmlEff(totalXotEh, totalXotAh);
     const totalEff = JmlEff(totalEh, totalAh);
     const varTarget = totalOuput - totalTarget;
     const varSchedule = totalOuput - totalSchQty;
@@ -113,6 +122,15 @@ export const getDataWeekly = async (req, res) => {
         totalNormal,
         totalOt,
         totalXot,
+        totalNormalEh,
+        totalOtEh,
+        totalXotEh,
+        totalNormalAh,
+        totalOtAh,
+        totalXotAh,
+        totalNormalEff,
+        totalOtEff,
+        totalXOtEff,
       },
     });
   } catch (error) {
