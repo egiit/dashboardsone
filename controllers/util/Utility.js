@@ -1,4 +1,6 @@
-import moment from "moment";
+import Moment from "moment";
+import momentRange from "moment-range";
+const moment = momentRange.extendMoment(Moment);
 
 export const CheckNilai = (nilai) => {
   if (!nilai || isNaN(nilai)) return 0;
@@ -149,3 +151,20 @@ export const SumByColoum = (dataTable, namecol) => {
     0
   );
 };
+
+export const roundNumber = (number, digitAfterComa) => {
+  if (!number || isNaN(number)) return 0;
+  if (!digitAfterComa) return Math.round(number);
+
+  const decimal = digitAfterComa * 10;
+  return Math.round(number * decimal) / decimal;
+};
+
+export function getRangeDate(newDate) {
+  const { start, end } = newDate; // object berdasarkan moment
+
+  //get range date
+  return Array.from(moment.range(start, end).by("days")).map((day) =>
+    day.format("YYYY-MM-DD")
+  );
+}

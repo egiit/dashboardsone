@@ -8,6 +8,8 @@ import {
   CompareBy,
   JmlEff,
   SumByColoum,
+  getRangeDate,
+  roundNumber,
 } from "../../util/Utility.js";
 
 // Get List We
@@ -55,22 +57,48 @@ export const getYtdListWe = async (req, res) => {
 // get data weekly
 export const getDataWeekly = async (req, res) => {
   try {
-    const { rangeDate, site, shift, customers } = req.query;
+    const { rangeDate, site, shift, customers, style, line } = req.query;
+
     const dates = rangeDate.split(",");
     let queryString = `a.SCHD_PROD_DATE BETWEEN '${dates[0]}' AND '${dates[1]}'`;
 
     if (site) {
-      const sites = site.split(",");
+      const sites = site
+        .split(",")
+        .map((st) => `'${st}'`)
+        .join(",");
       queryString = queryString + ` AND a.SITE_NAME IN (${sites})`;
     }
     if (shift) {
-      const shifts = site.split(",");
+      const shifts = shift
+        .split(",")
+        .map((st) => `'${st}'`)
+        .join(",");
       queryString = queryString + ` AND a.SHIFT IN (${shifts})`;
     }
     if (customers) {
-      const customerx = site.split(",");
+      const customerx = customers
+        .split("-")
+        .map((cust) => `'${decodeURIComponent(cust)}'`)
+        .join(",");
       queryString = queryString + ` AND a.CUSTOMER_NAME IN (${customerx})`;
     }
+    if (style) {
+      const styles = style
+        .split(",")
+        .map((stl) => `'${decodeURIComponent(stl)}'`)
+        .join(",");
+      queryString = queryString + ` AND a.PRODUCT_ITEM_CODE IN (${styles})`;
+    }
+    if (line) {
+      const lines = line
+        .split(",")
+        .map((st) => `'${st}'`)
+        .join(",");
+      queryString = queryString + ` AND a.ID_SITELINE IN (${lines})`;
+    }
+    // console.log(queryString);
+
     const whereQuery = QueryWeekRep(queryString);
     const weeklyData = await db.query(whereQuery, {
       // replacements: {
@@ -100,16 +128,122 @@ export const getDataWeekly = async (req, res) => {
     const varTarget = totalOuput - totalTarget;
     const varSchedule = totalOuput - totalSchQty;
 
-    const dataByDate = await sumData(weeklyData, "SCHD_PROD_DATE");
-    const dataBySite = await sumData(weeklyData, "SITE_NAME");
-    const dataByLine = await sumData(weeklyData, "ID_SITELINE");
-    const dataByCustomer = await sumData(weeklyData, "CUSTOMER_NAME");
+    const dataByDate = await sumData(weeklyData, ["SCHD_PROD_DATE"]);
+    const dataBySite = await sumData(weeklyData, ["SITE_NAME"]);
+    const dataByLine = (await sumData(weeklyData, ["ID_SITELINE"])).map(
+      (line) => ({
+        ...line,
+        CUS_LINE_NAME:
+          line.SHIFT === "Shift_B"
+            ? `${line.CUS_NAME}-${line.LINE_NAME}B`
+            : `${line.CUS_NAME}-${line.LINE_NAME}`,
+        LINE_NAME_SHIFT:
+          line.SHIFT === "Shift_B" ? `${line.LINE_NAME}B` : `${line.LINE_NAME}`,
+      })
+    );
+    const dataByCustomer = (
+      await sumData(weeklyData, ["CUSTOMER_NAME"])
+    ).filter((style) => style.CUSTOMER_NAME !== null);
+    const dataByStyle = await sumData(weeklyData, ["PRODUCT_ITEM_CODE"]);
+    const dataByDateAndSite = await sumData(weeklyData, [
+      "SCHD_PROD_DATE",
+      "SITE_NAME",
+    ]);
+    const dataByLineDate = (
+      await sumData(weeklyData, ["SCHD_PROD_DATE", "ID_SITELINE"])
+    )?.map((line) => ({
+      ID_SITELINE: line.ID_SITELINE,
+      SCHD_PROD_DATE: line.SCHD_PROD_DATE,
+      EFF: line.EFF,
+      TOTAL_OUTPUT: line.TOTAL_OUTPUT,
+      ACT_MP: line.ACT_MP,
+    }));
+
+    // console.log(dataByLineDate);
+
+    let topTenStyle = [];
+    let bottomStyle = [];
+    //jika data by style lebih dari 10 maka slice untuk top ten dan bottom ten
+    if (dataByStyle.length > 0) {
+      const dataStyleSortEffTop = [
+        ...dataByStyle.sort((a, b) => CompareBy(b, a, "EFF")),
+      ];
+      const dataStyleSortEffBotom = [
+        ...dataByStyle.sort((a, b) => CompareBy(a, b, "EFF")),
+      ];
+
+      topTenStyle = dataStyleSortEffTop?.slice(0, 9);
+      bottomStyle = dataStyleSortEffBotom?.slice(0, 9);
+    }
+    const colorsList = [
+      { SITE_NAME: "SBR_01", colorSite: "#2983FF" },
+      { SITE_NAME: "SBR_02A", colorSite: "#00E396" },
+      { SITE_NAME: "SBR_02B", colorSite: "#FEB019" },
+      { SITE_NAME: "SBR_03", colorSite: "#FF4560" },
+      { SITE_NAME: "SBR_04", colorSite: "#775DD0" },
+    ];
+    // cari data berdasarkan site untuk chart weekly eff per date per site
+    const arrySeriesSite = dataBySite.map((site) => ({
+      name: site.CUS_NAME,
+      type: "column",
+      color: colorsList.filter((clr) => clr.SITE_NAME === site.SITE_NAME)[0]
+        .colorSite,
+      data: dataByDateAndSite
+        .filter((dateNsite) => dateNsite.SITE_NAME === site.SITE_NAME)
+        .map((val) => val.EFF?.toFixed(2)),
+    }));
+
+    //cari daata berdasarkan date
+    const arrayDateEff = {
+      name: "OVERALL EFF",
+      type: "line",
+      color: "#008FFB",
+      data: dataByDate.map((dataDate) => dataDate.EFF?.toFixed(2)),
+    };
+    //join data series antara by site dan summary eff per date
+    const dataSeriesWeek = [...arrySeriesSite, arrayDateEff];
+
+    //list date berdasarkan scheddule
+    const listDate = dataByDate.map((dataDate) => dataDate.SCHD_PROD_DATE);
+
+    // ############### for table weekly summary ##############
+    const startDate = moment(dates[0]);
+    const endDate = moment(dates[1]);
+    const rangesDates = { start: startDate, end: endDate };
+
+    //get range date
+    const weekRangeDate = getRangeDate(rangesDates);
+
+    const joinDataLineWeek = dataByLine.map((line) => {
+      //filter berdasarkanline
+      const dataEachDate = dataByLineDate.filter(
+        (dataDate) => dataDate.ID_SITELINE === line.ID_SITELINE
+      );
+
+      // cari total manpower table weekl to date
+      const mp = SumByColoum(dataEachDate, "ACT_MP");
+      const newLineData = {
+        ...line,
+        dataLineDate: dataEachDate,
+        TOTAL_MP: mp,
+      };
+      return newLineData;
+    });
+
+    // ############### end for table weekly summary ##############
 
     res.json({
       dataByDate,
       dataBySite,
       dataByCustomer,
       dataByLine,
+      dataSeriesWeek,
+      dataByStyle,
+      listDate,
+      topTenStyle,
+      bottomStyle,
+      weekRangeDate,
+      joinDataLineWeek,
       dataTotal: {
         totalSchQty,
         totalTarget,
@@ -140,15 +274,84 @@ export const getDataWeekly = async (req, res) => {
 };
 
 //sumary data by line
-export const sumData = async (data, key) => {
-  const dataByLine = [
+// export const sumData = async (data, key) => {
+//   const dataByLine = [
+//     ...data
+//       .reduce((distLine, current) => {
+//         const attrib = current[key];
+//         const grouped = distLine.get(attrib);
+//         // console.log(grouped);
+//         if (!grouped) {
+//           distLine.set(attrib, {
+//             ...current,
+//             SCHD_QTY: CheckNilai(current.SCHD_QTY),
+//             TOTAL_TARGET: ChkNilaFlt(current.TOTAL_TARGET),
+//             TOTAL_OUTPUT: CheckNilai(current.TOTAL_OUTPUT),
+//             TOTAL_EH: ChkNilaFlt(current.TOTAL_EH),
+//             TOTAL_AH: CheckNilai(current.TOTAL_AH),
+//             ACT_TARGET: ChkNilaFlt(current.ACT_TARGET),
+//             ACT_TARGET_OT: ChkNilaFlt(current.ACT_TARGET_OT),
+//             ACT_TARGET_X_OT: ChkNilaFlt(current.ACT_TARGET_X_OT),
+//             NORMAL_OUTPUT: CheckNilai(current.NORMAL_OUTPUT),
+//             OT_OUTPUT: CheckNilai(current.OT_OUTPUT),
+//             X_OT_OUTPUT: CheckNilai(current.X_OT_OUTPUT),
+//           });
+//         } else {
+//           distLine.set(attrib, {
+//             ...grouped,
+//             SCHD_QTY:
+//               CheckNilai(grouped.SCHD_QTY) + CheckNilai(current.SCHD_QTY),
+//             TOTAL_TARGET:
+//               ChkNilaFlt(grouped.TOTAL_TARGET) +
+//               ChkNilaFlt(current.TOTAL_TARGET),
+//             TOTAL_OUTPUT:
+//               CheckNilai(grouped.TOTAL_OUTPUT) +
+//               CheckNilai(current.TOTAL_OUTPUT),
+//             TOTAL_EH:
+//               ChkNilaFlt(grouped.TOTAL_EH) + ChkNilaFlt(current.TOTAL_EH),
+//             TOTAL_AH:
+//               CheckNilai(grouped.TOTAL_AH) + CheckNilai(current.TOTAL_AH),
+//             ACT_TARGET:
+//               ChkNilaFlt(grouped.ACT_TARGET) + ChkNilaFlt(current.ACT_TARGET),
+//             ACT_TARGET_OT:
+//               ChkNilaFlt(grouped.ACT_TARGET_OT) +
+//               ChkNilaFlt(current.ACT_TARGET_OT),
+//             ACT_TARGET_X_OT:
+//               ChkNilaFlt(grouped.ACT_TARGET_X_OT) +
+//               ChkNilaFlt(current.ACT_TARGET_X_OT),
+//             NORMAL_OUTPUT:
+//               CheckNilai(grouped.NORMAL_OUTPUT) +
+//               CheckNilai(current.NORMAL_OUTPUT),
+//             OT_OUTPUT:
+//               CheckNilai(grouped.OT_OUTPUT) + CheckNilai(current.OT_OUTPUT),
+//             X_OT_OUTPUT:
+//               CheckNilai(grouped.X_OT_OUTPUT) + CheckNilai(current.X_OT_OUTPUT),
+//           });
+//         }
+
+//         return distLine;
+//       }, new Map())
+//       .values(),
+//   ].map((sum) => ({
+//     ...sum,
+//     VAR_SCHD: CheckNilai(sum.TOTAL_OUTPUT - sum.SCHD_QTY),
+//     VAR_TARGET: ChkNilaFlt(sum.TOTAL_OUTPUT - sum.TOTAL_TARGET),
+//     EFF: JmlEff(sum.TOTAL_EH, sum.TOTAL_AH),
+//   }));
+
+//   dataByLine.sort((a, b) => CompareBy(a, b, key));
+//   return dataByLine;
+// };
+
+const sumData = async (data, keys) => {
+  const dataSum = [
     ...data
       .reduce((distLine, current) => {
-        const attrib = current[key];
-        const grouped = distLine.get(attrib);
+        const groupKey = keys.map((key) => current[key]).join("_"); // Create a combined key
+        const grouped = distLine.get(groupKey);
         // console.log(grouped);
         if (!grouped) {
-          distLine.set(attrib, {
+          distLine.set(groupKey, {
             ...current,
             SCHD_QTY: CheckNilai(current.SCHD_QTY),
             TOTAL_TARGET: ChkNilaFlt(current.TOTAL_TARGET),
@@ -163,7 +366,7 @@ export const sumData = async (data, key) => {
             X_OT_OUTPUT: CheckNilai(current.X_OT_OUTPUT),
           });
         } else {
-          distLine.set(attrib, {
+          distLine.set(groupKey, {
             ...grouped,
             SCHD_QTY:
               CheckNilai(grouped.SCHD_QTY) + CheckNilai(current.SCHD_QTY),
@@ -205,6 +408,44 @@ export const sumData = async (data, key) => {
     EFF: JmlEff(sum.TOTAL_EH, sum.TOTAL_AH),
   }));
 
-  dataByLine.sort((a, b) => CompareBy(a, b, key));
-  return dataByLine;
+  keys.forEach((key) => {
+    dataSum.sort((a, b) => CompareBy(a, b, key));
+  });
+
+  return dataSum;
+};
+
+//untuk summary ACT MP dari parameter data meurpakan hasil distinct
+const sumDataMp = async (data, keys) => {
+  const dataSum = [
+    ...data
+      .reduce((distLine, current) => {
+        const groupKey = keys.map((key) => current[key]).join("_"); // Create a combined key
+        const grouped = distLine.get(groupKey);
+        // console.log(grouped);
+        if (!grouped) {
+          distLine.set(groupKey, {
+            ...current,
+            ACT_MP: CheckNilai(current.ACT_MP),
+          });
+        } else {
+          distLine.set(groupKey, {
+            ...grouped,
+            ACT_MP: CheckNilai(grouped.ACT_MP),
+          });
+        }
+
+        return distLine;
+      }, new Map())
+      .values(),
+  ].map((sum) => ({
+    ID_SITELINE: sum.ID_SITELINE,
+    ACT_MP: sum.ACT_MP,
+  }));
+
+  keys.forEach((key) => {
+    dataSum.sort((a, b) => CompareBy(a, b, key));
+  });
+
+  return dataSum;
 };
