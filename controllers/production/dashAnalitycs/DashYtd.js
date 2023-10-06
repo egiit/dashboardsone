@@ -60,6 +60,8 @@ export const getDataWeekly = async (req, res) => {
     const { rangeDate, site, shift, customers, style, line } = req.query;
 
     const dates = rangeDate.split(",");
+    const currentDate = moment().format("YYYY-MM-DD");
+
     let queryString = `a.SCHD_PROD_DATE BETWEEN '${dates[0]}' AND '${dates[1]}'`;
 
     if (site) {
@@ -100,12 +102,17 @@ export const getDataWeekly = async (req, res) => {
     // console.log(queryString);
 
     const whereQuery = QueryWeekRep(queryString);
-    const weeklyData = await db.query(whereQuery, {
+    const weeklyDataS = await db.query(whereQuery, {
       // replacements: {
       //   capId: capData.ID_CAPACITY,
       // },
       type: QueryTypes.SELECT,
     });
+
+    //buang current date
+    const weeklyData = weeklyDataS.filter(
+      (datas) => datas.SCHD_PROD_DATE !== currentDate
+    );
 
     const totalSchQty = SumByColoum(weeklyData, "SCHD_QTY");
     const totalTarget = SumByColoum(weeklyData, "TOTAL_TARGET");
@@ -343,7 +350,7 @@ export const getDataWeekly = async (req, res) => {
 //   return dataByLine;
 // };
 
-const sumData = async (data, keys) => {
+export const sumData = async (data, keys) => {
   const dataSum = [
     ...data
       .reduce((distLine, current) => {
@@ -406,41 +413,6 @@ const sumData = async (data, keys) => {
     VAR_SCHD: CheckNilai(sum.TOTAL_OUTPUT - sum.SCHD_QTY),
     VAR_TARGET: ChkNilaFlt(sum.TOTAL_OUTPUT - sum.TOTAL_TARGET),
     EFF: JmlEff(sum.TOTAL_EH, sum.TOTAL_AH),
-  }));
-
-  keys.forEach((key) => {
-    dataSum.sort((a, b) => CompareBy(a, b, key));
-  });
-
-  return dataSum;
-};
-
-//untuk summary ACT MP dari parameter data meurpakan hasil distinct
-const sumDataMp = async (data, keys) => {
-  const dataSum = [
-    ...data
-      .reduce((distLine, current) => {
-        const groupKey = keys.map((key) => current[key]).join("_"); // Create a combined key
-        const grouped = distLine.get(groupKey);
-        // console.log(grouped);
-        if (!grouped) {
-          distLine.set(groupKey, {
-            ...current,
-            ACT_MP: CheckNilai(current.ACT_MP),
-          });
-        } else {
-          distLine.set(groupKey, {
-            ...grouped,
-            ACT_MP: CheckNilai(grouped.ACT_MP),
-          });
-        }
-
-        return distLine;
-      }, new Map())
-      .values(),
-  ].map((sum) => ({
-    ID_SITELINE: sum.ID_SITELINE,
-    ACT_MP: sum.ACT_MP,
   }));
 
   keys.forEach((key) => {

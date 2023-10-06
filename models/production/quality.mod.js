@@ -550,3 +550,67 @@ m.ORDER_NO, m.ORDER_COLOR, m.ORDER_STYLE, m.ORDER_SIZE`;
 // WHERE a.SCHD_ID = :schdid AND  b.ORDER_SIZE = :size
 // GROUP BY a.SCH_ID, a.SCHD_ID, b.BUYER_CODE,
 // b.ORDER_NO, b.MO_NO, b.ORDER_COLOR, b.ORDER_STYLE, b.ORDER_SIZE`;
+
+//qc endline undo
+export const logEndlineCheck = db.define(
+  "log_endline_check",
+  {
+    SCH_ID: { type: DataTypes.INTEGER },
+    SCHD_ID: { type: DataTypes.INTEGER },
+    SCHD_PROD_DATE: { type: DataTypes.DATE },
+    ID_SITELINE: { type: DataTypes.STRING },
+    CHECKED: { type: DataTypes.INTEGER },
+    RTT: { type: DataTypes.INTEGER },
+    DEFECT: { type: DataTypes.INTEGER },
+    REPAIRED: { type: DataTypes.INTEGER },
+    BS: { type: DataTypes.INTEGER },
+  },
+  {
+    freezeTableName: true,
+    createdAt: false,
+    updatedAt: false,
+  }
+);
+
+logEndlineCheck.removeAttribute("id");
+
+export const queryQcLogCheck = `SELECT
+c.ENDLINE_SCH_ID,
+c.ENDLINE_ACT_SCHD_ID,
+c.ENDLINE_SCHD_DATE,
+c.ENDLINE_ID_SITELINE,
+SUM(c.RFT) + SUM(c.DEFECT) + SUM(c.BS) AS CHECKED,
+SUM(c.RFT) AS RTT,
+SUM(c.DEFECT) AS DEFECT,
+SUM(c.REPAIRED) AS REPAIRED,
+SUM(c.BS) AS BS
+FROM (
+SELECT
+    DATE(a.ENDLINE_SCHD_DATE) AS ENDLINE_SCHD_DATE,
+    a.ENDLINE_ID_SITELINE,
+    a.ENDLINE_SCH_ID,
+    a.ENDLINE_ACT_SCHD_ID,
+    CASE
+        WHEN a.ENDLINE_OUT_TYPE = 'RTT' AND IFNULL(a.ENDLINE_OUT_UNDO, 'OK') <> 'Y' THEN a.ENDLINE_OUT_QTY
+        ELSE 0
+    END AS RFT,
+    CASE
+        WHEN a.ENDLINE_OUT_TYPE = 'DEFECT' AND IFNULL(a.ENDLINE_OUT_UNDO, 'OK') <> 'Y' THEN a.ENDLINE_OUT_QTY
+        ELSE 0
+    END AS DEFECT,
+    CASE
+        WHEN a.ENDLINE_OUT_TYPE = 'BS' AND IFNULL(a.ENDLINE_OUT_UNDO, 'OK') <> 'Y' THEN a.ENDLINE_OUT_QTY
+        ELSE 0
+    END AS BS,
+    CASE
+        WHEN a.ENDLINE_OUT_TYPE = 'DEFECT' AND IFNULL(a.ENDLINE_OUT_UNDO, 'OK') <> 'Y' AND a.ENDLINE_REPAIR = 'Y' 
+        AND DATE(a.ENDLINE_MOD_TIME)  = CURDATE() THEN a.ENDLINE_OUT_QTY
+        ELSE 0
+    END AS REPAIRED
+FROM qc_endline_output a
+LEFT JOIN item_siteline b ON b.ID_SITELINE = a.ENDLINE_ID_SITELINE
+WHERE DATE(a.ENDLINE_ADD_TIME) = CURDATE()
+AND (a.ENDLINE_OUT_TYPE = 'RTT' OR (a.ENDLINE_OUT_TYPE = 'DEFECT' AND a.ENDLINE_REPAIR = 'Y') OR a.ENDLINE_OUT_TYPE = 'BS'
+OR (a.ENDLINE_OUT_TYPE = 'DEFECT' AND a.ENDLINE_REPAIR = 'Y' AND DATE(a.ENDLINE_MOD_TIME) = CURDATE()))
+) c
+GROUP BY c.ENDLINE_SCHD_DATE, c.ENDLINE_ID_SITELINE, c.ENDLINE_ACT_SCHD_ID`;

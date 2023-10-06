@@ -18,6 +18,7 @@ import {
   getDataWeekly,
   getYtdListWe,
 } from "../../controllers/production/dashAnalitycs/DashYtd.js";
+import { getDataMtd } from "../../controllers/production/dashAnalitycs/DashMtd.js";
 
 const router = express.Router();
 
@@ -38,5 +39,6 @@ router.get("/sitedash/defHourShift/:schDate/:idSiteLine/:shift", getRftPerhour);
 //YTD route
 router.get("/ytd/list-we/:year", getYtdListWe);
 router.get("/ytd/weekly", getDataWeekly);
+router.get("/ytd/monthly", getDataMtd);
 
 export default router;
