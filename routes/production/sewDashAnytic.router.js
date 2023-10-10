@@ -19,6 +19,10 @@ import {
   getYtdListWe,
 } from "../../controllers/production/dashAnalitycs/DashYtd.js";
 import { getDataMtd } from "../../controllers/production/dashAnalitycs/DashMtd.js";
+import {
+  getDataQcDash,
+  getTopDefectPartYes,
+} from "../../controllers/production/dashAnalitycs/DashQcDay.js";
 
 const router = express.Router();
 
@@ -35,6 +39,13 @@ router.get("/sitedash/defrate/:schDate/:sitename", getDataQcSite);
 //detil line
 router.get("/sitedash/topdefpart/:schDate/:idSiteline", getTopDefectPart);
 router.get("/sitedash/defHourShift/:schDate/:idSiteLine/:shift", getRftPerhour);
+
+//QC dashboard route
+router.get("/qcdashboard/daily", getDataQcDash);
+router.get(
+  "/qcdashboard/topdefpart-yestd/:schDate/:idSiteline",
+  getTopDefectPartYes
+);
 
 //YTD route
 router.get("/ytd/list-we/:year", getYtdListWe);

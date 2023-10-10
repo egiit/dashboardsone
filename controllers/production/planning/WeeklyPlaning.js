@@ -251,6 +251,7 @@ export const deleteSchHeader = async (req, res) => {
     const findCheck = await QcEndlineOutput.findOne({
       where: {
         ENDLINE_SCH_ID: schId,
+        ENDLINE_OUT_UNDO: null,
       },
     });
 
