@@ -119,9 +119,6 @@ router.get(
 );
 
 //measurement report
-router.get(
-  "/report/measurement/:schDate/:sitename/:linename/:orderNo",
-  getMeasurementRep
-);
+router.get("/report/measurement/:orderNo/:schdId/:shift", getMeasurementRep);
 
 export default router;

@@ -200,7 +200,7 @@ export const getDailyDefDetailSum = async (req, res) => {
 //get bulk report measurement
 export const getMeasurementRep = async (req, res) => {
   try {
-    const { schDate, sitename, linename, orderNo } = req.params;
+    const { orderNo, schdId, shift } = req.params;
 
     const desc = await db.query(QueryGetDescMes, {
       replacements: { orderNo },
@@ -208,17 +208,17 @@ export const getMeasurementRep = async (req, res) => {
     });
     //spec by size
     const specList = await db.query(QueryMeasSpecRep, {
-      replacements: { orderNo, schDate, sitename, linename },
+      replacements: { orderNo, schdId, shift },
       type: QueryTypes.SELECT,
     });
     //detail value
     const values = await db.query(QueryMesValueRep, {
-      replacements: { orderNo, schDate, sitename, linename },
+      replacements: { schdId, shift },
       type: QueryTypes.SELECT,
     });
     //detail value
     const headers = await db.query(QryMesHederRepList, {
-      replacements: { orderNo, schDate, sitename, linename },
+      replacements: { schdId, shift },
       type: QueryTypes.SELECT,
     });
 
