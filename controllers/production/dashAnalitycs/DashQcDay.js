@@ -16,6 +16,29 @@ import {
   SQLTopDefectLineYes,
   SQLTopPartLineYes,
 } from "../../../models/dashAnalitycs/qcDayDash.mod.js";
+import { QueryFindTarget } from "../../../models/dashAnalitycs/mainDashSew.js";
+
+//get target defRate
+export const getTarget = async (req, res) => {
+  try {
+    const { startDate, endDate, dept, category } = req.params;
+
+    const findTarget = await db.query(QueryFindTarget, {
+      replacements: { startDate, endDate, dept, category },
+      type: QueryTypes.SELECT,
+    });
+
+    const target = findTarget ? findTarget : 0;
+
+    res.json(target);
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      message: "error processing request",
+      data: error,
+    });
+  }
+};
 
 //get data qc dashboard
 export const getDataQcDash = async (req, res) => {

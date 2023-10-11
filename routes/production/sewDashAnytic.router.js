@@ -21,6 +21,7 @@ import {
 import { getDataMtd } from "../../controllers/production/dashAnalitycs/DashMtd.js";
 import {
   getDataQcDash,
+  getTarget,
   getTopDefectPartYes,
 } from "../../controllers/production/dashAnalitycs/DashQcDay.js";
 
@@ -41,6 +42,10 @@ router.get("/sitedash/topdefpart/:schDate/:idSiteline", getTopDefectPart);
 router.get("/sitedash/defHourShift/:schDate/:idSiteLine/:shift", getRftPerhour);
 
 //QC dashboard route
+router.get(
+  "/qcdashboard/target/:startDate/:endDate/:dept/:category",
+  getTarget
+);
 router.get("/qcdashboard/daily", getDataQcDash);
 router.get(
   "/qcdashboard/topdefpart-yestd/:schDate/:idSiteline",
