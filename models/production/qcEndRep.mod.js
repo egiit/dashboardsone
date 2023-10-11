@@ -481,13 +481,13 @@ LEFT JOIN measurement_chart_detail b ON a.MES_CHART_NO = b.MES_CHART_NO
 LEFT JOIN measurement_pom c ON c.MES_CHART_NO = a.MES_CHART_NO  AND b.POM_ID = c.POM_ID
 WHERE b.SIZE_CODE IN (
 	SELECT DISTINCT b.SIZE_CODE FROM measurement_qc_output b 
-	WHERE b.SCHD_ID = :schdId AND b.SHIFT = :shift
+	WHERE b.SCHD_ID = :schdId -- AND b.SHIFT = :shift
 )`;
 
 export const QueryMesValueRep = `SELECT a.MES_CHART_NO, a.POM_ID, a.SIZE_CODE, a.MES_VALUE, a.BARCODE_SERIAL, a.MES_SEQ, a.MES_CAT, a.ORDER_NO, b.MES_UOM
 FROM measurement_qc_output a 
 LEFT JOIN measurement_chart b ON a.MES_CHART_NO = b.MES_CHART_NO
-WHERE a.SCHD_ID = :schdId AND a.SHIFT = :shift
+WHERE a.SCHD_ID = :schdId -- AND a.SHIFT = :shift
  `;
 
 export const QryMesHederRepList = `-- query looping header measurement report 
@@ -495,5 +495,5 @@ SELECT DISTINCT a.BARCODE_SERIAL, a.SIZE_CODE, c.BUNDLE_SEQUENCE
 FROM measurement_qc_output a 
 LEFT JOIN measurement_chart b ON a.MES_CHART_NO = b.MES_CHART_NO
 LEFT JOIN order_qr_generate c ON a.BARCODE_SERIAL = c.BARCODE_SERIAL 
-WHERE a.SCHD_ID = :schdId AND a.SHIFT = :shift
+WHERE a.SCHD_ID = :schdId -- AND a.SHIFT = :shift
 `;
