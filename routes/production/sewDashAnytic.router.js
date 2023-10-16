@@ -24,6 +24,7 @@ import {
   getTarget,
   getTopDefectPartYes,
 } from "../../controllers/production/dashAnalitycs/DashQcDay.js";
+import { getDataQcSum } from "../../controllers/production/dashAnalitycs/DashQcSum.js";
 
 const router = express.Router();
 
@@ -51,6 +52,9 @@ router.get(
   "/qcdashboard/topdefpart-yestd/:schDate/:idSiteline",
   getTopDefectPartYes
 );
+
+//QC weekly
+router.get("/qcdashboard/summary", getDataQcSum);
 
 //YTD route
 router.get("/ytd/list-we/:year", getYtdListWe);

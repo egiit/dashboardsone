@@ -42,7 +42,7 @@ export const getYtdListWe = async (req, res) => {
       arrWeek.push({
         id: we,
         value: { startDate, endDate },
-        name: `WE${idx} (${startWeek}/${dateWeek})`,
+        name: `W${idx} (${startWeek}/${dateWeek})`,
       });
       we++;
 

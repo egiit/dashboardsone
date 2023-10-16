@@ -228,6 +228,7 @@ WHERE
 DATE(a.ENDLINE_ADD_TIME) = :schDate AND
 a.ENDLINE_OUT_TYPE = 'DEFECT' AND 
 a.ENDLINE_OUT_UNDO IS NULL 
+ORDER BY a.ENDLINE_ADD_TIME
 --	GROUP BY a.ENDLINE_SCHD_DATE, a.ENDLINE_DEFECT_CODE
 -- ORDER BY SUM(a.ENDLINE_OUT_QTY) DESC LIMIT 3`;
 
@@ -253,7 +254,8 @@ LEFT JOIN viewcapacity f ON f.ID_CAPACITY = e.SCH_CAPACITY_ID
 WHERE 
 DATE(a.ENDLINE_ADD_TIME) = :schDate AND
 a.ENDLINE_OUT_TYPE = 'DEFECT' AND 
-a.ENDLINE_OUT_UNDO IS NULL `;
+a.ENDLINE_OUT_UNDO IS NULL 
+ORDER BY a.ENDLINE_ADD_TIME`;
 
 //query site dash ###########################################################################
 
@@ -374,43 +376,50 @@ LEFT JOIN item_siteline e ON e.ID_SITELINE = a.ENDLINE_ID_SITELINE
 WHERE a.ENDLINE_SCHD_DATE = :schDate AND b.SCHD_SITE = :sitename
 GROUP BY  a.ENDLINE_SCHD_DATE, a.ENDLINE_ID_SITELINE, e.SITE_NAME, d.CUSTOMER_NAME`;
 
-export const SQLTopDefectLine = `SELECT  
-                              a.ENDLINE_SCHD_DATE AS SCHEDULE_DATE,
-                                a.ENDLINE_ID_SITELINE AS SITELINE,
-                                c.SITE_NAME AS SITE,
-                                c.LINE_NAME AS LINE,
-                                c.CUS_NAME,
-                                a.ENDLINE_DEFECT_CODE AS DEFECT_CODE,
-                                b.DEFECT_NAME AS DEFECT_NAME,
-                                SUM(a.ENDLINE_OUT_QTY) AS DEFECT_QTY
-                              FROM qc_endline_output a
-                              INNER JOIN item_defect_internal b ON a.ENDLINE_DEFECT_CODE = b.DEFECT_SEW_CODE
-                              INNER JOIN item_siteline c ON a.ENDLINE_ID_SITELINE = c.ID_SITELINE
-                              WHERE 
-                                DATE(a.ENDLINE_ADD_TIME) = :schDate AND a.ENDLINE_ID_SITELINE = :idSiteline
-                              GROUP BY a.ENDLINE_ID_SITELINE, a.ENDLINE_DEFECT_CODE
-                              ORDER BY SUM(a.ENDLINE_OUT_QTY) DESC LIMIT 3`;
+export const SQLTopDefectLine = `
+SELECT n.* FROM ( 
+ SELECT  
+  a.ENDLINE_SCHD_DATE AS SCHEDULE_DATE,
+    a.ENDLINE_ID_SITELINE AS SITELINE,
+    c.SITE_NAME AS SITE,
+    c.LINE_NAME AS LINE,
+    c.CUS_NAME,
+    a.ENDLINE_DEFECT_CODE AS DEFECT_CODE,
+    b.DEFECT_NAME AS DEFECT_NAME,
+    SUM(a.ENDLINE_OUT_QTY) AS DEFECT_QTY
+  FROM qc_endline_output a
+  INNER JOIN item_defect_internal b ON a.ENDLINE_DEFECT_CODE = b.DEFECT_SEW_CODE
+  INNER JOIN item_siteline c ON a.ENDLINE_ID_SITELINE = c.ID_SITELINE
+  WHERE 
+    DATE(a.ENDLINE_ADD_TIME) = :schDate AND a.ENDLINE_ID_SITELINE = :idSiteline
+  GROUP BY a.ENDLINE_ID_SITELINE, a.ENDLINE_DEFECT_CODE
+  ORDER BY a.ENDLINE_ADD_TIME 
+) n ORDER BY n.DEFECT_QTY DESC LIMIT 3`;
 
-export const SQLTopPartLine = ` SELECT  
-                              a.ENDLINE_SCHD_DATE AS SCHEDULE_DATE,
-                                a.ENDLINE_ID_SITELINE AS SITELINE,
-                                c.SITE_NAME AS SITE,
-                                c.LINE_NAME AS LINE,
-                                c.SHIFT AS SHIFT,
-                                c.CUS_NAME,
-                                a.ENDLINE_DEFECT_CODE AS DEFECT_CODE,
-                                b.DEFECT_NAME AS DEFECT_NAME,
-                                a.ENDLINE_PART_CODE AS PART_CODE,
-                                d.PART_NAME,
-                                SUM(a.ENDLINE_OUT_QTY) AS DEFECT_QTY
-                              FROM qc_endline_output a
-                              INNER JOIN item_defect_internal b ON a.ENDLINE_DEFECT_CODE = b.DEFECT_SEW_CODE
-                              INNER JOIN item_siteline c ON a.ENDLINE_ID_SITELINE = c.ID_SITELINE
-                              INNER JOIN item_part d ON a.ENDLINE_PART_CODE = d.PART_CODE
-                              WHERE 
-                              a.ENDLINE_SCHD_DATE = :schDate AND a.ENDLINE_ID_SITELINE = :idSiteline
-                              GROUP BY a.ENDLINE_PART_CODE
-                              ORDER BY SUM(a.ENDLINE_OUT_QTY) DESC LIMIT 3`;
+export const SQLTopPartLine = ` 
+SELECT n.* FROM 
+( 
+ SELECT  
+  a.ENDLINE_SCHD_DATE AS SCHEDULE_DATE,
+    a.ENDLINE_ID_SITELINE AS SITELINE,
+    c.SITE_NAME AS SITE,
+    c.LINE_NAME AS LINE,
+    c.SHIFT AS SHIFT,
+    c.CUS_NAME,
+    a.ENDLINE_DEFECT_CODE AS DEFECT_CODE,
+    b.DEFECT_NAME AS DEFECT_NAME,
+    a.ENDLINE_PART_CODE AS PART_CODE,
+    d.PART_NAME,
+    SUM(a.ENDLINE_OUT_QTY) AS DEFECT_QTY
+  FROM qc_endline_output a
+  INNER JOIN item_defect_internal b ON a.ENDLINE_DEFECT_CODE = b.DEFECT_SEW_CODE
+  INNER JOIN item_siteline c ON a.ENDLINE_ID_SITELINE = c.ID_SITELINE
+  INNER JOIN item_part d ON a.ENDLINE_PART_CODE = d.PART_CODE
+  WHERE 
+  a.ENDLINE_SCHD_DATE = :schDate AND a.ENDLINE_ID_SITELINE = :idSiteline
+  GROUP BY a.ENDLINE_PART_CODE
+  ORDER BY a.ENDLINE_ADD_TIME
+) n ORDER BY n.DEFECT_QTY DESC LIMIT 3`;
 
 // -- QC DASHBOARD CHECK PER HOUR
 export const QueryQcRftPerHiour = `SELECT 
