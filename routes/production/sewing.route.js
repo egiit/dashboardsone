@@ -14,6 +14,7 @@ import {
   postSewingSmvHeader,
 } from "../../controllers/production/sewing/SewingSmv.js";
 import {
+  clearFixDouble,
   postDailyWh,
   postRemark,
   postWhMpOt,
@@ -67,5 +68,7 @@ router.get(
   "/wip-monitoring-tracking/:schId/:orderSize",
   trackingByWipMontioring
 );
+
+router.post("/clear-double/", clearFixDouble);
 
 export default router;

@@ -276,3 +276,7 @@ LEFT JOIN viewsewingtfrqty l ON l.SCHD_ID = a.SCHD_ID AND a.ORDER_SIZE = l.ORDER
 LEFT JOIN  viewplansizeoutput m ON m.ENDLINE_SCHD_ID = a.SCHD_ID AND a.ORDER_SIZE = m.ENDLINE_PLAN_SIZE
 WHERE a.SCHD_ID = :schdId AND a.ORDER_SIZE = :orderSize 
 GROUP BY a.SCHD_ID,  a.ORDER_SIZE`;
+
+export const qryGetMpPlan = `SELECT * FROM mp_daily_detail a WHERE a.SCHD_ID = :schdId AND a.SHIFT = :shift `;
+export const qryGetWhPlan = `SELECT * FROM workinghour_detail a WHERE a.SCHD_ID = :schdId AND a.SHIFT = :shift `;
+export const qryGetSmvPlan = `SELECT * FROM smv_daily_plan a WHERE a.SCHD_ID = :schdId AND a.SHIFT = :shift `;

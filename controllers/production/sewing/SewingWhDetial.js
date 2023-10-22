@@ -4,7 +4,11 @@ import {
   ManpowewrDailyDetail,
   RemarkDailyDetail,
   WorkingHoursDetail,
+  qryGetMpPlan,
+  qryGetSmvPlan,
+  qryGetWhPlan,
 } from "../../../models/production/sewing.mod.js";
+import { SmvDailyPlan } from "../../../models/planning/dailyPlan.mod.js";
 
 //POST working  hours detail
 export const postDailyWh = async (req, res) => {
@@ -147,3 +151,122 @@ export const postRemark = async (req, res) => {
     });
   }
 };
+
+export const clearFixDouble = async (req, res) => {
+  try {
+    const { schdId, shift } = req.body;
+    res;
+
+    const mpPlanList = await db.query(qryGetMpPlan, {
+      replacements: { schdId, shift },
+      type: QueryTypes.SELECT,
+    });
+
+    const whList = await db.query(qryGetWhPlan, {
+      replacements: { schdId, shift },
+      type: QueryTypes.SELECT,
+    });
+
+    const smvList = await db.query(qryGetSmvPlan, {
+      replacements: { schdId, shift },
+      type: QueryTypes.SELECT,
+    });
+
+    if (mpPlanList.length < 2 && whList.length < 2 && smvList.length < 2) {
+      return res.json({ message: "Tidak Ada Data Duplicate" });
+    }
+
+    const proccDelMp = await delMP(mpPlanList);
+    const proccDelWh = await delWh(whList);
+    const proccDelSmv = await delSmv(smvList);
+    // console.log({ proccDelMp, proccDelWh, proccDelSmv });
+
+    if (!proccDelMp || !proccDelWh || !proccDelSmv) {
+      return res.json({
+        success: false,
+        message: "error processing clear data",
+      });
+    } else {
+      return res.json({
+        success: true,
+        message: "Success processing clear data",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      message: "error processing request",
+      data: error,
+    });
+  }
+};
+
+async function delMP(data) {
+  try {
+    if (data.length > 1) {
+      for (const [i, schd] of data.entries()) {
+        if (i > 0) {
+          await ManpowewrDailyDetail.destroy({
+            where: {
+              ID_MPD: schd.ID_MPD,
+              SCHD_ID: schd.SCHD_ID,
+              SHIFT: schd.SHIFT,
+            },
+          });
+        }
+        if (data.length === i + 1) return true;
+      }
+    } else {
+      return "nodata";
+    }
+  } catch (error) {
+    return false;
+  }
+}
+
+async function delWh(data) {
+  try {
+    if (data.length > 1) {
+      for (const [i, schd] of data.entries()) {
+        if (i > 0) {
+          await WorkingHoursDetail.destroy({
+            where: {
+              ID_WHD: schd.ID_WHD,
+              SCHD_ID: schd.SCHD_ID,
+              SHIFT: schd.SHIFT,
+            },
+          });
+        }
+
+        if (data.length === i + 1) return true;
+      }
+    } else {
+      return "nodata";
+    }
+  } catch (error) {
+    return false;
+  }
+}
+
+async function delSmv(data) {
+  try {
+    if (data.length > 1) {
+      for (const [i, schd] of data.entries()) {
+        if (i > 0) {
+          await SmvDailyPlan.destroy({
+            where: {
+              SMV_DAY_ID: schd.SMV_DAY_ID,
+              SCHD_ID: schd.SCHD_ID,
+              SHIFT: schd.SHIFT,
+            },
+          });
+        }
+        if (data.length === i + 1) return true;
+      }
+    } else {
+      return "nodata";
+    }
+  } catch (error) {
+    return false;
+  }
+}
