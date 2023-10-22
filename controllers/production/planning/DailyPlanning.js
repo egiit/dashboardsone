@@ -12,13 +12,18 @@ import {
   ManpowewrDailyDetail,
   WorkingHoursDetail,
 } from "../../../models/production/sewing.mod.js";
-import { QueryEffCurDate } from "../../../models/reports/sewDayliEffRep.mod.js";
+import {
+  QueryEffCurDate,
+  QueryEffCurDateShiftB,
+} from "../../../models/reports/sewDayliEffRep.mod.js";
 
 export const getDailyPlanning = async (req, res) => {
   try {
     const { plannDate, sitename, shift } = req.params;
+    const queryShift =
+      shift === "Shift_B" ? QueryEffCurDateShiftB : QueryEffCurDate;
 
-    const pland = await db.query(QueryEffCurDate, {
+    const pland = await db.query(queryShift, {
       // const pland = await db.query(QueryDailyPlann, {
       replacements: {
         schDate: plannDate,
