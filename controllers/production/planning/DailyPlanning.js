@@ -46,8 +46,9 @@ export const getDailyPlanning = async (req, res) => {
 export const syncLogDailyOutput = async (req, res) => {
   try {
     const { schDate, sitename, shift } = req.params;
-
-    const planWithOutput = await db.query(QryDailyResultForSyncLog, {
+    const queryShift =
+      shift === "Shift_B" ? QueryEffCurDateShiftB : QueryEffCurDate;
+    const planWithOutput = await db.query(queryShift, {
       // const pland = await db.query(QueryDailyPlann, {
       replacements: {
         schDate: schDate,
