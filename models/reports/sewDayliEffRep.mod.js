@@ -253,7 +253,7 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.LIN
 		           LEFT JOIN item_siteline d ON a.SCHD_ID_SITELINE = d.ID_SITELINE
 		           LEFT JOIN 	(
 		                   -- Manpower_detail di join dengan item siteline untunk mendapatkan line name dan shift
-						   SELECT a.ID_MPD, a.MP_DATE, a.ID_SITELINE, b.SITE_NAME, b.LINE_NAME, b.SHIFT, a.PLAN_MP,  a.PLAN_WH, SUM(d.PLAN_WH_OT) TTL_WH_OT, SUM(d.PLAN_WH_X_OT) TTL_WH_X_OT
+		                  SELECT a.ID_MPD, a.MP_DATE, a.ID_SITELINE, b.SITE_NAME, b.LINE_NAME, b.SHIFT, a.PLAN_MP,  a.PLAN_WH, SUM(d.PLAN_WH_OT) TTL_WH_OT, SUM(d.PLAN_WH_X_OT) TTL_WH_X_OT
                            FROM manpower_detail a 
                            LEFT JOIN item_siteline b ON a.ID_SITELINE = b.ID_SITELINE
                            INNER JOIN weekly_prod_sch_detail c ON a.ID_SITELINE = b.ID_SITELINE
@@ -305,7 +305,7 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.LIN
 								    FROM qc_endline_output a 
 								    LEFT JOIN item_siteline b ON a.ENDLINE_ID_SITELINE = b.ID_SITELINE
 								    WHERE 
-								        (a.ENDLINE_SCHD_DATE = :schDate OR DATE(a.ENDLINE_MOD_TIME) = :schDate)  
+								        (a.ENDLINE_SCHD_DATE = :schDate  OR DATE(a.ENDLINE_MOD_TIME) = :schDate )  
 								        AND b.SITE_NAME = :sitename 
 								        AND b.SHIFT = :shift 
 								        AND 
@@ -328,8 +328,8 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.LIN
 								    N.ENDLINE_ID_SITELINE,
 								    N.ENDLINE_LINE_NAME
 		           ) p ON a.SCHD_ID = p.ENDLINE_ACT_SCHD_ID
-		           LEFT JOIN item_working_shift k ON k.SHIFT_ID  = :shift AND INSTR(k.SHIFT_DAYS, DAYNAME (:schDate  )) > 1 
-		           WHERE a.SCHD_PROD_DATE = :schDate    AND  e.SHIFT = :shift AND d.SITE_NAME = :sitename
+		           LEFT JOIN item_working_shift k ON k.SHIFT_ID  = :shift AND INSTR(k.SHIFT_DAYS, DAYNAME (:schDate)) > 1 
+		           WHERE a.SCHD_PROD_DATE = :schDate     AND  e.SHIFT = :shift AND d.SITE_NAME = :sitename
             )n
         )h
     ) I`;
