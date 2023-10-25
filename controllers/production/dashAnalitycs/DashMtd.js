@@ -179,13 +179,13 @@ export const getDataMtd = async (req, res) => {
       name: "OVERALL EFF",
       type: "line",
       color: "#008FFB",
-      data: dataByDate.map((dataDate) => dataDate.EFF?.toFixed(2)),
+      data: dataByWeek.map((dataDate) => dataDate.EFF?.toFixed(2)),
     };
     //join data series antara by site dan summary eff per date
     const dataSeriesWeek = [...arrySeriesSite, arrayDateEff];
 
-    //list date berdasarkan scheddule
-    const listWeek = dataByWeek.map((dataDate) => dataDate.WE_NAME);
+    //list date berdasarkan scheddule listWeek
+    const listDate = dataByWeek.map((dataDate) => dataDate.WE_NAME);
 
     // ############### for table weekly summary ##############
     const startDate = moment(dates[0]);
@@ -221,8 +221,7 @@ export const getDataMtd = async (req, res) => {
       dataSeriesWeek,
       dataByStyle,
       dataByWeek,
-      listWeek,
-      //   listDate,
+      listDate, // listWeek,
       topTenStyle,
       bottomStyle,
       weekRangeDate,
