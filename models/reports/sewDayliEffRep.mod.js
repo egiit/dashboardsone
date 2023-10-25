@@ -101,64 +101,64 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.LIN
 		           LEFT JOIN mp_daily_detail m  ON m.SCHD_ID = a.SCHD_ID AND m.SHIFT = :shift 
 		           -- left join ciew qcendlineoutput untuk mendapatkan output
 		           LEFT JOIN (
-							       SELECT 
-								    N.ENDLINE_ACT_SCHD_ID, 
-								    N.ENDLINE_SCHD_DATE,  
-								    N.ENDLINE_SCH_ID, 
-								    N.ENDLINE_ID_SITELINE, 
-								    N.ENDLINE_LINE_NAME,
-								    SUM(N.ENDLINE_OUT_QTY) as NORMAL_OUTPUT,
-								    SUM(N.ENDLINE_OUT_QTY_OT) as OT_OUTPUT,
-								    SUM(N.ENDLINE_OUT_QTY_X_OT) as X_OT_OUTPUT
-								FROM(
-								    SELECT  
-								       CASE  WHEN  a.ENDLINE_REPAIR = 'Y' THEN a.ENDLINE_ACT_RPR_SCHD_ID
-												ELSE  a.ENDLINE_ACT_SCHD_ID END AS  ENDLINE_ACT_SCHD_ID,
-								        a.ENDLINE_SCH_ID, 
-								        a.ENDLINE_ID_SITELINE, 
-								        a.ENDLINE_LINE_NAME, 
-								        CASE 
-								            WHEN a.ENDLINE_PORD_TYPE = 'N' THEN a.ENDLINE_SCHD_DATE
-								            WHEN a.ENDLINE_PORD_TYPE = 'O' THEN DATE(a.ENDLINE_MOD_TIME)
-								            WHEN a.ENDLINE_PORD_TYPE = 'XO' THEN a.ENDLINE_SCHD_DATE
-								        END as ENDLINE_SCHD_DATE,
-								        SUM(CASE 
-								            WHEN a.ENDLINE_PORD_TYPE = 'N' THEN a.ENDLINE_OUT_QTY
-								            ELSE 0
-								        END) as ENDLINE_OUT_QTY,
-								        SUM(CASE 
-								            WHEN a.ENDLINE_PORD_TYPE = 'N' THEN 0
-								            ELSE a.ENDLINE_OUT_QTY
-								        END) as ENDLINE_OUT_QTY_OT,
-								        SUM(CASE 
-								            WHEN a.ENDLINE_PORD_TYPE = 'XO' THEN a.ENDLINE_OUT_QTY
-								            ELSE 0
-								        END) as ENDLINE_OUT_QTY_X_OT
-								    FROM qc_endline_output a 
-								    LEFT JOIN item_siteline b ON a.ENDLINE_ID_SITELINE = b.ID_SITELINE
-								    WHERE 
-								        (a.ENDLINE_SCHD_DATE = :schDate OR DATE(a.ENDLINE_MOD_TIME) = :schDate)  
-								        AND b.SITE_NAME = :sitename 
-								        AND b.SHIFT = :shift 
-								        AND 
-								        (
-								            (a.ENDLINE_OUT_TYPE = 'RTT' AND a.ENDLINE_OUT_UNDO IS NULL) 
-								            OR 
-								            (a.ENDLINE_OUT_TYPE <> 'BS' AND a.ENDLINE_OUT_UNDO IS NULL AND a.ENDLINE_REPAIR = 'Y' AND a.ENDLINE_ACT_RPR_SCHD_ID IS NOT NULL)
-								        )
-								    GROUP BY 
-								        a.ENDLINE_ACT_SCHD_ID, 
-								        a.ENDLINE_SCH_ID, 
-								        a.ENDLINE_ID_SITELINE, 
-								        a.ENDLINE_LINE_NAME
-								      --  a.ENDLINE_SCHD_DATE
-								) N
-								GROUP BY  
-								    N.ENDLINE_ACT_SCHD_ID,
-								 -- N.ENDLINE_SCHD_DATE,
-								    N.ENDLINE_SCH_ID,
-								    N.ENDLINE_ID_SITELINE,
-								    N.ENDLINE_LINE_NAME
+                                SELECT N.ENDLINE_ACT_SCHD_ID, N.ENDLINE_SCHD_DATE,  N.ENDLINE_SCH_ID, N.ENDLINE_ID_SITELINE, N.ENDLINE_LINE_NAME,
+                                SUM(N.ENDLINE_OUT_QTY) NORMAL_OUTPUT,
+                                SUM(N.ENDLINE_OUT_QTY_OT) OT_OUTPUT,
+                                SUM(N.ENDLINE_OUT_QTY_X_OT) X_OT_OUTPUT
+                                FROM(
+                                -- normal 
+                                        SELECT  
+                                        a.ENDLINE_ACT_SCHD_ID, a.ENDLINE_SCH_ID, a.ENDLINE_ID_SITELINE, a.ENDLINE_LINE_NAME, a.ENDLINE_SCHD_DATE, a.ENDLINE_OUT_TYPE, a.ENDLINE_PORD_TYPE, a.ENDLINE_PLAN_SIZE, 
+                                        a.ENDLINE_OUT_QTY, 0 ENDLINE_OUT_QTY_OT, 0 ENDLINE_OUT_QTY_X_OT
+                                        FROM qc_endline_output a 
+                                        LEFT JOIN item_siteline b ON a.ENDLINE_ID_SITELINE = b.ID_SITELINE
+                                        WHERE a.ENDLINE_SCHD_DATE = :schDate AND b.SITE_NAME = :sitename AND b.SHIFT = :shift AND 
+                                         a.ENDLINE_OUT_TYPE = 'RTT' AND a.ENDLINE_OUT_UNDO IS NULL AND a.ENDLINE_PORD_TYPE = 'N'
+                                        -- RTT n Repair
+                                        UNION ALL
+                                        SELECT 
+                                                a.ENDLINE_ACT_RPR_SCHD_ID, a.ENDLINE_SCH_ID, a.ENDLINE_ID_SITELINE, a.ENDLINE_LINE_NAME, date(a.ENDLINE_MOD_TIME) ENDLINE_SCHD_DATE, a.ENDLINE_OUT_TYPE, a.ENDLINE_PORD_TYPE, a.ENDLINE_PLAN_SIZE, 
+                                                a.ENDLINE_OUT_QTY, 0 ENDLINE_OUT_QTY_OT, 0 ENDLINE_OUT_QTY_X_OT
+                                        FROM qc_endline_output a 
+                                        LEFT JOIN item_siteline b ON a.ENDLINE_ID_SITELINE = b.ID_SITELINE
+                                        WHERE DATE(a.ENDLINE_MOD_TIME) = :schDate AND b.SITE_NAME = :sitename AND b.SHIFT = :shift AND 
+                                        a.ENDLINE_OUT_TYPE <> 'BS' AND a.ENDLINE_OUT_UNDO IS NULL AND a.ENDLINE_REPAIR = 'Y' AND a.ENDLINE_ACT_RPR_SCHD_ID IS NOT NULL   AND a.ENDLINE_PORD_TYPE = 'N'
+                                        UNION ALL
+                                -- OT
+                                        SELECT
+                                                a.ENDLINE_ACT_SCHD_ID, a.ENDLINE_SCH_ID, a.ENDLINE_ID_SITELINE, a.ENDLINE_LINE_NAME, a.ENDLINE_SCHD_DATE, a.ENDLINE_OUT_TYPE, a.ENDLINE_PORD_TYPE, a.ENDLINE_PLAN_SIZE,
+                                                0 ENDLINE_OUT_QTY, a.ENDLINE_OUT_QTY  ENDLINE_OUT_QTY_OT, 0 ENDLINE_OUT_QTY_X_OT
+                                        FROM qc_endline_output a 
+                                        LEFT JOIN item_siteline b ON a.ENDLINE_ID_SITELINE = b.ID_SITELINE
+                                        WHERE a.ENDLINE_SCHD_DATE = :schDate AND b.SITE_NAME = :sitename AND b.SHIFT = :shift AND 
+                                        a.ENDLINE_OUT_TYPE = 'RTT' AND a.ENDLINE_OUT_UNDO IS NULL AND a.ENDLINE_PORD_TYPE = 'O'
+                                        UNION ALL
+                                        SELECT 
+                                        a.ENDLINE_ACT_RPR_SCHD_ID, a.ENDLINE_SCH_ID, a.ENDLINE_ID_SITELINE, a.ENDLINE_LINE_NAME,date(a.ENDLINE_MOD_TIME) ENDLINE_SCHD_DATE, a.ENDLINE_OUT_TYPE, a.ENDLINE_PORD_TYPE, a.ENDLINE_PLAN_SIZE, 
+                                        0 ENDLINE_OUT_QTY, a.ENDLINE_OUT_QTY  ENDLINE_OUT_QTY_OT, 0 ENDLINE_OUT_QTY_X_OT
+                                        FROM qc_endline_output a 
+                                        LEFT JOIN item_siteline b ON a.ENDLINE_ID_SITELINE = b.ID_SITELINE
+                                        WHERE DATE(a.ENDLINE_MOD_TIME) = :schDate AND b.SITE_NAME = :sitename AND b.SHIFT = :shift AND  
+                                        a.ENDLINE_OUT_TYPE <> 'BS' AND a.ENDLINE_OUT_UNDO IS NULL AND a.ENDLINE_REPAIR = 'Y' AND a.ENDLINE_ACT_RPR_SCHD_ID IS NOT NULL  AND a.ENDLINE_PORD_TYPE = 'O'
+                                        UNION ALL 
+                                -- extra ot
+                                        SELECT
+                                                a.ENDLINE_ACT_SCHD_ID, a.ENDLINE_SCH_ID, a.ENDLINE_ID_SITELINE, a.ENDLINE_LINE_NAME, a.ENDLINE_SCHD_DATE, a.ENDLINE_OUT_TYPE, a.ENDLINE_PORD_TYPE, a.ENDLINE_PLAN_SIZE,
+                                                0 ENDLINE_OUT_QTY, 0  ENDLINE_OUT_QTY_OT, a.ENDLINE_OUT_QTY ENDLINE_OUT_QTY_X_OT
+                                        FROM qc_endline_output a 
+                                        LEFT JOIN item_siteline b ON a.ENDLINE_ID_SITELINE = b.ID_SITELINE
+                                        WHERE a.ENDLINE_SCHD_DATE = :schDate AND b.SITE_NAME = :sitename AND b.SHIFT = :shift AND 
+                                        a.ENDLINE_OUT_TYPE = 'RTT' AND a.ENDLINE_OUT_UNDO IS NULL AND a.ENDLINE_PORD_TYPE = 'XO'
+                                        UNION ALL
+                                        SELECT 
+                                        a.ENDLINE_ACT_RPR_SCHD_ID, a.ENDLINE_SCH_ID, a.ENDLINE_ID_SITELINE, a.ENDLINE_LINE_NAME, date(a.ENDLINE_MOD_TIME) ENDLINE_SCHD_DATE, a.ENDLINE_OUT_TYPE, a.ENDLINE_PORD_TYPE, a.ENDLINE_PLAN_SIZE, 
+                                        0 ENDLINE_OUT_QTY, 0  ENDLINE_OUT_QTY_OT, a.ENDLINE_OUT_QTY ENDLINE_OUT_QTY_X_OT
+                                        FROM qc_endline_output a  
+                                        LEFT JOIN item_siteline b ON a.ENDLINE_ID_SITELINE = b.ID_SITELINE
+                                        WHERE DATE(a.ENDLINE_MOD_TIME) = :schDate AND b.SITE_NAME = :sitename AND b.SHIFT = :shift AND 
+                                        a.ENDLINE_OUT_TYPE <> 'BS' AND a.ENDLINE_OUT_UNDO IS NULL AND a.ENDLINE_REPAIR = 'Y' AND a.ENDLINE_ACT_RPR_SCHD_ID IS NOT NULL  AND a.ENDLINE_PORD_TYPE = 'XO'
+                                ) N
+                                GROUP BY  N.ENDLINE_ACT_SCHD_ID
 		           ) p ON a.SCHD_ID = p.ENDLINE_ACT_SCHD_ID
 		           LEFT JOIN item_working_shift k ON k.SHIFT_ID  = :shift AND INSTR(k.SHIFT_DAYS, DAYNAME (:schDate  )) > 1 
 		           WHERE a.SCHD_PROD_DATE = :schDate    AND  e.SHIFT = :shift AND d.SITE_NAME = :sitename
@@ -269,64 +269,64 @@ SELECT h.SCHD_ID, h.SCH_ID, h.SCHD_PROD_DATE, h.ID_SITELINE,  h.SITE_NAME, h.LIN
 		           LEFT JOIN mp_daily_detail m  ON m.SCHD_ID = a.SCHD_ID AND m.SHIFT = :shift 
 		           -- left join ciew qcendlineoutput untuk mendapatkan output
 		           LEFT JOIN (
-							       SELECT 
-								    N.ENDLINE_ACT_SCHD_ID, 
-								    N.ENDLINE_SCHD_DATE,  
-								    N.ENDLINE_SCH_ID, 
-								    N.ENDLINE_ID_SITELINE, 
-								    N.ENDLINE_LINE_NAME,
-								    SUM(N.ENDLINE_OUT_QTY) as NORMAL_OUTPUT,
-								    SUM(N.ENDLINE_OUT_QTY_OT) as OT_OUTPUT,
-								    SUM(N.ENDLINE_OUT_QTY_X_OT) as X_OT_OUTPUT
-								FROM(
-								    SELECT  
-								       CASE  WHEN  a.ENDLINE_REPAIR = 'Y' THEN a.ENDLINE_ACT_RPR_SCHD_ID
-												ELSE  a.ENDLINE_ACT_SCHD_ID END AS  ENDLINE_ACT_SCHD_ID,
-								        a.ENDLINE_SCH_ID, 
-								        a.ENDLINE_ID_SITELINE, 
-								        a.ENDLINE_LINE_NAME, 
-								        CASE 
-								            WHEN a.ENDLINE_PORD_TYPE = 'N' THEN a.ENDLINE_SCHD_DATE
-								            WHEN a.ENDLINE_PORD_TYPE = 'O' THEN DATE(a.ENDLINE_MOD_TIME)
-								            WHEN a.ENDLINE_PORD_TYPE = 'XO' THEN a.ENDLINE_SCHD_DATE
-								        END as ENDLINE_SCHD_DATE,
-								        SUM(CASE 
-								            WHEN a.ENDLINE_PORD_TYPE = 'N' THEN a.ENDLINE_OUT_QTY
-								            ELSE 0
-								        END) as ENDLINE_OUT_QTY,
-								        SUM(CASE 
-								            WHEN a.ENDLINE_PORD_TYPE = 'N' THEN 0
-								            ELSE a.ENDLINE_OUT_QTY
-								        END) as ENDLINE_OUT_QTY_OT,
-								        SUM(CASE 
-								            WHEN a.ENDLINE_PORD_TYPE = 'XO' THEN a.ENDLINE_OUT_QTY
-								            ELSE 0
-								        END) as ENDLINE_OUT_QTY_X_OT
-								    FROM qc_endline_output a 
-								    LEFT JOIN item_siteline b ON a.ENDLINE_ID_SITELINE = b.ID_SITELINE
-								    WHERE 
-								        (a.ENDLINE_SCHD_DATE = :schDate OR DATE(a.ENDLINE_MOD_TIME) = :schDate)  
-								        AND b.SITE_NAME = :sitename 
-								        AND b.SHIFT = :shift 
-								        AND 
-								        (
-								            (a.ENDLINE_OUT_TYPE = 'RTT' AND a.ENDLINE_OUT_UNDO IS NULL) 
-								            OR 
-								            (a.ENDLINE_OUT_TYPE <> 'BS' AND a.ENDLINE_OUT_UNDO IS NULL AND a.ENDLINE_REPAIR = 'Y' AND a.ENDLINE_ACT_RPR_SCHD_ID IS NOT NULL)
-								        )
-								    GROUP BY 
-								        a.ENDLINE_ACT_SCHD_ID, 
-								        a.ENDLINE_SCH_ID, 
-								        a.ENDLINE_ID_SITELINE, 
-								        a.ENDLINE_LINE_NAME  
-								       --  a.ENDLINE_SCHD_DATE
-								) N
-								GROUP BY  
-								    N.ENDLINE_ACT_SCHD_ID,
-								 --   N.ENDLINE_SCHD_DATE,
-								    N.ENDLINE_SCH_ID,
-								    N.ENDLINE_ID_SITELINE,
-								    N.ENDLINE_LINE_NAME
+                                SELECT N.ENDLINE_ACT_SCHD_ID, N.ENDLINE_SCHD_DATE,  N.ENDLINE_SCH_ID, N.ENDLINE_ID_SITELINE, N.ENDLINE_LINE_NAME,
+                                SUM(N.ENDLINE_OUT_QTY) NORMAL_OUTPUT,
+                                SUM(N.ENDLINE_OUT_QTY_OT) OT_OUTPUT,
+                                SUM(N.ENDLINE_OUT_QTY_X_OT) X_OT_OUTPUT
+                                FROM(
+                                -- normal 
+                                        SELECT  
+                                        a.ENDLINE_ACT_SCHD_ID, a.ENDLINE_SCH_ID, a.ENDLINE_ID_SITELINE, a.ENDLINE_LINE_NAME, a.ENDLINE_SCHD_DATE, a.ENDLINE_OUT_TYPE, a.ENDLINE_PORD_TYPE, a.ENDLINE_PLAN_SIZE, 
+                                        a.ENDLINE_OUT_QTY, 0 ENDLINE_OUT_QTY_OT, 0 ENDLINE_OUT_QTY_X_OT
+                                        FROM qc_endline_output a 
+                                        LEFT JOIN item_siteline b ON a.ENDLINE_ID_SITELINE = b.ID_SITELINE
+                                        WHERE a.ENDLINE_SCHD_DATE = :schDate AND b.SITE_NAME = :sitename AND b.SHIFT = :shift AND 
+                                         a.ENDLINE_OUT_TYPE = 'RTT' AND a.ENDLINE_OUT_UNDO IS NULL AND a.ENDLINE_PORD_TYPE = 'N'
+                                        -- RTT n Repair
+                                        UNION ALL
+                                        SELECT 
+                                                a.ENDLINE_ACT_RPR_SCHD_ID, a.ENDLINE_SCH_ID, a.ENDLINE_ID_SITELINE, a.ENDLINE_LINE_NAME, date(a.ENDLINE_MOD_TIME) ENDLINE_SCHD_DATE, a.ENDLINE_OUT_TYPE, a.ENDLINE_PORD_TYPE, a.ENDLINE_PLAN_SIZE, 
+                                                a.ENDLINE_OUT_QTY, 0 ENDLINE_OUT_QTY_OT, 0 ENDLINE_OUT_QTY_X_OT
+                                        FROM qc_endline_output a 
+                                        LEFT JOIN item_siteline b ON a.ENDLINE_ID_SITELINE = b.ID_SITELINE
+                                        WHERE DATE(a.ENDLINE_MOD_TIME) = :schDate AND b.SITE_NAME = :sitename AND b.SHIFT = :shift AND 
+                                        a.ENDLINE_OUT_TYPE <> 'BS' AND a.ENDLINE_OUT_UNDO IS NULL AND a.ENDLINE_REPAIR = 'Y' AND a.ENDLINE_ACT_RPR_SCHD_ID IS NOT NULL   AND a.ENDLINE_PORD_TYPE = 'N'
+                                        UNION ALL
+                                -- OT
+                                        SELECT
+                                                a.ENDLINE_ACT_SCHD_ID, a.ENDLINE_SCH_ID, a.ENDLINE_ID_SITELINE, a.ENDLINE_LINE_NAME, a.ENDLINE_SCHD_DATE, a.ENDLINE_OUT_TYPE, a.ENDLINE_PORD_TYPE, a.ENDLINE_PLAN_SIZE,
+                                                0 ENDLINE_OUT_QTY, a.ENDLINE_OUT_QTY  ENDLINE_OUT_QTY_OT, 0 ENDLINE_OUT_QTY_X_OT
+                                        FROM qc_endline_output a 
+                                        LEFT JOIN item_siteline b ON a.ENDLINE_ID_SITELINE = b.ID_SITELINE
+                                        WHERE a.ENDLINE_SCHD_DATE = :schDate AND b.SITE_NAME = :sitename AND b.SHIFT = :shift AND 
+                                        a.ENDLINE_OUT_TYPE = 'RTT' AND a.ENDLINE_OUT_UNDO IS NULL AND a.ENDLINE_PORD_TYPE = 'O'
+                                        UNION ALL
+                                        SELECT 
+                                        a.ENDLINE_ACT_RPR_SCHD_ID, a.ENDLINE_SCH_ID, a.ENDLINE_ID_SITELINE, a.ENDLINE_LINE_NAME,date(a.ENDLINE_MOD_TIME) ENDLINE_SCHD_DATE, a.ENDLINE_OUT_TYPE, a.ENDLINE_PORD_TYPE, a.ENDLINE_PLAN_SIZE, 
+                                        0 ENDLINE_OUT_QTY, a.ENDLINE_OUT_QTY  ENDLINE_OUT_QTY_OT, 0 ENDLINE_OUT_QTY_X_OT
+                                        FROM qc_endline_output a 
+                                        LEFT JOIN item_siteline b ON a.ENDLINE_ID_SITELINE = b.ID_SITELINE
+                                        WHERE DATE(a.ENDLINE_MOD_TIME) = :schDate AND b.SITE_NAME = :sitename AND b.SHIFT = :shift AND  
+                                        a.ENDLINE_OUT_TYPE <> 'BS' AND a.ENDLINE_OUT_UNDO IS NULL AND a.ENDLINE_REPAIR = 'Y' AND a.ENDLINE_ACT_RPR_SCHD_ID IS NOT NULL  AND a.ENDLINE_PORD_TYPE = 'O'
+                                        UNION ALL 
+                                -- extra ot
+                                        SELECT
+                                                a.ENDLINE_ACT_SCHD_ID, a.ENDLINE_SCH_ID, a.ENDLINE_ID_SITELINE, a.ENDLINE_LINE_NAME, a.ENDLINE_SCHD_DATE, a.ENDLINE_OUT_TYPE, a.ENDLINE_PORD_TYPE, a.ENDLINE_PLAN_SIZE,
+                                                0 ENDLINE_OUT_QTY, 0  ENDLINE_OUT_QTY_OT, a.ENDLINE_OUT_QTY ENDLINE_OUT_QTY_X_OT
+                                        FROM qc_endline_output a 
+                                        LEFT JOIN item_siteline b ON a.ENDLINE_ID_SITELINE = b.ID_SITELINE
+                                        WHERE a.ENDLINE_SCHD_DATE = :schDate AND b.SITE_NAME = :sitename AND b.SHIFT = :shift AND 
+                                        a.ENDLINE_OUT_TYPE = 'RTT' AND a.ENDLINE_OUT_UNDO IS NULL AND a.ENDLINE_PORD_TYPE = 'XO'
+                                        UNION ALL
+                                        SELECT 
+                                        a.ENDLINE_ACT_RPR_SCHD_ID, a.ENDLINE_SCH_ID, a.ENDLINE_ID_SITELINE, a.ENDLINE_LINE_NAME, date(a.ENDLINE_MOD_TIME) ENDLINE_SCHD_DATE, a.ENDLINE_OUT_TYPE, a.ENDLINE_PORD_TYPE, a.ENDLINE_PLAN_SIZE, 
+                                        0 ENDLINE_OUT_QTY, 0  ENDLINE_OUT_QTY_OT, a.ENDLINE_OUT_QTY ENDLINE_OUT_QTY_X_OT
+                                        FROM qc_endline_output a  
+                                        LEFT JOIN item_siteline b ON a.ENDLINE_ID_SITELINE = b.ID_SITELINE
+                                        WHERE DATE(a.ENDLINE_MOD_TIME) = :schDate AND b.SITE_NAME = :sitename AND b.SHIFT = :shift AND 
+                                        a.ENDLINE_OUT_TYPE <> 'BS' AND a.ENDLINE_OUT_UNDO IS NULL AND a.ENDLINE_REPAIR = 'Y' AND a.ENDLINE_ACT_RPR_SCHD_ID IS NOT NULL  AND a.ENDLINE_PORD_TYPE = 'XO'
+                                ) N
+                                GROUP BY  N.ENDLINE_ACT_SCHD_ID
 		           ) p ON a.SCHD_ID = p.ENDLINE_ACT_SCHD_ID
 		           LEFT JOIN item_working_shift k ON k.SHIFT_ID  = :shift AND INSTR(k.SHIFT_DAYS, DAYNAME (:schDate  )) > 1 
 		           WHERE a.SCHD_PROD_DATE = :schDate    AND  e.SHIFT = :shift AND d.SITE_NAME = :sitename
