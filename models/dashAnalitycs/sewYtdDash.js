@@ -48,7 +48,7 @@ export const QueryWeekRep = (params) => {
       a.PRODUCT_ITEM_CODE, a.ORDER_STYLE_DESCRIPTION, a.ITEM_COLOR_CODE, a.ITEM_COLOR_NAME, a.PRODUCTION_MONTH
       FROM log_daily_output a
       LEFT JOIN item_siteline b ON a.ID_SITELINE = b.ID_SITELINE
-      WHERE  (a.PLAN_WH <> '0' OR a.TOTAL_TARGET <> '0.0') AND (a.ORDER_REFERENCE_PO_NO IS NOT NULL)
+      WHERE  (a.TOTAL_TARGET <> '0.0' OR IFNULL(a.TOTAL_TARGET, '0.0') <> '0.0') AND (a.ORDER_REFERENCE_PO_NO IS NOT NULL)
       AND  ${params}
       -- a.SCHD_PROD_DATE BETWEEN '2023-01-01' AND  '2023-09-22'
       -- AND a.SITE_NAME = 'SBR_02A'-- AND a.SHIFT = :shift
@@ -59,7 +59,7 @@ export const QueryWeekRep = (params) => {
 export const QueryMonthRep = (params) => {
   if (!params) return false;
 
-  return `SELECT n.SCHD_ID, n.SCH_ID, DATE_FORMAT(n.SCHD_PROD_DATE, '%M/%Y') PRODUCTION_MONTH, n.SCHD_PROD_DATE,
+  return `SELECT n.SCHD_ID, n.SCH_ID, DATE_FORMAT(n.SCHD_PROD_DATE, '%m-%Y') MONTH, DATE_FORMAT(n.SCHD_PROD_DATE, '%M/%Y') PRODUCTION_MONTH, n.SCHD_PROD_DATE,
   n.ID_SITELINE,  n.SITE_NAME, n.CUS_NAME, n.LINE_NAME, n.ACT_MP,
   n.CUS_LINE_NAME,
   n.SHIFT,
@@ -107,7 +107,7 @@ export const QueryMonthRep = (params) => {
       a.PRODUCT_ITEM_CODE, a.ORDER_STYLE_DESCRIPTION, a.ITEM_COLOR_CODE, a.ITEM_COLOR_NAME, a.PRODUCTION_MONTH
       FROM log_daily_output a
       LEFT JOIN item_siteline b ON a.ID_SITELINE = b.ID_SITELINE
-      WHERE  (a.PLAN_WH <> '0' OR a.TOTAL_TARGET <> '0.0') AND (a.ORDER_REFERENCE_PO_NO IS NOT NULL)
+      WHERE  (a.TOTAL_TARGET <> '0.0' OR IFNULL(a.TOTAL_TARGET, '0.0') <> '0.0') AND (a.ORDER_REFERENCE_PO_NO IS NOT NULL)
       AND  ${params}
       -- a.SCHD_PROD_DATE =  MONTH('2023-01-01')
       -- AND a.SITE_NAME = 'SBR_02A'-- AND a.SHIFT = :shift

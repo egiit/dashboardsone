@@ -6,11 +6,18 @@ import {
   CheckNilai,
   ChkNilaFlt,
   CompareBy,
-  JmlEff,
+  // JmlEff,
   SumByColoum,
   getRangeDate,
   roundNumber,
 } from "../../util/Utility.js";
+
+// hitung eff
+export function JmlEff(eh, ah) {
+  const Eff = (ChkNilaFlt(eh) / ChkNilaFlt(ah)) * 100;
+  if (!Number.isFinite(Eff)) return 0;
+  return Eff;
+}
 
 // Get List We
 export const getYtdListWe = async (req, res) => {
@@ -151,7 +158,9 @@ export const getDataWeekly = async (req, res) => {
     const dataByCustomer = (
       await sumData(weeklyData, ["CUSTOMER_NAME"])
     ).filter((style) => style.CUSTOMER_NAME !== null);
-    const dataByStyle = await sumData(weeklyData, ["PRODUCT_ITEM_CODE"]);
+    const dataByStyle = (
+      await sumData(weeklyData, ["PRODUCT_ITEM_CODE"])
+    ).filter((stl) => stl.EFF !== 0);
     const dataByDateAndSite = await sumData(weeklyData, [
       "SCHD_PROD_DATE",
       "SITE_NAME",

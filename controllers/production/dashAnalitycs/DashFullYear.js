@@ -14,7 +14,7 @@ import {
 import { sumData } from "./DashYtd.js";
 
 // get data weekly
-export const getDataMtd = async (req, res) => {
+export const getSewFullYear = async (req, res) => {
   try {
     const { rangeDate, site, shift, customers, style, line } = req.query;
 
@@ -23,7 +23,7 @@ export const getDataMtd = async (req, res) => {
     const theYear = moment(dates[0]).format("YYYY");
     const listWeekOneYear = await getListWe(theYear);
 
-    let queryString = `MONTH(a.SCHD_PROD_DATE) = MONTH('${dates[0]}')`;
+    let queryString = `YEAR(a.SCHD_PROD_DATE) = YEAR('${dates[0]}')`;
 
     if (site) {
       const sites = site
@@ -75,35 +75,37 @@ export const getDataMtd = async (req, res) => {
       (datas) => datas.SCHD_PROD_DATE !== currentDate
     );
 
-    //menambahan we identitas ke tiap monthdata
-    const monthData = monthWithOutCurDate.map((data) => {
-      const matchingWeek = listWeekOneYear.find((week) =>
-        week.rangeDate.includes(data.SCHD_PROD_DATE)
-      );
-      const WE = matchingWeek
-        ? {
-            WE: matchingWeek.id,
-            WE_NAME: matchingWeek.name,
-            ID_WE: matchingWeek.WE,
-          }
-        : {};
-      return { ...data, ...WE };
-    });
+    //menambahan we identitas ke tiap yearData
+    const yearData = monthWithOutCurDate
+      .map((data) => {
+        const matchingWeek = listWeekOneYear.find((week) =>
+          week.rangeDate.includes(data.SCHD_PROD_DATE)
+        );
+        const WE = matchingWeek
+          ? {
+              WE: matchingWeek.id,
+              WE_NAME: matchingWeek.name,
+              ID_WE: matchingWeek.WE,
+            }
+          : {};
+        return { ...data, ...WE };
+      })
+      .filter((we) => we.WE);
 
-    const totalSchQty = SumByColoum(monthData, "SCHD_QTY");
-    const totalTarget = SumByColoum(monthData, "TOTAL_TARGET");
-    const totalOuput = SumByColoum(monthData, "TOTAL_OUTPUT");
-    const totalEh = SumByColoum(monthData, "TOTAL_EH");
-    const totalAh = SumByColoum(monthData, "TOTAL_AH");
-    const totalNormal = SumByColoum(monthData, "NORMAL_OUTPUT");
-    const totalOt = SumByColoum(monthData, "OT_OUTPUT");
-    const totalXot = SumByColoum(monthData, "X_OT_OUTPUT");
-    const totalNormalEh = SumByColoum(monthData, "ACTUAL_EH");
-    const totalOtEh = SumByColoum(monthData, "ACTUAL_EH_OT");
-    const totalXotEh = SumByColoum(monthData, "ACTUAL_EH_X_OT");
-    const totalNormalAh = SumByColoum(monthData, "ACTUAL_AH");
-    const totalOtAh = SumByColoum(monthData, "ACTUAL_AH_OT");
-    const totalXotAh = SumByColoum(monthData, "ACTUAL_AH_X_OT");
+    const totalSchQty = SumByColoum(yearData, "SCHD_QTY");
+    const totalTarget = SumByColoum(yearData, "TOTAL_TARGET");
+    const totalOuput = SumByColoum(yearData, "TOTAL_OUTPUT");
+    const totalEh = SumByColoum(yearData, "TOTAL_EH");
+    const totalAh = SumByColoum(yearData, "TOTAL_AH");
+    const totalNormal = SumByColoum(yearData, "NORMAL_OUTPUT");
+    const totalOt = SumByColoum(yearData, "OT_OUTPUT");
+    const totalXot = SumByColoum(yearData, "X_OT_OUTPUT");
+    const totalNormalEh = SumByColoum(yearData, "ACTUAL_EH");
+    const totalOtEh = SumByColoum(yearData, "ACTUAL_EH_OT");
+    const totalXotEh = SumByColoum(yearData, "ACTUAL_EH_X_OT");
+    const totalNormalAh = SumByColoum(yearData, "ACTUAL_AH");
+    const totalOtAh = SumByColoum(yearData, "ACTUAL_AH_OT");
+    const totalXotAh = SumByColoum(yearData, "ACTUAL_AH_X_OT");
     const totalNormalEff = JmlEff(totalNormalEh, totalNormalAh);
     const totalOtEff = JmlEff(totalOtEh, totalOtAh);
     const totalXOtEff = JmlEff(totalXotEh, totalXotAh);
@@ -111,10 +113,10 @@ export const getDataMtd = async (req, res) => {
     const varTarget = totalOuput - totalTarget;
     const varSchedule = totalOuput - totalSchQty;
 
-    const dataByWeek = await sumData(monthData, ["WE"]);
-    const dataByDate = await sumData(monthData, ["SCHD_PROD_DATE"]);
-    const dataBySite = await sumData(monthData, ["SITE_NAME"]);
-    const dataByLine = (await sumData(monthData, ["ID_SITELINE"])).map(
+    const dataByWeek = await sumData(yearData, ["WE"]);
+    const dataByMonth = await sumData(yearData, ["MONTH"]);
+    const dataBySite = await sumData(yearData, ["SITE_NAME"]);
+    const dataByLine = (await sumData(yearData, ["ID_SITELINE"])).map(
       (line) => ({
         ...line,
         CUS_LINE_NAME:
@@ -125,22 +127,22 @@ export const getDataMtd = async (req, res) => {
           line.SHIFT === "Shift_B" ? `${line.LINE_NAME}B` : `${line.LINE_NAME}`,
       })
     );
-    const dataByCustomer = (await sumData(monthData, ["CUSTOMER_NAME"])).filter(
+    const dataByCustomer = (await sumData(yearData, ["CUSTOMER_NAME"])).filter(
       (style) => style.CUSTOMER_NAME !== null
     );
-    const dataByStyle = (
-      await sumData(monthData, ["PRODUCT_ITEM_CODE"])
-    ).filter((stl) => stl.EFF !== 0);
-    const dataByDateAndSite = await sumData(monthData, ["WE", "SITE_NAME"]);
-    const dataByLineDate = (
-      await sumData(monthData, ["SCHD_PROD_DATE", "ID_SITELINE"])
-    )?.map((line) => ({
-      ID_SITELINE: line.ID_SITELINE,
-      SCHD_PROD_DATE: line.SCHD_PROD_DATE,
-      EFF: line.EFF,
-      TOTAL_OUTPUT: line.TOTAL_OUTPUT,
-      ACT_MP: line.ACT_MP,
-    }));
+    const dataByStyle = (await sumData(yearData, ["PRODUCT_ITEM_CODE"])).filter(
+      (stl) => stl.EFF !== 0
+    );
+    const dataByDateAndSite = await sumData(yearData, ["MONTH", "SITE_NAME"]);
+    // const dataByLineDate = ( //data untuk tabel
+    //   await sumData(yearData, ["PRODUCTION_MONTH", "ID_SITELINE"])
+    // )?.map((line) => ({
+    //   ID_SITELINE: line.ID_SITELINE,
+    //   SCHD_PROD_DATE: line.SCHD_PROD_DATE,
+    //   EFF: line.EFF,
+    //   TOTAL_OUTPUT: line.TOTAL_OUTPUT,
+    //   ACT_MP: line.ACT_MP,
+    // }));
 
     // console.log(dataByLineDate);
 
@@ -181,13 +183,13 @@ export const getDataMtd = async (req, res) => {
       name: "OVERALL EFF",
       type: "line",
       color: "#008FFB",
-      data: dataByWeek.map((dataDate) => dataDate.EFF?.toFixed(2)),
+      data: dataByMonth.map((dataDate) => dataDate.EFF?.toFixed(2)),
     };
     //join data series antara by site dan summary eff per date
     const dataSeriesWeek = [...arrySeriesSite, arrayDateEff];
 
     //list date berdasarkan scheddule listWeek
-    const listDate = dataByWeek.map((dataDate) => dataDate.WE_NAME);
+    const listDate = dataByMonth.map((dataDate) => dataDate.PRODUCTION_MONTH);
 
     // ############### for table weekly summary ##############
     const startDate = moment(dates[0]);
@@ -197,26 +199,26 @@ export const getDataMtd = async (req, res) => {
     //get range date
     const weekRangeDate = getRangeDate(rangesDates);
 
-    const joinDataLineWeek = dataByLine.map((line) => {
-      //filter berdasarkanline
-      const dataEachDate = dataByLineDate.filter(
-        (dataDate) => dataDate.ID_SITELINE === line.ID_SITELINE
-      );
+    // const joinDataLineWeek = dataByLine.map((line) => {
+    //   //filter berdasarkanline
+    //   const dataEachDate = dataByLineDate.filter(
+    //     (dataDate) => dataDate.ID_SITELINE === line.ID_SITELINE
+    //   );
 
-      // cari total manpower table weekl to date
-      const mp = SumByColoum(dataEachDate, "ACT_MP");
-      const newLineData = {
-        ...line,
-        dataLineDate: dataEachDate,
-        TOTAL_MP: mp,
-      };
-      return newLineData;
-    });
+    //   // cari total manpower table weekl to date
+    //   const mp = SumByColoum(dataEachDate, "ACT_MP");
+    //   const newLineData = {
+    //     ...line,
+    //     dataLineDate: dataEachDate,
+    //     TOTAL_MP: mp,
+    //   };
+    //   return newLineData;
+    // });
 
     // ############### end for table weekly summary ##############
 
     res.json({
-      dataByDate,
+      dataByMonth,
       dataBySite,
       dataByCustomer,
       dataByLine,
@@ -227,7 +229,7 @@ export const getDataMtd = async (req, res) => {
       topTenStyle,
       bottomStyle,
       weekRangeDate,
-      joinDataLineWeek,
+      // joinDataLineWeek,
       dataTotal: {
         totalSchQty,
         totalTarget,
@@ -292,8 +294,8 @@ export const getListWe = async (year) => {
         id: we,
         value: { startDate, endDate },
         rangeDate: weekRangeDate,
-        WE: `W${idx}`,
-        name: `W${idx} (${startWeek}/${dateWeek})`,
+        WE: `WE${idx}`,
+        name: `WE${idx} (${startWeek}/${dateWeek})`,
       });
       we++;
 
