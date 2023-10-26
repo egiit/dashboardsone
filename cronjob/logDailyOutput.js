@@ -33,11 +33,8 @@ export const cronLogDialyOut = async () => {
             SCHD_PROD_DATE: currDate,
           },
         }).then((res) => {
-          //   console.log(res);
-          if (res) {
-            LogDailyOutput.bulkCreate(getDataLog);
-            console.log("qty loging");
-          }
+          LogDailyOutput.bulkCreate(getDataLog);
+          console.log("qty loging");
         });
 
         const getDataLogQcCheck = await db.query(queryQcLogCheck, {
