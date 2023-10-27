@@ -28,13 +28,13 @@ export const getDataQcSum = async (req, res) => {
       shift,
       customers,
       style,
-      // line,
+      line,
       defCode,
       partCode,
     } = req.query;
 
     const dates = rangeDate.split(",");
-    const currentDate = moment().format("YYYY-MM-DD");
+    // const currentDate = moment().format("YYYY-MM-DD");
 
     let queryString = `a.SCHD_PROD_DATE BETWEEN '${dates[0]}' AND '${dates[1]}'`;
     let querySelDefPart = false;
@@ -65,6 +65,14 @@ export const getDataQcSum = async (req, res) => {
         .map((stl) => `'${decodeURIComponent(stl)}'`)
         .join(",");
       queryString = queryString + ` AND a.PRODUCT_ITEM_CODE IN (${styles})`;
+    }
+
+    if (line) {
+      const lines = line
+        .split(",")
+        .map((st) => `'${st}'`)
+        .join(",");
+      queryString = queryString + ` AND a.ID_SITELINE IN (${lines})`;
     }
 
     if (!partCode && defCode) {
@@ -169,7 +177,7 @@ export const getDataQcSum = async (req, res) => {
     }
 
     //TOP 3 DEFECT AND PART
-    const dataTop3Def = (
+    const fullDefect = (
       await sumDefOrPart(qcDashDataDefPart, ["DEFECT_CODE"])
     )?.map((def) => ({
       DEFECT_CODE: def.DEFECT_CODE,
@@ -177,13 +185,15 @@ export const getDataQcSum = async (req, res) => {
       DEFECT_QTY: def.DEFECT_QTY,
     }));
 
-    const dataTop3Part = (
-      await sumDefOrPart(qcDashDataDefPart, ["PART_CODE"])
-    )?.map((part) => ({
-      PART_CODE: part.PART_CODE,
-      PART_NAME: part.PART_NAME,
-      DEFECT_QTY: part.DEFECT_QTY,
-    }));
+    const dataTop3Def = fullDefect?.slice(0, 5);
+
+    const dataTop3Part = (await sumDefOrPart(qcDashDataDefPart, ["PART_CODE"]))
+      ?.map((part) => ({
+        PART_CODE: part.PART_CODE,
+        PART_NAME: part.PART_NAME,
+        DEFECT_QTY: part.DEFECT_QTY,
+      }))
+      ?.slice(0, 5);
 
     res.json({
       dataBySite,
@@ -195,6 +205,7 @@ export const getDataQcSum = async (req, res) => {
       topTenStyle,
       dataTop3Def,
       dataTop3Part,
+      fullDefect,
       dataTotal: {
         totalTarget,
         totalChecked,

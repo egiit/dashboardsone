@@ -7,7 +7,7 @@ import {
   ChkNilaFlt,
   CompareBy,
   // JmlEff,
-  SumByColoum,
+  // SumByColoum,
   getRangeDate,
   roundNumber,
 } from "../../util/Utility.js";
@@ -18,6 +18,14 @@ export function JmlEff(eh, ah) {
   if (!Number.isFinite(Eff)) return 0;
   return Eff;
 }
+
+//sumby colom
+export const SumByColoum = (dataTable, namecol) => {
+  return dataTable.reduce(
+    (sum, item) => ChkNilaFlt(sum) + ChkNilaFlt(item[namecol]),
+    0
+  );
+};
 
 // Get List We
 export const getYtdListWe = async (req, res) => {

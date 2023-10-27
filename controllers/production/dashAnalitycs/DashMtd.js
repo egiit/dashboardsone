@@ -6,12 +6,27 @@ import {
   CheckNilai,
   ChkNilaFlt,
   CompareBy,
-  JmlEff,
-  SumByColoum,
+  // JmlEff,
+  // SumByColoum,
   getRangeDate,
   roundNumber,
 } from "../../util/Utility.js";
 import { sumData } from "./DashYtd.js";
+
+// hitung eff
+export function JmlEff(eh, ah) {
+  const Eff = (ChkNilaFlt(eh) / ChkNilaFlt(ah)) * 100;
+  if (!Number.isFinite(Eff)) return 0;
+  return Eff;
+}
+
+//sumby colom
+export const SumByColoum = (dataTable, namecol) => {
+  return dataTable.reduce(
+    (sum, item) => ChkNilaFlt(sum) + ChkNilaFlt(item[namecol]),
+    0
+  );
+};
 
 // get data weekly
 export const getDataMtd = async (req, res) => {

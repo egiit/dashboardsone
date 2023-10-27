@@ -193,7 +193,7 @@ export const getDataQcDash = async (req, res) => {
     }
 
     //TOP 3 DEFECT AND PART
-    const dataTop3Def = (
+    const fullDefect = (
       await sumDefOrPart(qcDashDataDefPart, ["DEFECT_CODE"])
     )?.map((def) => ({
       DEFECT_CODE: def.DEFECT_CODE,
@@ -201,13 +201,15 @@ export const getDataQcDash = async (req, res) => {
       DEFECT_QTY: def.DEFECT_QTY,
     }));
 
-    const dataTop3Part = (
-      await sumDefOrPart(qcDashDataDefPart, ["PART_CODE"])
-    )?.map((part) => ({
-      PART_CODE: part.PART_CODE,
-      PART_NAME: part.PART_NAME,
-      DEFECT_QTY: part.DEFECT_QTY,
-    }));
+    const dataTop3Def = fullDefect?.slice(0, 5);
+
+    const dataTop3Part = (await sumDefOrPart(qcDashDataDefPart, ["PART_CODE"]))
+      ?.map((part) => ({
+        PART_CODE: part.PART_CODE,
+        PART_NAME: part.PART_NAME,
+        DEFECT_QTY: part.DEFECT_QTY,
+      }))
+      .slice(0, 5);
 
     res.json({
       dataBySite,
@@ -217,6 +219,7 @@ export const getDataQcDash = async (req, res) => {
       topTenStyle,
       dataTop3Def,
       dataTop3Part,
+      fullDefect,
       dataTotal: {
         totalTarget,
         totalChecked,
@@ -322,10 +325,8 @@ export const sumDefOrPart = async (data, keys) => {
   ];
 
   //short dari yang terbesar
-  dataSum.sort((a, b) => CompareBy(b, a, "DEFECT_QTY"));
-  const top5 = dataSum?.slice(0, 5);
+  const top5 = dataSum.sort((a, b) => CompareBy(b, a, "DEFECT_QTY"));
 
-  // lalu ambil 5 besar
   return top5;
 };
 
