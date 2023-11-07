@@ -86,35 +86,6 @@ export const getDataWeekly = async (req, res) => {
         .join(",");
       queryString = queryString + ` AND a.SITE_NAME IN (${sites})`;
     }
-    if (shift) {
-      const shifts = shift
-        .split(",")
-        .map((st) => `'${st}'`)
-        .join(",");
-      queryString = queryString + ` AND a.SHIFT IN (${shifts})`;
-    }
-    if (customers) {
-      const customerx = customers
-        .split("-")
-        .map((cust) => `'${decodeURIComponent(cust)}'`)
-        .join(",");
-      queryString = queryString + ` AND a.CUSTOMER_NAME IN (${customerx})`;
-    }
-    if (style) {
-      const styles = style
-        .split(",")
-        .map((stl) => `'${decodeURIComponent(stl)}'`)
-        .join(",");
-      queryString = queryString + ` AND a.PRODUCT_ITEM_CODE IN (${styles})`;
-    }
-    if (line) {
-      const lines = line
-        .split(",")
-        .map((st) => `'${st}'`)
-        .join(",");
-      queryString = queryString + ` AND a.ID_SITELINE IN (${lines})`;
-    }
-    // console.log(queryString);
 
     const whereQuery = QueryWeekRep(queryString);
     const weeklyDataS = await db.query(whereQuery, {
@@ -129,9 +100,9 @@ export const getDataWeekly = async (req, res) => {
       (datas) => datas.SCHD_PROD_DATE !== currentDate
     );
 
-    const totalSchQty = SumByColoum(weeklyData, "SCHD_QTY");
-    const totalTarget = SumByColoum(weeklyData, "TOTAL_TARGET");
-    const totalOuput = SumByColoum(weeklyData, "TOTAL_OUTPUT");
+    // const totalSchQty = SumByColoum(weeklyData, "SCHD_QTY");
+    // const totalTarget = SumByColoum(weeklyData, "TOTAL_TARGET");
+    // const totalOuput = SumByColoum(weeklyData, "TOTAL_OUTPUT");
     const totalEh = SumByColoum(weeklyData, "TOTAL_EH");
     const totalAh = SumByColoum(weeklyData, "TOTAL_AH");
     const totalNormal = SumByColoum(weeklyData, "NORMAL_OUTPUT");
@@ -147,8 +118,8 @@ export const getDataWeekly = async (req, res) => {
     const totalOtEff = JmlEff(totalOtEh, totalOtAh);
     const totalXOtEff = JmlEff(totalXotEh, totalXotAh);
     const totalEff = JmlEff(totalEh, totalAh);
-    const varTarget = totalOuput - totalTarget;
-    const varSchedule = totalOuput - totalSchQty;
+    // const varTarget = totalOuput - totalTarget;
+    // const varSchedule = totalOuput - totalSchQty;
 
     const dataByDate = await sumData(weeklyData, ["SCHD_PROD_DATE"]);
     const dataBySite = await sumData(weeklyData, ["SITE_NAME"]);

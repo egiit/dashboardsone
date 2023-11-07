@@ -16,7 +16,7 @@ import { sumData } from "./DashYtd.js";
 // get data weekly
 export const getSewFullYear = async (req, res) => {
   try {
-    const { rangeDate, site, shift, customers, style, line } = req.query;
+    const { rangeDate, site } = req.query;
 
     const dates = rangeDate.split(",");
     const currentDate = moment().format("YYYY-MM-DD");
@@ -32,34 +32,7 @@ export const getSewFullYear = async (req, res) => {
         .join(",");
       queryString = queryString + ` AND a.SITE_NAME IN (${sites})`;
     }
-    if (shift) {
-      const shifts = shift
-        .split(",")
-        .map((st) => `'${st}'`)
-        .join(",");
-      queryString = queryString + ` AND a.SHIFT IN (${shifts})`;
-    }
-    if (customers) {
-      const customerx = customers
-        .split("-")
-        .map((cust) => `'${decodeURIComponent(cust)}'`)
-        .join(",");
-      queryString = queryString + ` AND a.CUSTOMER_NAME IN (${customerx})`;
-    }
-    if (style) {
-      const styles = style
-        .split(",")
-        .map((stl) => `'${decodeURIComponent(stl)}'`)
-        .join(",");
-      queryString = queryString + ` AND a.PRODUCT_ITEM_CODE IN (${styles})`;
-    }
-    if (line) {
-      const lines = line
-        .split(",")
-        .map((st) => `'${st}'`)
-        .join(",");
-      queryString = queryString + ` AND a.ID_SITELINE IN (${lines})`;
-    }
+
     // console.log(queryString);
 
     const whereQuery = QueryMonthRep(queryString);
@@ -92,74 +65,61 @@ export const getSewFullYear = async (req, res) => {
       })
       .filter((we) => we.WE);
 
-    const totalSchQty = SumByColoum(yearData, "SCHD_QTY");
-    const totalTarget = SumByColoum(yearData, "TOTAL_TARGET");
-    const totalOuput = SumByColoum(yearData, "TOTAL_OUTPUT");
-    const totalEh = SumByColoum(yearData, "TOTAL_EH");
-    const totalAh = SumByColoum(yearData, "TOTAL_AH");
-    const totalNormal = SumByColoum(yearData, "NORMAL_OUTPUT");
-    const totalOt = SumByColoum(yearData, "OT_OUTPUT");
-    const totalXot = SumByColoum(yearData, "X_OT_OUTPUT");
-    const totalNormalEh = SumByColoum(yearData, "ACTUAL_EH");
-    const totalOtEh = SumByColoum(yearData, "ACTUAL_EH_OT");
-    const totalXotEh = SumByColoum(yearData, "ACTUAL_EH_X_OT");
-    const totalNormalAh = SumByColoum(yearData, "ACTUAL_AH");
-    const totalOtAh = SumByColoum(yearData, "ACTUAL_AH_OT");
-    const totalXotAh = SumByColoum(yearData, "ACTUAL_AH_X_OT");
-    const totalNormalEff = JmlEff(totalNormalEh, totalNormalAh);
-    const totalOtEff = JmlEff(totalOtEh, totalOtAh);
-    const totalXOtEff = JmlEff(totalXotEh, totalXotAh);
-    const totalEff = JmlEff(totalEh, totalAh);
-    const varTarget = totalOuput - totalTarget;
-    const varSchedule = totalOuput - totalSchQty;
-
-    const dataByWeek = await sumData(yearData, ["WE"]);
-    const dataByMonth = await sumData(yearData, ["MONTH"]);
-    const dataBySite = await sumData(yearData, ["SITE_NAME"]);
-    const dataByLine = (await sumData(yearData, ["ID_SITELINE"])).map(
-      (line) => ({
-        ...line,
-        CUS_LINE_NAME:
-          line.SHIFT === "Shift_B"
-            ? `${line.CUS_NAME}-${line.LINE_NAME}B`
-            : `${line.CUS_NAME}-${line.LINE_NAME}`,
-        LINE_NAME_SHIFT:
-          line.SHIFT === "Shift_B" ? `${line.LINE_NAME}B` : `${line.LINE_NAME}`,
-      })
+    const thisWeek = listWeekOneYear.find((week) =>
+      week.rangeDate.includes(dates[0])
     );
-    const dataByCustomer = (await sumData(yearData, ["CUSTOMER_NAME"])).filter(
+
+    const dataWeek = yearData.filter((weeks) => weeks.ID_WE === thisWeek.WE);
+    //filter berdasarkan month
+    const thisMonth = moment(dates[0], "YYYY-MM-DD").format("MMMM/YYYY");
+    // console.log({ thisMonth, thisWeek: thisWeek.WE });
+
+    const dataMonth = yearData.filter(
+      (months) => months.PRODUCTION_MONTH === thisMonth
+    );
+
+    //DATA EFF WEEK
+    const totalEhWeek = SumByColoum(dataWeek, "TOTAL_EH");
+    const totalAhWeek = SumByColoum(dataWeek, "TOTAL_AH");
+    const totalEffWeek = JmlEff(totalEhWeek, totalAhWeek);
+
+    //DATA EFF MONTH
+    const totalEhMonth = SumByColoum(dataMonth, "TOTAL_EH");
+    const totalAhMonth = SumByColoum(dataMonth, "TOTAL_AH");
+    const totalEffMonth = JmlEff(totalEhMonth, totalAhMonth);
+
+    //DATA EFF YEAR
+    const totalEhYear = SumByColoum(yearData, "TOTAL_EH");
+    const totalAhYear = SumByColoum(yearData, "TOTAL_AH");
+    const totalEffYear = JmlEff(totalEhYear, totalAhYear);
+
+    const dataByDate = await sumData(dataWeek, ["SCHD_PROD_DATE"]);
+    const dataByWeek = await sumData(dataMonth, ["WE"]);
+    const dataByMonth = await sumData(yearData, ["MONTH"]);
+    const dataByDateAndSiteWeek = await sumData(dataWeek, [
+      "SCHD_PROD_DATE",
+      "SITE_NAME",
+    ]);
+    const dataByDateAndSiteMonth = await sumData(dataMonth, [
+      "WE",
+      "SITE_NAME",
+    ]);
+    const dataByDateAndSiteY = await sumData(yearData, ["MONTH", "SITE_NAME"]);
+
+    const dataBySiteWeek = await sumData(dataWeek, ["SITE_NAME"]);
+    const dataBySiteMonth = await sumData(dataMonth, ["SITE_NAME"]);
+    const dataBySiteYear = await sumData(yearData, ["SITE_NAME"]);
+
+    const dataByCustomerY = (await sumData(yearData, ["CUSTOMER_NAME"])).filter(
       (style) => style.CUSTOMER_NAME !== null
     );
-    const dataByStyle = (await sumData(yearData, ["PRODUCT_ITEM_CODE"])).filter(
-      (stl) => stl.EFF !== 0
-    );
-    const dataByDateAndSite = await sumData(yearData, ["MONTH", "SITE_NAME"]);
-    // const dataByLineDate = ( //data untuk tabel
-    //   await sumData(yearData, ["PRODUCTION_MONTH", "ID_SITELINE"])
-    // )?.map((line) => ({
-    //   ID_SITELINE: line.ID_SITELINE,
-    //   SCHD_PROD_DATE: line.SCHD_PROD_DATE,
-    //   EFF: line.EFF,
-    //   TOTAL_OUTPUT: line.TOTAL_OUTPUT,
-    //   ACT_MP: line.ACT_MP,
-    // }));
+    const dataByCustomerMonth = (
+      await sumData(dataMonth, ["CUSTOMER_NAME"])
+    ).filter((style) => style.CUSTOMER_NAME !== null);
+    const dataByCustomerWeek = (
+      await sumData(dataWeek, ["CUSTOMER_NAME"])
+    ).filter((style) => style.CUSTOMER_NAME !== null);
 
-    // console.log(dataByLineDate);
-
-    let topTenStyle = [];
-    let bottomStyle = [];
-    //jika data by style lebih dari 10 maka slice untuk top ten dan bottom ten
-    if (dataByStyle.length > 0) {
-      const dataStyleSortEffTop = [
-        ...dataByStyle.sort((a, b) => CompareBy(b, a, "EFF")),
-      ];
-      const dataStyleSortEffBotom = [
-        ...dataByStyle.sort((a, b) => CompareBy(a, b, "EFF")),
-      ];
-
-      topTenStyle = dataStyleSortEffTop?.slice(0, 9);
-      bottomStyle = dataStyleSortEffBotom?.slice(0, 9);
-    }
     const colorsList = [
       { SITE_NAME: "SBR_01", colorSite: "#2983FF" },
       { SITE_NAME: "SBR_02A", colorSite: "#00E396" },
@@ -168,12 +128,32 @@ export const getSewFullYear = async (req, res) => {
       { SITE_NAME: "SBR_04", colorSite: "#775DD0" },
     ];
     // cari data berdasarkan site untuk chart weekly eff per date per site
-    const arrySeriesSite = dataBySite.map((site) => ({
+    const arrySeriesSiteYear = dataBySiteYear.map((site) => ({
       name: site.CUS_NAME,
       type: "column",
       color: colorsList.filter((clr) => clr.SITE_NAME === site.SITE_NAME)[0]
         .colorSite,
-      data: dataByDateAndSite
+      data: dataByDateAndSiteY
+        .filter((dateNsite) => dateNsite.SITE_NAME === site.SITE_NAME)
+        .map((val) => val.EFF?.toFixed(2)),
+    }));
+
+    const arrySeriesSiteMonth = dataBySiteMonth.map((site) => ({
+      name: site.CUS_NAME,
+      type: "column",
+      color: colorsList.filter((clr) => clr.SITE_NAME === site.SITE_NAME)[0]
+        .colorSite,
+      data: dataByDateAndSiteMonth
+        .filter((dateNsite) => dateNsite.SITE_NAME === site.SITE_NAME)
+        .map((val) => val.EFF?.toFixed(2)),
+    }));
+
+    const arrySeriesSiteWeek = dataBySiteWeek.map((site) => ({
+      name: site.CUS_NAME,
+      type: "column",
+      color: colorsList.filter((clr) => clr.SITE_NAME === site.SITE_NAME)[0]
+        .colorSite,
+      data: dataByDateAndSiteWeek
         .filter((dateNsite) => dateNsite.SITE_NAME === site.SITE_NAME)
         .map((val) => val.EFF?.toFixed(2)),
     }));
@@ -183,13 +163,30 @@ export const getSewFullYear = async (req, res) => {
       name: "OVERALL EFF",
       type: "line",
       color: "#008FFB",
+      data: dataByDate.map((dataDate) => dataDate.EFF?.toFixed(2)),
+    };
+    const arrayWeekEff = {
+      name: "OVERALL EFF",
+      type: "line",
+      color: "#008FFB",
+      data: dataByWeek.map((dataDate) => dataDate.EFF?.toFixed(2)),
+    };
+    const arrayMonthEff = {
+      name: "OVERALL EFF",
+      type: "line",
+      color: "#008FFB",
       data: dataByMonth.map((dataDate) => dataDate.EFF?.toFixed(2)),
     };
+
     //join data series antara by site dan summary eff per date
-    const dataSeriesWeek = [...arrySeriesSite, arrayDateEff];
+    const dataSeriesWeek = [...arrySeriesSiteWeek, arrayDateEff];
+    const dataSeriesMonth = [...arrySeriesSiteMonth, arrayWeekEff];
+    const dataSeriesYear = [...arrySeriesSiteYear, arrayMonthEff];
 
     //list date berdasarkan scheddule listWeek
-    const listDate = dataByMonth.map((dataDate) => dataDate.PRODUCTION_MONTH);
+    const listDate = dataByMonth.map((dataDate) => dataDate.SCHD_PROD_DATE);
+    const listWeek = dataByMonth.map((dataDate) => dataDate.WE_NAME);
+    const listMonth = dataByMonth.map((dataDate) => dataDate.PRODUCTION_MONTH);
 
     // ############### for table weekly summary ##############
     const startDate = moment(dates[0]);
@@ -199,59 +196,30 @@ export const getSewFullYear = async (req, res) => {
     //get range date
     const weekRangeDate = getRangeDate(rangesDates);
 
-    // const joinDataLineWeek = dataByLine.map((line) => {
-    //   //filter berdasarkanline
-    //   const dataEachDate = dataByLineDate.filter(
-    //     (dataDate) => dataDate.ID_SITELINE === line.ID_SITELINE
-    //   );
-
-    //   // cari total manpower table weekl to date
-    //   const mp = SumByColoum(dataEachDate, "ACT_MP");
-    //   const newLineData = {
-    //     ...line,
-    //     dataLineDate: dataEachDate,
-    //     TOTAL_MP: mp,
-    //   };
-    //   return newLineData;
-    // });
-
     // ############### end for table weekly summary ##############
 
     res.json({
-      dataByMonth,
-      dataBySite,
-      dataByCustomer,
-      dataByLine,
+      dataByCustomerY,
+      dataByCustomerMonth,
+      dataByCustomerWeek,
       dataSeriesWeek,
-      dataByStyle,
-      dataByWeek,
-      listDate, // listWeek,
-      topTenStyle,
-      bottomStyle,
-      weekRangeDate,
-      // joinDataLineWeek,
-      dataTotal: {
-        totalSchQty,
-        totalTarget,
-        totalOuput,
-        totalEh,
-        totalAh,
-        totalEff,
-        varTarget,
-        varSchedule,
-        totalNormal,
-        totalOt,
-        totalXot,
-        totalNormalEh,
-        totalOtEh,
-        totalXotEh,
-        totalNormalAh,
-        totalOtAh,
-        totalXotAh,
-        totalNormalEff,
-        totalOtEff,
-        totalXOtEff,
-      },
+      dataSeriesMonth,
+      dataSeriesYear,
+      dataBySiteWeek,
+      dataBySiteMonth,
+      dataBySiteYear,
+      totalEhWeek,
+      totalAhWeek,
+      totalEffWeek,
+      totalEhMonth,
+      totalAhMonth,
+      totalEffMonth,
+      totalEhYear,
+      totalAhYear,
+      totalEffYear,
+      listDate,
+      listWeek,
+      listMonth,
     });
   } catch (error) {
     console.log(error);

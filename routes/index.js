@@ -21,8 +21,11 @@ import qcEndlineRoute from "./production/qcEndlineNew.route.js";
 import packingroute from "./production/packing.route.js";
 import measurement from "./production/measurement.route.js";
 import sewDashboard from "./production/sewDashAnytic.router.js";
+import { getSites } from "../controllers/production/reports/SewSites.js";
 
 const router = express.Router();
+
+router.get("/test-connection", (req, res) => res.json({ conection: true }));
 
 router.post("/login", Login);
 router.post("/loginqc", LoginQc);
@@ -39,14 +42,10 @@ router.use("/holidays", holidaysRoute);
 router.use("/order", orderRoute);
 router.use("/cutting", cuttingRoute);
 router.use("/sewing", sewingRoute);
-router.use("/planning", planningRoute);
-router.use("/pocapacity", pocapacityRoute);
 router.use("/qc", qcroutes);
-router.use("/qc-endline", qcEndlineRoute);
 router.use("/reports", reportsrouter);
-router.use("/packing", packingroute);
-router.use("/measurement", measurement);
 router.use("/sewdashboard", sewDashboard);
+router.get("/list-sites", getSites);
 
 router.all("*", (req, res, next) => {
   next(new ExpressError("Page Not Found", 404));
