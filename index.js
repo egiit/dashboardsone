@@ -17,7 +17,7 @@ import { cronLogDialyOut } from "./cronjob/logDailyOutput.js";
 // import https from "https"; //untuk ssl
 // import bodyParser from 'body-parser';
 
-const PORT = 5001;
+const PORT = 5003;
 const app = express();
 
 const runDb = async () => {

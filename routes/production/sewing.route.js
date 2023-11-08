@@ -42,18 +42,18 @@ router.get("/smvlist", getListSmvHeader);
 router.get("/sewingsmvdetail/:orderNO", getSewingSmvDetail);
 router.get("/manpower-detail/:date/:site/:shift", getManpowerPlanVsActual);
 
-router.post("/sewingsmv", postSewingSmvHeader);
-router.post("/sewingsmvdetail", postSewingSmvDetail);
-router.post("/sewing-mp/generate", postRegenerateMp);
-router.post("/sewing-wh-detail/", postDailyWh);
-router.post("/order/scan", QRScanSewing);
-router.post("/ot-mp-wh/", postWhMpOt);
-router.post("/smv-plan/", postSmvPlan);
-router.post("/daily-remark/", postRemark);
+// router.post("/sewingsmv", postSewingSmvHeader);
+// router.post("/sewingsmvdetail", postSewingSmvDetail);
+// router.post("/sewing-mp/generate", postRegenerateMp);
+// router.post("/sewing-wh-detail/", postDailyWh);
+// router.post("/order/scan", QRScanSewing);
+// router.post("/ot-mp-wh/", postWhMpOt);
+// router.post("/smv-plan/", postSmvPlan);
+// router.post("/daily-remark/", postRemark);
 //clear daily selected
-router.post("/clear-selected/", clearMpAndWh);
+// router.post("/clear-selected/", clearMpAndWh);
 
-router.patch("/sewing-mp/", updateManpowerDefault);
+// router.patch("/sewing-mp/", updateManpowerDefault);
 
 //sewing wip monitoring
 router.get(

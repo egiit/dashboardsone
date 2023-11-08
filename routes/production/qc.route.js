@@ -44,11 +44,11 @@ router.get("/users", getListUserQc);
 router.get("/part", getListPart);
 router.get("/defect", getListDefect);
 
-router.post("/users", createUserQC);
-router.patch("/users", updateUserQc);
-router.patch("/delete/users/:id", deleteUserQC);
+// router.post("/users", createUserQC);
+// router.patch("/users", updateUserQc);
+// router.patch("/delete/users/:id", deleteUserQC);
 
-router.post("/endline/act-manpower", SetActualMp);
+// router.post("/endline/act-manpower", SetActualMp);
 
 //planning size endline
 router.get(
@@ -77,13 +77,13 @@ router.get(
 router.get("/endline/defect/:schdid/:size", getDefForRepair);
 
 //post qc endline tablet
-router.post("/endline/output", postEndlineOutput);
-router.post("/endline/plansize", planSizePost);
-router.patch("/endline/plansize", planSizeUpdate);
-router.patch("/endline/repaired", repairedProccess);
-router.post("/endline/qr/transfer", sewingScanOut);
-router.post("/endline/plan/remarks", postUpdtEndlineRmks);
-router.post("/endline/qr/return", postReturnBdl);
+// router.post("/endline/output", postEndlineOutput);
+// router.post("/endline/plansize", planSizePost);
+// router.patch("/endline/plansize", planSizeUpdate);
+// router.patch("/endline/repaired", repairedProccess);
+// router.post("/endline/qr/transfer", sewingScanOut);
+// router.post("/endline/plan/remarks", postUpdtEndlineRmks);
+// router.post("/endline/qr/return", postReturnBdl);
 
 //undo
 router.patch("/endline/undo", handleUndo);
