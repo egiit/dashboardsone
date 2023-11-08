@@ -49,17 +49,7 @@ function logOriginalUrl(req, res, next) {
   next();
 }
 
-var whitelist = [
-  "http://localhost:3000",
-  "http://localhost:3001",
-  "http://192.168.1.192:3001",
-  "http://192.168.1.96:3000",
-  "http://192.168.1.192:3000",
-  "https://spmqc.sumbiri.com",
-  "https://spmqc1.sumbiri.com",
-  "https://spm.sumbiri.com",
-  "https://api.sumbiri.com",
-];
+var whitelist = ["http://localhost:3000", "http://summit-monitor.sumbiri.com"];
 
 // const options = {
 //   key: fs.readFileSync("server.key"),
