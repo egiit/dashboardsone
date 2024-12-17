@@ -49,7 +49,15 @@ function logOriginalUrl(req, res, next) {
   next();
 }
 
-var whitelist = ["http://localhost:3000", "http://summit-monitor.sumbiri.com"];
+var whitelist = [
+  "http://localhost:3000",
+  "http://summit-monitor.sumbiri.com",
+  "http://summittvsewingstay.sumbiri.com",
+  "http://summittvsewingrunning.sumbiri.com",
+  "http://summittvqualityrunning.sumbiri.com",
+  "http://summittvqualitystay.sumbiri.com",
+  "http://summittvcuttingstay.sumbiri.com",
+ ];
 
 // const options = {
 //   key: fs.readFileSync("server.key"),
