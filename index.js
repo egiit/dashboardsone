@@ -52,6 +52,7 @@ function logOriginalUrl(req, res, next) {
 var whitelist = [
   "http://localhost:3000",
   "http://summit-monitor.sumbiri.com",
+  "https://summit-monitor.sumbiri.com",
   "http://summittvsewingstay.sumbiri.com",
   "http://summittvsewingrunning.sumbiri.com",
   "http://summittvqualityrunning.sumbiri.com",

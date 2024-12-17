@@ -1,11 +1,18 @@
 import Moment from "moment";
 import momentRange from "moment-range";
+// import multer from "multer";
 const moment = momentRange.extendMoment(Moment);
 
 export const CheckNilai = (nilai) => {
   if (!nilai || isNaN(nilai)) return 0;
 
   return nilai;
+};
+
+export const CheckNilaiToint = (nilai) => {
+  if (!nilai || isNaN(nilai)) return 0;
+
+  return parseInt(nilai);
 };
 
 export const totalCol = (dataTable, namecol) => {
@@ -168,3 +175,155 @@ export function getRangeDate(newDate) {
     day.format("YYYY-MM-DD")
   );
 }
+
+export function customSortByLetterFirst(arrOfObj, key) {
+  return arrOfObj.sort((a, b) => {
+    const matchA = a[key].match(/(\d+)(\D+)/);
+    const matchB = b[key].match(/(\d+)(\D+)/);
+
+    // Handle cases where there is no match (only letters)
+    if (!matchA && !matchB) {
+      // Return default order (unchanged)
+      return 0;
+    } else if (!matchA) {
+      // A has only letters, should come after B
+      return 1;
+    } else if (!matchB) {
+      // B has only letters, should come after A
+      return -1;
+    }
+
+    // Both have the pattern with numbers and letters
+    const [numA, letterA] = matchA.slice(1);
+    const [numB, letterB] = matchB.slice(1);
+
+    if (letterA < letterB) return -1;
+    if (letterA > letterB) return 1;
+
+    return numA - numB;
+  });
+}
+
+// export function customSortByLetterFirst(arrOfObj, key) {
+//   return arrOfObj.sort((a, b) => {
+//     const [numA, letterA] = a[key].match(/(\d+)(\D+)/).slice(1);
+//     const [numB, letterB] = b[key].match(/(\d+)(\D+)/).slice(1);
+
+//     if (letterA < letterB) return -1;
+//     if (letterA > letterB) return 1;
+
+//     return numA - numB;
+//   });
+// }
+
+export function customSortByNumberFirst(arrOfObj, key) {
+  return arrOfObj.sort((a, b) => {
+    const [numA, letterA] = a[key].match(/(\d+)(\D+)/).slice(1);
+    const [numB, letterB] = b[key].match(/(\d+)(\D+)/).slice(1);
+
+    if (numA !== numB) {
+      return numA - numB;
+    }
+
+    if (letterA < letterB) return -1;
+    if (letterA > letterB) return 1;
+
+    return 0; // Angka dan huruf sama
+  });
+}
+
+export function cstmArrSortSizeByLetter(arr) {
+  return arr.sort((a, b) => {
+    // Pisahkan angka dan huruf
+    const [numA, letterA] = a.match(/(\d+)(\D+)/).slice(1);
+    const [numB, letterB] = b.match(/(\d+)(\D+)/).slice(1);
+
+    // Bandingkan huruf dulu
+    if (letterA < letterB) return -1;
+    if (letterA > letterB) return 1;
+
+    // Jika huruf sama, bandingkan angka
+    return numA - numB;
+  });
+}
+
+export function cstArrSortByNumberFirst(arr) {
+  return arr.sort((a, b) => {
+    // Pisahkan angka dan huruf
+    const [numA, letterA] = a.match(/(\d+)(\D+)/).slice(1);
+    const [numB, letterB] = b.match(/(\d+)(\D+)/).slice(1);
+
+    // Bandingkan angka dulu
+    if (numA !== numB) {
+      return numA - numB;
+    }
+
+    // Jika angka sama, bandingkan huruf
+    if (letterA < letterB) return -1;
+    if (letterA > letterB) return 1;
+
+    return 0; // Angka dan huruf sama
+  });
+}
+
+export function replaceMonthToIndonesian(dateStr) {
+  // English to Indonesian month mapping
+  const monthMapping = {
+    January: "Januari",
+    February: "Februari",
+    March: "Maret",
+    April: "April",
+    May: "Mei",
+    June: "Juni",
+    July: "Juli",
+    August: "Agustus",
+    September: "September",
+    October: "Oktober",
+    November: "November",
+    December: "Desember",
+  };
+
+  // Replace each English month with the corresponding Indonesian month
+  for (const [engMonth, indMonth] of Object.entries(monthMapping)) {
+    const regex = new RegExp(engMonth, "g"); // create regex to match all instances
+    dateStr = dateStr.replace(regex, indMonth);
+  }
+
+  return dateStr;
+}
+
+export function convertMonthToRoman(monthNumber) {
+  // Array of Roman numerals for each month (1-12)
+  const romanMonths = [
+    "I", // January
+    "II", // February
+    "III", // March
+    "IV", // April
+    "V", // May
+    "VI", // June
+    "VII", // July
+    "VIII", // August
+    "IX", // September
+    "X", // October
+    "XI", // November
+    "XII", // December
+  ];
+
+  // Check if month number is valid (1-12)
+  if (monthNumber < 1 || monthNumber > 12) {
+    return "Invalid month number";
+  }
+
+  // Return the corresponding Roman numeral
+  return romanMonths[monthNumber - 1];
+}
+
+
+// export const EmpPhotos = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, '../../assets/images/photos/'); // Specify the destination folder for uploads
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, Date.now() + path.extname(file.originalname)); // Use timestamp to avoid filename conflicts
+//   },
+// });

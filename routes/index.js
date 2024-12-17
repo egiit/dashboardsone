@@ -40,7 +40,7 @@ router.get("/test-connection", (req, res) => res.json({ conection: true }));
 // router.use("/user", userRoute);
 router.use("/holidays", holidaysRoute);
 // router.use("/order", orderRoute);
-// router.use("/cutting", cuttingRoute);
+router.use("/cutting", cuttingRoute);
 router.use("/sewing", sewingRoute);
 router.use("/qc", qcroutes);
 router.use("/reports", reportsrouter);
