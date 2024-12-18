@@ -195,6 +195,34 @@ export const getDataQcSum = async (req, res) => {
       }))
       ?.slice(0, 5);
 
+      //ambil data top 5 line with defect rate tiap Site
+      let chartTop5Line = []
+    if (dataBySite && dataByLine) {
+      const dataHiLine = dataBySite.map((item) => {
+        const dataline = dataByLine
+          .filter((len) => len.SITE_NAME === item.SITE_NAME)
+          ?.map((itm) => ({
+            ID_SITELINE: itm.ID_SITELINE,
+            SITE_NAME: itm.SITE_NAME,
+            LINE_NAME: itm.LINE_NAME,
+            percentDefect: itm.percentDefect,
+          }));
+          
+        dataline.sort((a, b) => b.percentDefect - a.percentDefect);
+
+        const data5 = dataline.slice(0, 5);
+
+        const dataEachSite = {
+          SITE_NAME: item.SITE_NAME,
+          CUS_NAME: item.CUS_NAME,
+          dataChart: data5,
+        };
+
+        return dataEachSite;
+      });
+
+      chartTop5Line = dataHiLine || []
+    }
     res.json({
       dataBySite,
       dataByCustomer,
@@ -205,6 +233,7 @@ export const getDataQcSum = async (req, res) => {
       topTenStyle,
       dataTop3Def,
       dataTop3Part,
+      chartTop5Line,
       fullDefect,
       dataTotal: {
         totalTarget,
