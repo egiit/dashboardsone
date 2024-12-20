@@ -7,7 +7,7 @@ import {
   QueryMainSewDash,
   QueryMainSewDashPast,
 } from "../../../models/dashAnalitycs/mainDashSew.js";
-import { CheckNilai, findRTT, totalCol } from "../../util/Utility.js";
+import { CheckNilai, findRTT, JmlEff, totalCol } from "../../util/Utility.js";
 import moment from "moment/moment.js";
 
 //query get data All size dash
@@ -151,17 +151,17 @@ export const sumByLine = async (req, res, next) => {
     ];
 
     //maping untuk mencari RTT
-    // const dataDasrboard = dataByLine.map((site) => ({
-    //   ...site,
-    //   RTT: findRTT(
-    //     site.SHIFT,
-    //     site.STARTH,
-    //     site.ENDH,
-    //     site.SCHD_PROD_DATE,
-    //     site.ACT_TARGET,
-    //     site.TPPM_NORMAL
-    //   ),
-    // }));
+    const dataByLineEff = dataByLine.map((line) => {
+      const TOTAL_EH = chkNilaiMin(
+        line.ACTUAL_EH + line.ACTUAL_EH_OT + line.ACTUAL_EH_X_OT
+      );
+      const TOTAL_AH = chkNilaiMin(
+        line.ACTUAL_AH + line.ACTUAL_AH_OT + line.ACTUAL_AH_X_OT
+      );
+      const EFF = JmlEff(TOTAL_EH, TOTAL_AH);
+
+      return { ...line, TOTAL_EH, TOTAL_AH, EFF };
+    })?.filter(itm => itm.TOTAL_AH)
 
     //get total manpower
     //filter data yang hanya memiliki act manpower
@@ -176,6 +176,7 @@ export const sumByLine = async (req, res, next) => {
     const actlMp = totalCol(distSiteline, "ACT_MP");
     const planMp = totalCol(distSiteline, "PLAN_MP");
     req.ttlMP = { actlMp, planMp };
+    req.dataByLineEff = dataByLineEff;
     req.dataDash = dataByLine;
     next();
   } catch (error) {
@@ -190,6 +191,7 @@ export const sumByLine = async (req, res, next) => {
 export const splitDataDashboard = async (req, res) => {
   try {
     const dataDash = req.dataDash;
+    const dataByLine = req.dataByLineEff;
     const resultCards = makeSumAll(dataDash);
 
     const dataBySite = [
@@ -261,10 +263,44 @@ export const splitDataDashboard = async (req, res) => {
     dataBySite.sort(compare);
     // console.log(dataBySite);
 
+    //ambil data top 5 line with defect rate tiap Site
+    let chartTop5Line = [];
+    if (dataBySite && dataByLine) {
+      const dataHiLine = dataBySite.map((item) => {
+        const dataline = dataByLine
+          .filter((len) => len.SITE_NAME === item.SITE_NAME)
+          ?.map((itm) => ({
+            ID_SITELINE: itm.ID_SITELINE,
+            SITE_NAME: itm.SITE_NAME,
+            LINE_NAME: itm.LINE_NAME,
+            NAME: itm.LINE_NAME,
+            TOTAL_EH: itm.TOTAL_EH,
+            TOTAL_AH: itm.TOTAL_AH,
+            EFF: itm.EFF,
+          }));
+
+        dataline.sort((a, b) => a.EFF - b.EFF);
+
+        const data5 = dataline.slice(0, 5);
+
+        const dataEachSite = {
+          SITE_NAME: item.SITE_NAME,
+          CUS_NAME: item.CUS_NAME,
+          dataChart: data5,
+        };
+
+        // console.log(dataEachSite);
+        return dataEachSite;
+      });
+
+      chartTop5Line = dataHiLine || [];
+    }
+    
     return res.status(200).json({
       success: true,
       dataCards: resultCards,
       dataBySite: dataBySite,
+      chartTop5Line: chartTop5Line,
       ttlMP: req.ttlMP,
     });
   } catch (error) {
