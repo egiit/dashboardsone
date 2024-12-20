@@ -227,11 +227,11 @@ function getDataBanner(dataDash) {
 export const getLoadPlanVsActual = async (req, res) => {
   try {
     const { date, site } = req.query;
-    let stringQryPlan = `cs.CUT_LOAD_DATE = '${date}'`;
+    let stringQryPlan = `a.CUT_LOAD_DATE = '${date}'`;
     let stringQryActual = `lcd.TRANS_DATE = '${date}'`;
 
     if (site) {
-      stringQryPlan = stringQryPlan + ` csl.CUT_SITE_NAME '${site}'`;
+      stringQryPlan = stringQryPlan + ` a.CUT_SITE_NAME '${site}'`;
       stringQryActual = stringQryActual + ` lcd.CUT_SITE '${site}' `;
     }
 
