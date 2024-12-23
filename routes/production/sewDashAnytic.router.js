@@ -18,7 +18,7 @@ import {
   getDataWeekly,
   getYtdListWe,
 } from "../../controllers/production/dashAnalitycs/DashYtd.js";
-import { getDataMtd } from "../../controllers/production/dashAnalitycs/DashMtd.js";
+import { getDataMtd, getDataMtdRadialOnly } from "../../controllers/production/dashAnalitycs/DashMtd.js";
 import {
   getDataQcDash,
   getTarget,
@@ -62,5 +62,6 @@ router.get("/ytd/list-we/:year", getYtdListWe);
 router.get("/ytd/weekly", getDataWeekly);
 router.get("/ytd/monthly", getDataMtd);
 router.get("/ytd/year", getSewFullYear);
+router.get("/ytd/monthly-radial-only", getDataMtdRadialOnly);
 
 export default router;
