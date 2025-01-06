@@ -23,6 +23,11 @@ import measurement from "./production/measurement.route.js";
 import sewDashboard from "./production/sewDashAnytic.router.js";
 import { getSites } from "../controllers/production/reports/SewSites.js";
 
+// import hrRoute from "./hr/employe.route.js";
+// import attandance from "./hr/attandance.router.js";
+// import absen from "./hr/absens.router.js";
+import hrdashboard from "./hr/hrDash.route.js";
+
 const router = express.Router();
 
 router.get("/test-connection", (req, res) => res.json({ conection: true }));
@@ -46,6 +51,11 @@ router.use("/qc", qcroutes);
 router.use("/reports", reportsrouter);
 router.use("/sewdashboard", sewDashboard);
 router.get("/list-sites", getSites);
+
+// router.use("/hr", hrRoute);
+// router.use("/attandance", attandance);
+// router.use("/absensi", absen);
+router.use("/hrdashboard", hrdashboard);
 
 router.all("*", (req, res, next) => {
   next(new ExpressError("Page Not Found", 404));
