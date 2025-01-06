@@ -54,6 +54,7 @@ var whitelist = [
   "http://summit-monitor.sumbiri.com",
   "https://summit-monitor.sumbiri.com",
   "http://summittvsewingstay.sumbiri.com",
+  "http://summittvhrstay.sumbiri.com",
   "http://summittvsewingrunning.sumbiri.com",
   "http://summittvqualityrunning.sumbiri.com",
   "http://summittvqualitystay.sumbiri.com",
