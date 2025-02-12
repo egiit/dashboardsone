@@ -291,7 +291,7 @@ export const getReportMonth = async (req, res) => {
        
         const data = monthlyDatas.filter(month => month['CUS_NAME'] === item);
         const dataDate = data.map(date => moment(date.SCHD_PROD_DATE, 'YYYY-MM-DD').format('MMM-DD'))
-        const dataEff = data.map(eff => (eff.EFF).toFixed(2))
+        const dataEff = data.map(eff => eff.EFF ? (eff.EFF).toFixed(2) : 0)
         const dataTotPut = data.map(qty => qty.TOTAL_OUTPUT)
 
         const category = dataDate
