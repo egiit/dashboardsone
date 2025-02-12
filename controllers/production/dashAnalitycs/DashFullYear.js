@@ -1,6 +1,6 @@
 import { QueryTypes, Op } from "sequelize";
 import moment from "moment";
-import { QueryMonthRep } from "../../../models/dashAnalitycs/sewYtdDash.js";
+import { queryGetMonthDash, QueryMonthRep } from "../../../models/dashAnalitycs/sewYtdDash.js";
 import db from "../../../config/database.js";
 import {
   CheckNilai,
@@ -274,3 +274,49 @@ export const getListWe = async (year) => {
     return [];
   }
 };
+
+
+export const getReportMonth = async (req, res) => {
+  try {
+    const { dates } = req.params;
+    
+    const monthlyDatas = await db.query(queryGetMonthDash, {
+      replacements : {dates},
+      type: QueryTypes.SELECT,
+    });
+
+    const unixSite = [...new Set(monthlyDatas.map(item => item['CUS_NAME']))];
+    
+      const structurData = unixSite.map(item => {
+       
+        const data = monthlyDatas.filter(month => month['CUS_NAME'] === item);
+        const dataDate = data.map(date => moment(date.SCHD_PROD_DATE, 'YYYY-MM-DD').format('MMM-DD'))
+        const dataEff = data.map(eff => (eff.EFF).toFixed(2))
+        const dataTotPut = data.map(qty => qty.TOTAL_OUTPUT)
+
+        const category = dataDate
+        const series = [
+          {
+            name: "Output Qty",
+            type: "area",
+            data: dataTotPut,
+          },
+          {
+            name: "Efficiency (%)",
+            type: "line",
+            data: dataEff,
+          }
+        ]
+         return {site : item, category, series}
+
+      })
+
+      // console.log(structurData);
+      
+    return res.status(200).json({ data : structurData });
+  } catch (error) {
+    console.log(error);
+    
+    return res.status(500).json({ message: "Somthing when wrong" });
+  }
+} 

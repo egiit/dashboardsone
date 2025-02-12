@@ -25,7 +25,7 @@ import {
   getTopDefectPartYes,
 } from "../../controllers/production/dashAnalitycs/DashQcDay.js";
 import { getDataQcSum } from "../../controllers/production/dashAnalitycs/DashQcSum.js";
-import { getSewFullYear } from "../../controllers/production/dashAnalitycs/DashFullYear.js";
+import { getReportMonth, getSewFullYear } from "../../controllers/production/dashAnalitycs/DashFullYear.js";
 
 const router = express.Router();
 
@@ -63,5 +63,8 @@ router.get("/ytd/weekly", getDataWeekly);
 router.get("/ytd/monthly", getDataMtd);
 router.get("/ytd/year", getSewFullYear);
 router.get("/ytd/monthly-radial-only", getDataMtdRadialOnly);
+
+//monthly dashboard
+router.get("/month-dashboard/:dates", getReportMonth);
 
 export default router;
