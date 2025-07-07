@@ -13,6 +13,7 @@ import holidaysRoute from "./setup/holidays.route.js";
 import orderRoute from "./production/order.route.js";
 import cuttingRoute from "./production/cutting.route.js";
 import sewingRoute from "./production/sewing.route.js";
+import machineRoute from "./machine/machine.route.js";
 import planningRoute from "./production/planning.route.js";
 import pocapacityRoute from "./production/poByCap.route.js";
 import reportsrouter from "./production/reports.router.js";
@@ -48,6 +49,7 @@ router.use("/holidays", holidaysRoute);
 router.use("/cutting", cuttingRoute);
 router.use("/sewing", sewingRoute);
 router.use("/qc", qcroutes);
+router.use("/machine", machineRoute)
 router.use("/reports", reportsrouter);
 router.use("/sewdashboard", sewDashboard);
 router.get("/list-sites", getSites);

@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import db from "./config/database.js";
 import db2 from "./config/database.js";
+import { Server } from 'socket.io'
 
 dotenv.config();
 import cookieParser from "cookie-parser";
@@ -12,6 +13,8 @@ import cron from "node-cron";
 import sumbiriOneRoute from "./routes/index.js";
 import { funcReschedule } from "./cronjob/cronSchdVsActual.js";
 import { cronLogDialyOut } from "./cronjob/logDailyOutput.js";
+import * as http from "http";
+import {setupWebSocket} from "./controllers/soket/soket.js";
 
 // import fs from "fs"; //untuk ssl
 // import https from "https"; //untuk ssl
@@ -51,6 +54,8 @@ function logOriginalUrl(req, res, next) {
 
 var whitelist = [
   "http://localhost:3000",
+  "http://localhost:3001",
+  "http://localhost:3002",
   "http://summit-monitor.sumbiri.com",
   "https://summit-monitor.sumbiri.com",
   "http://summittvsewingstay.sumbiri.com",
@@ -88,6 +93,28 @@ app.use(cookieParser());
 app.use(express.json({ limit: "45mb" }));
 app.use(FileUpload());
 
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: function (origin, callback) {
+      if (!origin || whitelist.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST"]
+  }
+});
+
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
+setupWebSocket(io)
+
 app.use("/", sumbiriOneRoute);
 
-app.listen(PORT, () => console.log(`Server Runing On port : ${PORT}`));
+server.listen(PORT, () => console.log(`Server Runing On port : ${PORT}`));
