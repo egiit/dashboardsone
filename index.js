@@ -65,7 +65,9 @@ var whitelist = [
   "http://summittvqualitystay.sumbiri.com",
   "http://summittvcuttingstay.sumbiri.com",
   "http://sewingmonthly-monitor.sumbiri.com/",
- ];
+  "https://line-service.sumbiri.com",
+  "https://spm.sumbiri.com"
+];
 
 // const options = {
 //   key: fs.readFileSync("server.key"),
