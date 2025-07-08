@@ -66,7 +66,8 @@ var whitelist = [
   "http://summittvcuttingstay.sumbiri.com",
   "http://sewingmonthly-monitor.sumbiri.com/",
   "https://line-service.sumbiri.com",
-  "https://spm.sumbiri.com"
+  "https://spm.sumbiri.com",
+  "http://dashboard-mechanic.sumbiri.com"
 ];
 
 // const options = {
