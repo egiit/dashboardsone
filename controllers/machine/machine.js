@@ -132,7 +132,7 @@ export const getDownTimeById = async (req, res) => {
 export const updateDownTime = async (req, res) => {
     try {
         const { id } = req.params;
-        const { START_TIME, END_TIME, DESCRIPTION, MACHINE_ID, STORAGE_INVENTORY_ID, MECHANIC_ID, ID_SITELINE, SCHD_ID } = req.body;
+        const { START_TIME, RESPONSE_TIME, END_TIME, DESCRIPTION, MACHINE_ID, STORAGE_INVENTORY_ID, MECHANIC_ID, ID_SITELINE, SCHD_ID } = req.body;
 
         const downTime = await MecDownTimeModel.findByPk(id);
 
@@ -147,6 +147,7 @@ export const updateDownTime = async (req, res) => {
         await downTime.update({
             START_TIME,
             END_TIME,
+            RESPONSE_TIME,
             DESCRIPTION,
             MACHINE_ID,
             STORAGE_INVENTORY_ID,
@@ -218,6 +219,7 @@ export const updateStatusOnFix = async (req, res) => {
             {
                 MECHANIC_ID,
                 STATUS: "ON_FIX",
+                RESPONSE_TIME: new Date(),
                 UPDATED_AT: new Date(),
             },
             {
