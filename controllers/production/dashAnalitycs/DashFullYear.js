@@ -183,7 +183,7 @@ export const getSewFullYear = async (req, res) => {
     const dataSeriesMonth = [...arrySeriesSiteMonth, arrayWeekEff];
     const dataSeriesYear = [...arrySeriesSiteYear, arrayMonthEff];
 
-    //list date berdasarkan scheddule listWeek
+    //storage date berdasarkan scheddule listWeek
     const listDate = dataByMonth.map((dataDate) => dataDate.SCHD_PROD_DATE);
     const listWeek = dataByMonth.map((dataDate) => dataDate.WE_NAME);
     const listMonth = dataByMonth.map((dataDate) => dataDate.PRODUCTION_MONTH);

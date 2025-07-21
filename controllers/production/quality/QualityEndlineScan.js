@@ -74,7 +74,7 @@ export const SetActualMp = async (req, res) => {
   }
 };
 
-//get qr list
+//get qr storage
 export const GetQrSewingIn = async (req, res) => {
   try {
     //line name disini tidak dipakai tapi dipakai untuk tablet
@@ -241,7 +241,7 @@ export const handleUndo = async (req, res) => {
   }
 };
 
-//get list plan size for main table
+//get storage plan size for main table
 export const getPlanningEendBySize = async (req, res) => {
   try {
     const { schDate, sitename, linename, userId } = req.params;
@@ -282,7 +282,7 @@ export const getDataQcEndSizeResult = async (req, res) => {
   }
 };
 
-//get list defect for Repaired
+//get storage defect for Repaired
 export const getDefForRepair = async (req, res) => {
   try {
     const { schdid, size } = req.params;

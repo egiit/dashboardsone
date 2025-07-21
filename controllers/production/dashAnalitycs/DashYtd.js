@@ -198,7 +198,7 @@ export const getDataWeekly = async (req, res) => {
     //join data series antara by site dan summary eff per date
     const dataSeriesWeek = [...arrySeriesSite, arrayDateEff];
 
-    //list date berdasarkan scheddule
+    //storage date berdasarkan scheddule
     const listDate = dataByDate.map((dataDate) => dataDate.SCHD_PROD_DATE);
 
     // ############### for table weekly summary ##############

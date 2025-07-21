@@ -23,7 +23,7 @@ import {
 import { WeekSchDetail } from "../../../models/planning/weekLyPlan.mod.js";
 import moment from "moment";
 
-//get list schedule size
+//get storage schedule size
 export const getEndlineSchSize = async (req, res) => {
   try {
     const { schDate, sitename, linename } = req.params;
@@ -66,7 +66,7 @@ export const getQrListActive = async (req, res) => {
   }
 };
 
-//qet qr list pennding
+//qet qr storage pennding
 export const getQrListPenddingNew = async (req, res) => {
   try {
     const { schDate, sitename, linename } = req.params;

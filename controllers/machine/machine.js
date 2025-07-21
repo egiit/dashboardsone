@@ -1,5 +1,7 @@
 import {MecDownTimeModel, MecListMachine} from "../../models/machine/machine.mod.js"
 import {Op} from "sequelize";
+import StorageInventoryLogModel from "../../models/storage/StorageInventoryLog.js";
+import {EnumStorage} from "../../enum/general.js";
 
 export const createDownTime = async (req, res) => {
     try {
@@ -244,7 +246,7 @@ export const updateStatusOnFix = async (req, res) => {
 
 export const updateStatusAction = async (req, res) => {
     try {
-        const { STORAGE_INVENTORY_ID, MACHINE_ID, STATUS } = req.body;
+        const { STORAGE_INVENTORY_ID, MACHINE_ID, STATUS, USER_ID } = req.body;
 
         if (!STORAGE_INVENTORY_ID || !MACHINE_ID || !STATUS) {
             return res.status(400).json({
@@ -281,7 +283,14 @@ export const updateStatusAction = async (req, res) => {
             await machine.update({
                 STATUS: "BROKEN",
                 IS_REPLACE: true,
+                STORAGE_INVENTORY_ID: EnumStorage(),
             });
+            StorageInventoryLogModel.create({
+                STORAGE_INVENTORY_ID: EnumStorage(),
+                MACHINE_ID: MACHINE_ID,
+                USER_ADD_ID: USER_ID,
+                DESCRIPTION: 'REPLACE MACHINE'
+            })
         } else {
             await machine.update({
                 STATUS: "NORMAL",

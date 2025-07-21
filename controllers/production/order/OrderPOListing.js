@@ -217,7 +217,7 @@ export const newOrderPOListingSizes = async (req, res) => {
       });
     }
 
-    //get list of month for destroy data befor post new data
+    //get storage of month for destroy data befor post new data
     const listMonth = [
       ...new Set(dataOrder.map((item) => item.PRODUCTION_MONTH)),
     ];

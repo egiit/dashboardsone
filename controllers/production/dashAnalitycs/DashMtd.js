@@ -201,7 +201,7 @@ export const getDataMtd = async (req, res) => {
     //join data series antara by site dan summary eff per date
     const dataSeriesWeek = [...arrySeriesSite, arrayDateEff];
 
-    //list date berdasarkan scheddule listWeek
+    //storage date berdasarkan scheddule listWeek
     const listDate = dataByWeek.map((dataDate) => dataDate.WE_NAME);
 
     // ############### for table weekly summary ##############
@@ -459,7 +459,7 @@ export const getDataMtdRadialOnly = async (req, res) => {
     // //join data series antara by site dan summary eff per date
     // const dataSeriesWeek = [...arrySeriesSite, arrayDateEff];
 
-    // //list date berdasarkan scheddule listWeek
+    // //storage date berdasarkan scheddule listWeek
     // const listDate = dataByWeek.map((dataDate) => dataDate.WE_NAME);
 
     // // ############### for table weekly summary ##############

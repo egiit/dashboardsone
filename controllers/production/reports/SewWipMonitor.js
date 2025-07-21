@@ -74,7 +74,7 @@ export const trackingByWipMontioring = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(404).json({
-      message: "error processing get data list tracking",
+      message: "error processing get data storage tracking",
       data: error,
     });
   }

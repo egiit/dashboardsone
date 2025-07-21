@@ -16,7 +16,7 @@ import {
   QurTablPlanQcEndRep,
 } from "../../../models/production/qcEndRep.mod.js";
 
-//get list plan size for main table
+//get storage plan size for main table
 export const getPlanningEendReport = async (req, res) => {
   try {
     const { schDate, sitename, shift } = req.params;
@@ -42,7 +42,7 @@ export const getPlanningEendReport = async (req, res) => {
   }
 };
 
-//get list qc endline check per hour
+//get storage qc endline check per hour
 export const getQcEndCheckPerHour = async (req, res) => {
   try {
     const { schDate, idSiteLine, schdId } = req.params;
@@ -68,7 +68,7 @@ export const getQcEndCheckPerHour = async (req, res) => {
   }
 };
 
-//get list qc endline check per hour
+//get storage qc endline check per hour
 export const getQcEndSumPartDefCode = async (req, res) => {
   try {
     const { schDate, idSiteLine, schdId } = req.params;
@@ -94,7 +94,7 @@ export const getQcEndSumPartDefCode = async (req, res) => {
   }
 };
 
-//get list qc endline check per hour
+//get storage qc endline check per hour
 export const getQcEndChckTablet = async (req, res) => {
   try {
     const { schDate, idSiteLine } = req.params;
@@ -120,7 +120,7 @@ export const getQcEndChckTablet = async (req, res) => {
   }
 };
 
-//get list qc endline check per hour tablet
+//get storage qc endline check per hour tablet
 export const getQcEndDefReprTblt = async (req, res) => {
   try {
     const { schDate, idSiteLine } = req.params;
@@ -145,7 +145,7 @@ export const getQcEndDefReprTblt = async (req, res) => {
   }
 };
 
-//get list detail defect
+//get storage detail defect
 export const getDailyDefDetail = async (req, res) => {
   try {
     const { schDate, sitename, shift } = req.params;
@@ -171,7 +171,7 @@ export const getDailyDefDetail = async (req, res) => {
   }
 };
 
-//get list detail defect Sumary
+//get storage detail defect Sumary
 export const getDailyDefDetailSum = async (req, res) => {
   try {
     const { schDate, sitename, shift } = req.params;

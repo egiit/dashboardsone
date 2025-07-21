@@ -46,7 +46,7 @@ GROUP BY b.MANUFACTURING_SITE, b.CUSTOMER_NAME, a.SCH_CAPACITY_ID,  a.SCH_ID_SIT
 // WHERE a.SCH_PROD_MONTH BETWEEN :startMonth AND :endMonth AND  b.MANUFACTURING_SITE = :siteName
 // GROUP BY b.MANUFACTURING_SITE, b.CUSTOMER_NAME, a.SCH_CAPACITY_ID,  a.SCH_ID_SITELINE`;
 
-//query list buyer capacity by site
+//query storage buyer capacity by site
 export const QueryGetBuyerLis = `SELECT a.PRODUCTION_MONTH, a.PROD_MONTH, a.MANUFACTURING_SITE, a.CUSTOMER_NAME,
 SUM(a.MO_QTY) MO_QTY, SUM(a.ORDER_QTY) ORDER_QTY,   nm.MAX_LINE , nd.SCH_QTY
 FROM viewcapacity a 

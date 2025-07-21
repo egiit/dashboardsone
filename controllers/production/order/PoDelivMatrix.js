@@ -76,10 +76,10 @@ export const postPOMatrixDeliv = async (req, res) => {
       })
       .filter((dt) => dt !== undefined);
 
-    //get list of month for destroy data befor post new data
+    //get storage of month for destroy data befor post new data
     const listMonth = [...new Set(dataPoM.map((item) => item.PROD_MONTH))];
 
-    // if no list month for new month do bulk inster
+    // if no storage month for new month do bulk inster
     if (listMonth.length === 0) {
       await PoMatrixDelivery.bulkCreate(dataPoM).then(() => {
         return res.status(200).json({
@@ -88,7 +88,7 @@ export const postPOMatrixDeliv = async (req, res) => {
         });
       });
     } else {
-      //if have list month do destroy befor post
+      //if have storage month do destroy befor post
       for (const [i, month] of listMonth.entries()) {
         await PoMatrixDelivery.destroy({
           where: {

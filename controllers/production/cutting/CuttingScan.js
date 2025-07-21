@@ -277,7 +277,7 @@ export const DelQrScanSewIN = async (req, res) => {
   }
 };
 
-//cntrole list all size schedule for sewing scan in
+//cntrole storage all size schedule for sewing scan in
 export const ListSizeSewingScanIn = async (req, res) => {
   try {
     const { schDate, sitename } = req.params;
@@ -297,7 +297,7 @@ export const ListSizeSewingScanIn = async (req, res) => {
   }
 };
 
-//cntrole list all size schedule for sewing scan in
+//cntrole storage all size schedule for sewing scan in
 export const ListQrReturnFrmSewing = async (req, res) => {
   try {
     const { sitename, startDate, endDate, status } = req.params;

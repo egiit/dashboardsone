@@ -54,7 +54,7 @@ export const getListBuyer = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(404).json({
-      message: "error processing get list Buyer",
+      message: "error processing get storage Buyer",
       data: error,
     });
   }
@@ -77,7 +77,7 @@ export const getListStyleByBuyer = async (req, res) => {
   } catch (error) {
     // console.log(error);
     return res.status(404).json({
-      message: "error processing get list style",
+      message: "error processing get storage style",
       data: error,
     });
   }

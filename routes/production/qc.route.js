@@ -56,12 +56,12 @@ router.get(
   getPlanningEendBySize
 );
 
-//get list qr after scan sewing in
+//get storage qr after scan sewing in
 router.get(
   "/endline/qr-sewing-in/:schDate/:sitename/:linename/:barcodeserial",
   GetQrSewingIn
 );
-//get list qr pendding
+//get storage qr pendding
 router.get(
   "/endline/qr-sewing-in-pend/:schDate/:sitename/:linename",
   getQrListPendding

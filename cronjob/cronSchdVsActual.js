@@ -101,7 +101,7 @@ export const createNewSchdl = async (newDet, datas) => {
       type: QueryTypes.SELECT,
     });
 
-    //dapatakan list holiday
+    //dapatakan storage holiday
     const listHoliday = await db.query(QueryGetHoliday, {
       replacements: {
         startYear: moment().format("YYYY"),
