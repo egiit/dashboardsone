@@ -5,7 +5,7 @@ import {EnumStorage} from "../../enum/general.js";
 
 export const createDownTime = async (req, res) => {
     try {
-        const { DESCRIPTION, MACHINE_ID, STORAGE_INVENTORY_ID, ID_SITELINE, SCHD_ID  } = req.body;
+        const { DESCRIPTION, MACHINE_ID, STORAGE_INVENTORY_ID, ID_SITELINE, SCHD_ID, USER_ID  } = req.body;
 
 
         if (!DESCRIPTION || !MACHINE_ID || !STORAGE_INVENTORY_ID || !ID_SITELINE || !SCHD_ID) {
@@ -55,6 +55,8 @@ export const createDownTime = async (req, res) => {
                 ID_SITELINE, SCHD_ID,
                 STATUS: "BROKEN",
                 IS_COMPLETE: false,
+                CREATED_ID: USER_ID,
+                CREATED_AT: new Date()
             });
 
             return res.status(201).json({
@@ -174,7 +176,7 @@ export const updateDownTime = async (req, res) => {
 
 export const updateStatusOnFix = async (req, res) => {
     try {
-        const { STORAGE_INVENTORY_ID, MACHINE_ID, MECHANIC_ID } = req.body;
+        const { STORAGE_INVENTORY_ID, MACHINE_ID, MECHANIC_ID, USER_ID } = req.body;
 
 
         if (!STORAGE_INVENTORY_ID || !MACHINE_ID || !MECHANIC_ID) {
@@ -222,6 +224,7 @@ export const updateStatusOnFix = async (req, res) => {
                 MECHANIC_ID,
                 STATUS: "ON_FIX",
                 RESPONSE_TIME: new Date(),
+                UPDATED_ID: USER_ID,
                 UPDATED_AT: new Date(),
             },
             {
@@ -304,6 +307,7 @@ export const updateStatusAction = async (req, res) => {
                 UPDATED_AT: new Date(),
                 END_TIME: new Date(),
                 IS_COMPLETE: true,
+                UPDATED_ID: USER_ID,
             },
             {
                 where: {
