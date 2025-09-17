@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import db from "../../config/database.js";
 
 export const MecDownTimeModel = db.define(
-    "mec_down_time",
+    "mec_down_time_1",
     {
         ID: {
             type: DataTypes.INTEGER,
@@ -30,6 +30,10 @@ export const MecDownTimeModel = db.define(
             allowNull: false,
         },
         STORAGE_INVENTORY_ID: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        STORAGE_INVENTORY_NODE_ID: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
@@ -69,13 +73,13 @@ export const MecDownTimeModel = db.define(
         },
     },
     {
-        tableName: "mec_down_time",
+        tableName: "mec_down_time_1",
         timestamps: false,
     }
 );
 
 export const MecListMachine = db.define(
-    "mec_item_master",
+    "mec_item_master_1",
     {
         MACHINE_ID: {
             type: DataTypes.STRING(255),
@@ -139,6 +143,10 @@ export const MecListMachine = db.define(
             allowNull: true,
         },
         STORAGE_INVENTORY_ID: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
+        STORAGE_INVENTORY_NODE_ID: {
             type: DataTypes.INTEGER,
             allowNull: true,
         },

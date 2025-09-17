@@ -15,7 +15,6 @@ router.put("/down-time/:id", updateDownTime);
 router.patch("/down-time/fix", updateStatusOnFix);
 router.patch("/down-time/action", updateStatusAction);
 
-
 router.delete("/down-time/:id", deleteDownTime);
 
 export default router

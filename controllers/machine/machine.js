@@ -5,7 +5,7 @@ import {EnumStorage} from "../../enum/general.js";
 
 export const createDownTime = async (req, res) => {
     try {
-        const { DESCRIPTION, MACHINE_ID, STORAGE_INVENTORY_ID, ID_SITELINE, SCHD_ID, USER_ID  } = req.body;
+        const { DESCRIPTION, MACHINE_ID, STORAGE_INVENTORY_ID, STORAGE_INVENTORY_NODE_ID, ID_SITELINE, SCHD_ID, USER_ID  } = req.body;
 
 
         if (!DESCRIPTION || !MACHINE_ID || !STORAGE_INVENTORY_ID || !ID_SITELINE || !SCHD_ID) {
@@ -51,6 +51,7 @@ export const createDownTime = async (req, res) => {
                 START_TIME: new Date(),
                 DESCRIPTION,
                 MACHINE_ID,
+                STORAGE_INVENTORY_NODE_ID,
                 STORAGE_INVENTORY_ID,
                 ID_SITELINE, SCHD_ID,
                 STATUS: "BROKEN",
@@ -176,7 +177,7 @@ export const updateDownTime = async (req, res) => {
 
 export const updateStatusOnFix = async (req, res) => {
     try {
-        const { STORAGE_INVENTORY_ID, MACHINE_ID, MECHANIC_ID, USER_ID } = req.body;
+        const { STORAGE_INVENTORY_ID, MACHINE_ID,  MECHANIC_ID, USER_ID } = req.body;
 
 
         if (!STORAGE_INVENTORY_ID || !MACHINE_ID || !MECHANIC_ID) {
