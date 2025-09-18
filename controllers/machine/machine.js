@@ -73,13 +73,16 @@ export const createDownTime = async (req, res) => {
             }
         })
         if (listLamp) {
-            const apiUrl = `http://${listLamp.IP_ADDRESS}/relay/on`;
-            await fetch(apiUrl, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+            try {
+                await fetch(`http://${listLamp.IP_ADDRESS}/relay/on`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+            } catch (err) {
+                console.log("Error post to lamp ", err.message)
+            }
         }
 
 
@@ -363,16 +366,18 @@ export const updateStatusAction = async (req, res) => {
             })
 
             if (listLamp) {
-                const apiUrl = `http://${listLamp.IP_ADDRESS}/relay/off`;
-                await fetch(apiUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
+                try {
+                    await fetch(`http://${listLamp.IP_ADDRESS}/relay/off`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                } catch (err) {
+                    console.log("Error post to lamp ", err.message)
+                }
             }
         }
-
 
 
         return res.status(200).json({
