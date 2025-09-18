@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import db from "../../config/database.js";
 
 export const MecDownTimeModel = db.define(
-    "mec_down_time_1",
+    "mec_down_time",
     {
         ID: {
             type: DataTypes.INTEGER,
@@ -73,13 +73,13 @@ export const MecDownTimeModel = db.define(
         },
     },
     {
-        tableName: "mec_down_time_1",
+        tableName: "mec_down_time",
         timestamps: false,
     }
 );
 
 export const MecListMachine = db.define(
-    "mec_item_master_1",
+    "mec_item_master",
     {
         MACHINE_ID: {
             type: DataTypes.STRING(255),
