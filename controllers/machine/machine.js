@@ -2,10 +2,19 @@ import {MecDownTimeModel, MecListMachine} from "../../models/machine/machine.mod
 import {Op} from "sequelize";
 import StorageInventoryLogModel from "../../models/storage/StorageInventoryLog.js";
 import {EnumStorage} from "../../enum/general.js";
+import {ListLampModel} from "../../models/machine/listLamp.mod.js";
 
 export const createDownTime = async (req, res) => {
     try {
-        const { DESCRIPTION, MACHINE_ID, STORAGE_INVENTORY_ID, STORAGE_INVENTORY_NODE_ID, ID_SITELINE, SCHD_ID, USER_ID  } = req.body;
+        const {
+            DESCRIPTION,
+            MACHINE_ID,
+            STORAGE_INVENTORY_ID,
+            STORAGE_INVENTORY_NODE_ID,
+            ID_SITELINE,
+            SCHD_ID,
+            USER_ID
+        } = req.body;
 
 
         if (!DESCRIPTION || !MACHINE_ID || !STORAGE_INVENTORY_ID || !ID_SITELINE || !SCHD_ID) {
@@ -22,49 +31,65 @@ export const createDownTime = async (req, res) => {
                 success: false,
                 message: "Machine ID not found",
             });
+        }
+
+
+        const existingDowntime = await MecDownTimeModel.findOne({
+            where: {
+                MACHINE_ID,
+                STORAGE_INVENTORY_ID,
+                IS_COMPLETE: false,
+                STATUS: "BROKEN"
+            },
+        });
+
+        if (existingDowntime) {
+            return res.status(400).json({
+                success: false,
+                message: "The machine is still being repaired",
+            });
+        }
+
+
+        await machine.update({
+            STATUS: "BROKEN",
+        });
+
+
+        const newDownTime = await MecDownTimeModel.create({
+            START_TIME: new Date(),
+            DESCRIPTION,
+            MACHINE_ID,
+            STORAGE_INVENTORY_NODE_ID,
+            STORAGE_INVENTORY_ID,
+            ID_SITELINE, SCHD_ID,
+            STATUS: "BROKEN",
+            IS_COMPLETE: false,
+            CREATED_ID: USER_ID,
+            CREATED_AT: new Date()
+        });
+
+        const listLamp = await ListLampModel.findOne({
+            where: {
+                ID_SITELINE
             }
-
-
-            const existingDowntime = await MecDownTimeModel.findOne({
-                where: {
-                    MACHINE_ID,
-                    STORAGE_INVENTORY_ID,
-                    IS_COMPLETE: false,
-                    STATUS: "BROKEN"
+        })
+        if (listLamp) {
+            const apiUrl = `http://${listLamp.IP_ADDRESS}/relay/on`;
+            await fetch(apiUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
             });
-
-            if (existingDowntime) {
-                return res.status(400).json({
-                    success: false,
-                    message: "The machine is still being repaired",
-                });
-            }
+        }
 
 
-            await machine.update({
-                STATUS: "BROKEN",
-            });
-
-
-            const newDownTime = await MecDownTimeModel.create({
-                START_TIME: new Date(),
-                DESCRIPTION,
-                MACHINE_ID,
-                STORAGE_INVENTORY_NODE_ID,
-                STORAGE_INVENTORY_ID,
-                ID_SITELINE, SCHD_ID,
-                STATUS: "BROKEN",
-                IS_COMPLETE: false,
-                CREATED_ID: USER_ID,
-                CREATED_AT: new Date()
-            });
-
-            return res.status(201).json({
-                success: true,
-                message: "Downtime record created successfully",
-                data: newDownTime,
-            });
+        return res.status(201).json({
+            success: true,
+            message: "Downtime record created successfully",
+            data: newDownTime,
+        });
 
     } catch (error) {
         return res.status(500).json({
@@ -110,7 +135,7 @@ export const getAllDownTimes = async (req, res) => {
 
 export const getDownTimeById = async (req, res) => {
     try {
-        const { id } = req.params;
+        const {id} = req.params;
 
         const downTime = await MecDownTimeModel.findByPk(id);
         if (!downTime) {
@@ -136,8 +161,18 @@ export const getDownTimeById = async (req, res) => {
 
 export const updateDownTime = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { START_TIME, RESPONSE_TIME, END_TIME, DESCRIPTION, MACHINE_ID, STORAGE_INVENTORY_ID, MECHANIC_ID, ID_SITELINE, SCHD_ID } = req.body;
+        const {id} = req.params;
+        const {
+            START_TIME,
+            RESPONSE_TIME,
+            END_TIME,
+            DESCRIPTION,
+            MACHINE_ID,
+            STORAGE_INVENTORY_ID,
+            MECHANIC_ID,
+            ID_SITELINE,
+            SCHD_ID
+        } = req.body;
 
         const downTime = await MecDownTimeModel.findByPk(id);
 
@@ -177,7 +212,7 @@ export const updateDownTime = async (req, res) => {
 
 export const updateStatusOnFix = async (req, res) => {
     try {
-        const { STORAGE_INVENTORY_ID, MACHINE_ID,  MECHANIC_ID, USER_ID } = req.body;
+        const {STORAGE_INVENTORY_ID, MACHINE_ID, MECHANIC_ID, USER_ID} = req.body;
 
 
         if (!STORAGE_INVENTORY_ID || !MACHINE_ID || !MECHANIC_ID) {
@@ -195,7 +230,6 @@ export const updateStatusOnFix = async (req, res) => {
                 message: "Machine ID not found",
             });
         }
-
 
 
         const downTime = await MecDownTimeModel.findOne({
@@ -250,9 +284,9 @@ export const updateStatusOnFix = async (req, res) => {
 
 export const updateStatusAction = async (req, res) => {
     try {
-        const { STORAGE_INVENTORY_ID, MACHINE_ID, STATUS, USER_ID } = req.body;
+        const {STORAGE_INVENTORY_ID, MACHINE_ID, STATUS, ID_SITELINE, USER_ID} = req.body;
 
-        if (!STORAGE_INVENTORY_ID || !MACHINE_ID || !STATUS) {
+        if (!STORAGE_INVENTORY_ID || !MACHINE_ID || !STATUS || !ID_SITELINE) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required",
@@ -316,6 +350,20 @@ export const updateStatusAction = async (req, res) => {
                 },
             }
         );
+        const listLamp = await ListLampModel.findOne({
+            where: {
+                ID_SITELINE: downTime.ID_SITELINE
+            }
+        })
+        if (listLamp) {
+            const apiUrl = `http://${listLamp.IP_ADDRESS}/relay/on`;
+            await fetch(apiUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+        }
 
         return res.status(200).json({
             success: true,
@@ -332,7 +380,7 @@ export const updateStatusAction = async (req, res) => {
 
 export const deleteDownTime = async (req, res) => {
     try {
-        const { id } = req.params;
+        const {id} = req.params;
 
         const downTime = await MecDownTimeModel.findByPk(id);
 

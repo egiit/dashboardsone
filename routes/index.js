@@ -23,6 +23,7 @@ import packingroute from "./production/packing.route.js";
 import measurement from "./production/measurement.route.js";
 import sewDashboard from "./production/sewDashAnytic.router.js";
 import { getSites } from "../controllers/production/reports/SewSites.js";
+import listLampRoute from "./machine/listLamp.route.js";
 
 // import hrRoute from "./hr/employe.route.js";
 // import attandance from "./hr/attandance.router.js";
@@ -52,6 +53,8 @@ router.use("/qc", qcroutes);
 router.use("/machine", machineRoute)
 router.use("/reports", reportsrouter);
 router.use("/sewdashboard", sewDashboard);
+router.use("/list-lamp", listLampRoute);
+
 router.get("/list-sites", getSites);
 
 // router.use("/hr", hrRoute);
