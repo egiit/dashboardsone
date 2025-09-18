@@ -50,11 +50,9 @@ export const createDownTime = async (req, res) => {
             });
         }
 
-
         await machine.update({
             STATUS: "BROKEN",
         });
-
 
         const newDownTime = await MecDownTimeModel.create({
             START_TIME: new Date(),
@@ -284,9 +282,9 @@ export const updateStatusOnFix = async (req, res) => {
 
 export const updateStatusAction = async (req, res) => {
     try {
-        const {STORAGE_INVENTORY_ID, MACHINE_ID, STATUS, ID_SITELINE, USER_ID} = req.body;
+        const {STORAGE_INVENTORY_ID, MACHINE_ID, STATUS, USER_ID} = req.body;
 
-        if (!STORAGE_INVENTORY_ID || !MACHINE_ID || !STATUS || !ID_SITELINE) {
+        if (!STORAGE_INVENTORY_ID || !MACHINE_ID || !STATUS) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required",
@@ -350,20 +348,32 @@ export const updateStatusAction = async (req, res) => {
                 },
             }
         );
-        const listLamp = await ListLampModel.findOne({
+
+        const isStillError = await MecDownTimeModel.count({
             where: {
-                ID_SITELINE: downTime.ID_SITELINE
+                STATUS: {[Op.in]: ["BROKEN", "ON_FIX"]}
             }
         })
-        if (listLamp) {
-            const apiUrl = `http://${listLamp.IP_ADDRESS}/relay/on`;
-            await fetch(apiUrl, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+
+        if (!isStillError) {
+            const listLamp = await ListLampModel.findOne({
+                where: {
+                    ID_SITELINE: downTime.ID_SITELINE
+                }
+            })
+
+            if (listLamp) {
+                const apiUrl = `http://${listLamp.IP_ADDRESS}/relay/off`;
+                await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+            }
         }
+
+
 
         return res.status(200).json({
             success: true,
