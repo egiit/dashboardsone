@@ -490,7 +490,6 @@ export const SewingBdlReturn = db.define(
     },
     SCH_ID: { type: DataTypes.INTEGER },
     SCHD_ID: { type: DataTypes.INTEGER },
-    SEWING_RETURN_BY: { type: DataTypes.INTEGER },
     PLANSIZE_ID: { type: DataTypes.INTEGER },
     SEWING_RETURN_BY: { type: DataTypes.INTEGER },
     CONFIRM_RETURN_BY: { type: DataTypes.INTEGER },

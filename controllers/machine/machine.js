@@ -3,6 +3,8 @@ import {Op} from "sequelize";
 import StorageInventoryLogModel from "../../models/storage/StorageInventoryLog.js";
 import {EnumStorage} from "../../enum/general.js";
 import {ListLampModel} from "../../models/machine/listLamp.mod.js";
+import {QcUsers} from "../../models/production/quality.mod.js";
+import * as node
 
 export const createDownTime = async (req, res) => {
     try {
@@ -294,10 +296,18 @@ export const updateStatusAction = async (req, res) => {
     try {
         const {STORAGE_INVENTORY_ID, MACHINE_ID, STATUS, USER_ID} = req.body;
 
-        if (!STORAGE_INVENTORY_ID || !MACHINE_ID || !STATUS) {
+        if (!STORAGE_INVENTORY_ID || !MACHINE_ID || !STATUS  || !USER_ID) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required",
+            });
+        }
+
+        const qcUser = await QcUsers.findByPk(USER_ID)
+        if (!qcUser) {
+            return res.status(404).json({
+                success: false,
+                message: "QC user not found",
             });
         }
 
@@ -326,13 +336,35 @@ export const updateStatusAction = async (req, res) => {
         }
 
         if (STATUS === "REPLACE") {
+            let inventoryId = EnumStorage()
+            switch (qcUser.SITE_NAME) {
+                case "SBR_01":
+                    inventoryId = 168
+                    break
+                case "SBR_02A":
+                    inventoryId = 173
+                    break
+                case "SBR_02B":
+                    inventoryId = 173
+                    break
+                case "SBR_03":
+                    inventoryId = 174
+                    break
+                case "SBR_04":
+                    inventoryId = 175
+                    break
+                default:
+                    inventoryId = 168 // storage master gedung 1
+            }
+
             await machine.update({
                 STATUS: "BROKEN",
                 IS_REPLACE: true,
-                STORAGE_INVENTORY_ID: EnumStorage(),
+                STORAGE_INVENTORY_ID: inventoryId,
+                STORAGE_INVENTORY_NODE_ID: null
             });
             StorageInventoryLogModel.create({
-                STORAGE_INVENTORY_ID: EnumStorage(),
+                STORAGE_INVENTORY_ID:inventoryId,
                 MACHINE_ID: MACHINE_ID,
                 USER_ADD_ID: USER_ID,
                 DESCRIPTION: 'REPLACE MACHINE'
