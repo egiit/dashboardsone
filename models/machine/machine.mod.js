@@ -162,10 +162,6 @@ export const MecListMachine = db.define(
             type: DataTypes.ENUM('NORMAL', 'BROKEN', 'ON_FIX'),
             defaultValue: 'NORMAL'
         },
-        IS_REPLACE: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        }
     },
     {
         freezeTableName: true,

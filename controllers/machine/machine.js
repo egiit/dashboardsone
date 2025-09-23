@@ -358,7 +358,6 @@ export const updateStatusAction = async (req, res) => {
 
             await machine.update({
                 STATUS: "BROKEN",
-                IS_REPLACE: true,
                 STORAGE_INVENTORY_ID: inventoryId,
                 STORAGE_INVENTORY_NODE_ID: null
             });
@@ -371,7 +370,6 @@ export const updateStatusAction = async (req, res) => {
         } else {
             await machine.update({
                 STATUS: "NORMAL",
-                IS_REPLACE: false,
             });
         }
 
