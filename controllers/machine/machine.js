@@ -81,13 +81,14 @@ export const createDownTime = async (req, res) => {
                         'Content-Type': 'application/json',
                     },
                 });
-                ListLampModel.update({
+                await  ListLampModel.update({
                     IS_ACTIVE: true
                 }, {
                     where: {
                         ID: listLamp.ID
                     }
                 })
+                console.log("Lamp off ", listLamp.ID)
             } catch (err) {
                 console.log("Error post to lamp ", err.message)
             }
@@ -409,13 +410,14 @@ export const updateStatusAction = async (req, res) => {
                             'Content-Type': 'application/json',
                         },
                     });
-                    ListLampModel.update({
+                    await  ListLampModel.update({
                         IS_ACTIVE: false
                     }, {
                         where: {
                             ID: listLamp.ID
                         }
                     })
+                    console.log("Lamp off ", listLamp.ID)
                 } catch (err) {
                     console.log("Error post to lamp ", err.message)
                 }
