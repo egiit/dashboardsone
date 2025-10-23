@@ -14,6 +14,7 @@ export const createDownTime = async (req, res) => {
             STORAGE_INVENTORY_NODE_ID,
             ID_SITELINE,
             SCHD_ID,
+            SCH_ID,
             USER_ID
         } = req.body;
 
@@ -61,7 +62,9 @@ export const createDownTime = async (req, res) => {
             MACHINE_ID,
             STORAGE_INVENTORY_NODE_ID,
             STORAGE_INVENTORY_ID,
-            ID_SITELINE, SCHD_ID,
+            ID_SITELINE, 
+            SCHD_ID,
+            SCH_ID,
             STATUS: "BROKEN",
             IS_COMPLETE: false,
             CREATED_ID: USER_ID,

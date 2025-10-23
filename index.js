@@ -104,12 +104,13 @@ const io = new Server(server, {
   }
 });
 
+setupWebSocket(io)
+
 app.use((req, res, next) => {
   req.io = io;
   next();
 });
 
-setupWebSocket(io)
 
 app.use("/", sumbiriOneRoute);
 

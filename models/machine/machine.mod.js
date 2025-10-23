@@ -63,6 +63,10 @@ export const MecDownTimeModel = db.define(
             type: DataTypes.INTEGER,
             allowNull: false,
         },
+        SCH_ID: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
         CREATED_ID: {
             type: DataTypes.INTEGER,
             allowNull: true,

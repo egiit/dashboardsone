@@ -29,6 +29,7 @@ import listLampRoute from "./machine/listLamp.route.js";
 // import attandance from "./hr/attandance.router.js";
 // import absen from "./hr/absens.router.js";
 import hrdashboard from "./hr/hrDash.route.js";
+import { sendConnectionSocket } from "../controllers/soket/soket.js";
 
 const router = express.Router();
 
@@ -56,6 +57,7 @@ router.use("/sewdashboard", sewDashboard);
 router.use("/list-lamp", listLampRoute);
 
 router.get("/list-sites", getSites);
+router.post("/request-connection", sendConnectionSocket)
 
 // router.use("/hr", hrRoute);
 // router.use("/attandance", attandance);
