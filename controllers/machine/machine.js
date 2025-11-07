@@ -392,6 +392,7 @@ export const updateStatusAction = async (req, res) => {
 
         const isStillError = await MecDownTimeModel.count({
             where: {
+                ID_SITELINE: downTime.ID_SITELINE,
                 STATUS: {[Op.in]: ["BROKEN", "ON_FIX"]}
             }
         })
