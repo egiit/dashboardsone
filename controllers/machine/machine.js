@@ -91,7 +91,7 @@ export const createDownTime = async (req, res) => {
                         MAC: listLamp.MAC
                     }
                 })
-                console.log("Lamp off ", listLamp.MAC)
+                console.log("Lamp on ", listLamp.MAC)
             } catch (err) {
                 console.log("Error post to lamp ", err.message)
             }
@@ -396,6 +396,7 @@ export const updateStatusAction = async (req, res) => {
             }
         })
 
+        console.log("isStillError ", isStillError)
         if (!isStillError) {
             const listLamp = await ListLampModel.findOne({
                 where: {
