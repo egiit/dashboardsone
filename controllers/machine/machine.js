@@ -88,7 +88,7 @@ export const createDownTime = async (req, res) => {
                     IS_ACTIVE: true
                 }, {
                     where: {
-                        ID: listLamp.ID
+                        MAC: listLamp.MAC
                     }
                 })
                 console.log("Lamp off ", listLamp.ID)
@@ -96,8 +96,6 @@ export const createDownTime = async (req, res) => {
                 console.log("Error post to lamp ", err.message)
             }
         }
-
-
         return res.status(201).json({
             success: true,
             message: "Downtime record created successfully",
@@ -417,7 +415,7 @@ export const updateStatusAction = async (req, res) => {
                         IS_ACTIVE: false
                     }, {
                         where: {
-                            ID: listLamp.ID
+                            MAC: listLamp.MAC
                         }
                     })
                     console.log("Lamp off ", listLamp.ID)
