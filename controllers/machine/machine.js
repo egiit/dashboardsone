@@ -91,7 +91,7 @@ export const createDownTime = async (req, res) => {
                         MAC: listLamp.MAC
                     }
                 })
-                console.log("Lamp off ", listLamp.ID)
+                console.log("Lamp off ", listLamp.MAC)
             } catch (err) {
                 console.log("Error post to lamp ", err.message)
             }
@@ -418,7 +418,7 @@ export const updateStatusAction = async (req, res) => {
                             MAC: listLamp.MAC
                         }
                     })
-                    console.log("Lamp off ", listLamp.ID)
+                    console.log("Lamp off ", listLamp.MAC)
                 } catch (err) {
                     console.log("Error post to lamp ", err.message)
                 }
