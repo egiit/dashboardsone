@@ -4,6 +4,8 @@ import StorageInventoryLogModel from "../../models/storage/StorageInventoryLog.j
 import {EnumStorage} from "../../enum/general.js";
 import {ListLampModel} from "../../models/machine/listLamp.mod.js";
 import {QcUsers} from "../../models/production/quality.mod.js";
+import db from "../../config/database.js";
+import axios from "axios";
 
 export const createDownTime = async (req, res) => {
     try {
@@ -78,12 +80,7 @@ export const createDownTime = async (req, res) => {
         })
         if (listLamp) {
             try {
-                await fetch(`http://${listLamp.IP_ADDRESS}/relay/on`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
+                await axios.get(`http://${listLamp.IP_ADDRESS}/relay/on`, {timeout: 15000});
                 await  ListLampModel.update({
                     IS_ACTIVE: true
                 }, {
@@ -294,6 +291,7 @@ export const updateStatusOnFix = async (req, res) => {
 };
 
 export const updateStatusAction = async (req, res) => {
+    const transaction = await db.transaction();
     try {
         const {STORAGE_INVENTORY_ID, MACHINE_ID, STATUS, USER_ID} = req.body;
 
@@ -304,8 +302,9 @@ export const updateStatusAction = async (req, res) => {
             });
         }
 
-        const qcUser = await QcUsers.findByPk(USER_ID)
+        const qcUser = await QcUsers.findByPk(USER_ID, {transaction})
         if (!qcUser) {
+            await  transaction.rollback()
             return res.status(404).json({
                 success: false,
                 message: "QC user not found",
@@ -318,18 +317,21 @@ export const updateStatusAction = async (req, res) => {
                 MACHINE_ID,
                 IS_COMPLETE: false,
                 STATUS: "ON_FIX"
-            }
+            },
+            transaction
         });
 
         if (!downTime) {
+            await  transaction.rollback()
             return res.status(404).json({
                 success: false,
                 message: "No downtime record created today for this machine and storage inventory",
             });
         }
 
-        const machine = await MecListMachine.findByPk(MACHINE_ID);
+        const machine = await MecListMachine.findByPk(MACHINE_ID, {transaction});
         if (!machine) {
+            await  transaction.rollback()
             return res.status(404).json({
                 success: false,
                 message: "Machine ID not found",
@@ -337,42 +339,30 @@ export const updateStatusAction = async (req, res) => {
         }
 
         if (STATUS === "REPLACE") {
-            let inventoryId = EnumStorage()
+            let inventoryId;
             switch (qcUser.SITE_NAME) {
-                case "SBR_01":
-                    inventoryId = 168
-                    break
+                case "SBR_01": inventoryId = 168; break;
                 case "SBR_02A":
-                    inventoryId = 173
-                    break
-                case "SBR_02B":
-                    inventoryId = 173
-                    break
-                case "SBR_03":
-                    inventoryId = 174
-                    break
-                case "SBR_04":
-                    inventoryId = 175
-                    break
-                default:
-                    inventoryId = 168 // storage master gedung 1
+                case "SBR_02B": inventoryId = 173; break;
+                case "SBR_03": inventoryId = 174; break;
+                case "SBR_04": inventoryId = 175; break;
+                default: inventoryId = 168;
             }
 
             await machine.update({
                 STATUS: "BROKEN",
                 STORAGE_INVENTORY_ID: inventoryId,
                 STORAGE_INVENTORY_NODE_ID: null
-            });
-            StorageInventoryLogModel.create({
+            }, {transaction});
+
+            await StorageInventoryLogModel.create({
                 STORAGE_INVENTORY_ID:inventoryId,
                 MACHINE_ID: MACHINE_ID,
                 USER_ADD_ID: USER_ID,
                 DESCRIPTION: 'REPLACE MACHINE'
-            })
+            }, {transaction})
         } else {
-            await machine.update({
-                STATUS: "NORMAL",
-            });
+            await machine.update({ STATUS: "NORMAL", }, {transaction});
         }
 
         await MecDownTimeModel.update(
@@ -384,9 +374,8 @@ export const updateStatusAction = async (req, res) => {
                 UPDATED_ID: USER_ID,
             },
             {
-                where: {
-                    ID: downTime.ID,
-                },
+                where: {ID: downTime.ID},
+                transaction
             }
         );
 
@@ -394,46 +383,38 @@ export const updateStatusAction = async (req, res) => {
             where: {
                 ID_SITELINE: downTime.ID_SITELINE,
                 STATUS: {[Op.in]: ["BROKEN", "ON_FIX"]}
-            }
+            },
+            transaction
         })
 
-        console.log("isStillError ", isStillError)
         if (!isStillError) {
             const listLamp = await ListLampModel.findOne({
-                where: {
-                    ID_SITELINE: downTime.ID_SITELINE
-                }
+                where: { ID_SITELINE: downTime.ID_SITELINE },
+                transaction
             })
 
             if (listLamp) {
                 try {
-                    await fetch(`http://${listLamp.IP_ADDRESS}/relay/off`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    });
-                    await  ListLampModel.update({
-                        IS_ACTIVE: false
-                    }, {
-                        where: {
-                            MAC: listLamp.MAC
-                        }
+                    await axios.get(`http://${listLamp.IP_ADDRESS}/relay/off`, {timeout: 15000});
+                    await  ListLampModel.update({ IS_ACTIVE: false }, {
+                        where: { MAC: listLamp.MAC },
+                        transaction
                     })
-                    console.log("Lamp off ", listLamp.MAC)
                 } catch (err) {
-                    console.log("Error post to lamp ", err.message)
+                    await  transaction.rollback()
+                    return res.status(500).json({status: false, message: "Please press again off downtime"})
                 }
             }
         }
 
-
+        await  transaction.commit()
         return res.status(200).json({
             success: true,
             message: "Downtime record action updated successfully",
             data: downTime,
         });
     } catch (error) {
+        await  transaction.rollback()
         return res.status(500).json({
             success: false,
             message: `Failed to update downtime action: ${error.message}`,
