@@ -8,35 +8,26 @@ import db from "../../config/database.js";
 import axios from "axios";
 
 export const createDownTime = async (req, res) => {
+    const transaction = await db.transaction()
     try {
-        const {
-            DESCRIPTION,
-            MACHINE_ID,
-            STORAGE_INVENTORY_ID,
-            STORAGE_INVENTORY_NODE_ID,
-            ID_SITELINE,
-            SCHD_ID,
-            SCH_ID,
-            USER_ID
-        } = req.body;
-
+        const { DESCRIPTION, MACHINE_ID, STORAGE_INVENTORY_ID, STORAGE_INVENTORY_NODE_ID, ID_SITELINE, SCHD_ID, SCH_ID, USER_ID } = req.body;
 
         if (!DESCRIPTION || !MACHINE_ID || !STORAGE_INVENTORY_ID || !ID_SITELINE || !SCHD_ID) {
+            await transaction.rollback()
             return res.status(400).json({
                 success: false,
                 message: "All fields are required",
             });
         }
 
-
-        const machine = await MecListMachine.findByPk(MACHINE_ID);
+        const machine = await MecListMachine.findByPk(MACHINE_ID, {transaction});
         if (!machine) {
+            await transaction.rollback()
             return res.status(404).json({
                 success: false,
                 message: "Machine ID not found",
             });
         }
-
 
         const existingDowntime = await MecDownTimeModel.findOne({
             where: {
@@ -45,9 +36,11 @@ export const createDownTime = async (req, res) => {
                 IS_COMPLETE: false,
                 STATUS: "BROKEN"
             },
+            transaction
         });
 
         if (existingDowntime) {
+            await transaction.rollback()
             return res.status(400).json({
                 success: false,
                 message: "The machine is still being repaired",
@@ -56,7 +49,7 @@ export const createDownTime = async (req, res) => {
 
         await machine.update({
             STATUS: "BROKEN",
-        });
+        }, {transaction});
 
         const newDownTime = await MecDownTimeModel.create({
             START_TIME: new Date(),
@@ -71,28 +64,30 @@ export const createDownTime = async (req, res) => {
             IS_COMPLETE: false,
             CREATED_ID: USER_ID,
             CREATED_AT: new Date()
-        });
+        }, {transaction});
 
         const listLamp = await ListLampModel.findOne({
-            where: {
-                ID_SITELINE
-            }
+            where: { ID_SITELINE },
+            transaction
         })
         if (listLamp) {
             try {
                 await axios.get(`http://${listLamp.IP_ADDRESS}/relay/on`, {timeout: 15000});
-                await  ListLampModel.update({
-                    IS_ACTIVE: true
-                }, {
-                    where: {
-                        MAC: listLamp.MAC
-                    }
+                await  ListLampModel.update({ IS_ACTIVE: true }, {
+                    where: { MAC: listLamp.MAC },
+                    transaction
                 })
-                console.log("Lamp on ", listLamp.MAC)
+
             } catch (err) {
                 console.log("Error post to lamp ", err.message)
+                await transaction.rollback()
+                return res.status(500).json({
+                    success: false,
+                    message: `Tolong tekan kembali tombol downtime, karena terdapat gangguan saat menyalakan lampu`,
+                });
             }
         }
+        await transaction.commit()
         return res.status(201).json({
             success: true,
             message: "Downtime record created successfully",
@@ -100,6 +95,7 @@ export const createDownTime = async (req, res) => {
         });
 
     } catch (error) {
+        await transaction.rollback()
         return res.status(500).json({
             success: false,
             message: `Failed to create downtime record: ${error.message}`,
@@ -402,7 +398,7 @@ export const updateStatusAction = async (req, res) => {
                     })
                 } catch (err) {
                     await  transaction.rollback()
-                    return res.status(500).json({status: false, message: "Please press again off downtime"})
+                    return res.status(500).json({status: false, message: "Tolong klik lagi matikan downtime, terdapat gangguan sinyal saat mematikan lampu"})
                 }
             }
         }
