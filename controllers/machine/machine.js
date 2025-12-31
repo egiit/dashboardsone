@@ -378,7 +378,7 @@ export const updateStatusAction = async (req, res) => {
         const isStillError = await MecDownTimeModel.count({
             where: {
                 ID_SITELINE: downTime.ID_SITELINE,
-                STATUS: {[Op.in]: ["BROKEN", "ON_FIX"]}
+                IS_COMPLETE: false
             },
             transaction
         })
@@ -392,10 +392,7 @@ export const updateStatusAction = async (req, res) => {
             if (listLamp) {
                 try {
                     await axios.get(`http://${listLamp.IP_ADDRESS}/relay/off`, {timeout: 15000});
-                    await  ListLampModel.update({ IS_ACTIVE: false }, {
-                        where: { MAC: listLamp.MAC },
-                        transaction
-                    })
+                    await ListLampModel.update({ IS_ACTIVE: false }, { where: { MAC: listLamp.MAC }, transaction })
                 } catch (err) {
                     await  transaction.rollback()
                     return res.status(500).json({status: false, message: "Tolong klik lagi matikan downtime, terdapat gangguan sinyal saat mematikan lampu"})
