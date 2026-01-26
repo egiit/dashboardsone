@@ -20,7 +20,10 @@ export const createDownTime = async (req, res) => {
             });
         }
 
-        const machine = await MecListMachine.findByPk(MACHINE_ID, {transaction});
+        const machine = await MecListMachine.findOne({
+            where: {MACHINE_ID},
+            transaction
+        });
         if (!machine) {
             await transaction.rollback()
             return res.status(404).json({
@@ -47,9 +50,7 @@ export const createDownTime = async (req, res) => {
             });
         }
 
-        await machine.update({
-            STATUS: "BROKEN",
-        }, {transaction});
+        await machine.update({ STATUS: "BROKEN" }, {transaction});
 
         const newDownTime = await MecDownTimeModel.create({
             START_TIME: new Date(),
@@ -67,19 +68,14 @@ export const createDownTime = async (req, res) => {
         }, {transaction});
 
         const listLamp = await ListLampModel.findOne({
-            where: { ID_SITELINE },
+            where: { ID_SITELINE, IS_WORK: true },
             transaction
         })
         if (listLamp) {
             try {
                 await axios.get(`http://${listLamp.IP_ADDRESS}/relay/on`, {timeout: 15000});
-                await  ListLampModel.update({ IS_ACTIVE: true }, {
-                    where: { MAC: listLamp.MAC },
-                    transaction
-                })
-
+                await  listLamp.update({ IS_ACTIVE: true }, { transaction })
             } catch (err) {
-                console.log("Error post to lamp ", err.message)
                 await transaction.rollback()
                 return res.status(500).json({
                     success: false,
@@ -385,14 +381,14 @@ export const updateStatusAction = async (req, res) => {
 
         if (!isStillError) {
             const listLamp = await ListLampModel.findOne({
-                where: { ID_SITELINE: downTime.ID_SITELINE },
+                where: { ID_SITELINE: downTime.ID_SITELINE, IS_WORK: true },
                 transaction
             })
 
             if (listLamp) {
                 try {
                     await axios.get(`http://${listLamp.IP_ADDRESS}/relay/off`, {timeout: 15000});
-                    await ListLampModel.update({ IS_ACTIVE: false }, { where: { MAC: listLamp.MAC }, transaction })
+                    await listLamp.update({ IS_ACTIVE: false }, { transaction })
                 } catch (err) {
                     await  transaction.rollback()
                     return res.status(500).json({status: false, message: "Tolong klik lagi matikan downtime, terdapat gangguan sinyal saat mematikan lampu"})

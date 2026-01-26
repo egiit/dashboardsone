@@ -22,6 +22,10 @@ export const ListLampModel = db.define(
             defaultValue: false,
             allowNull: false
         },
+        IS_WORK: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true
+        },
         createdAt: {
             type: DataTypes.DATE,
             allowNull: true,
