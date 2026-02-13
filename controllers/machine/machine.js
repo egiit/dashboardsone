@@ -1,11 +1,15 @@
 import {MecDownTimeModel, MecListMachine} from "../../models/machine/machine.mod.js"
-import {Op} from "sequelize";
+import {DataTypes, Op} from "sequelize";
 import StorageInventoryLogModel from "../../models/storage/StorageInventoryLog.js";
 import {EnumStorage} from "../../enum/general.js";
 import {ListLampModel} from "../../models/machine/listLamp.mod.js";
 import {QcUsers} from "../../models/production/quality.mod.js";
 import db from "../../config/database.js";
 import axios from "axios";
+import moment from "moment";
+import {sendTelegramNotification} from "../util/TelegramNotif.js";
+import {AUTO_LAMP_CHANNEL, downtimeLampMessage} from "../../enum/telegram.js";
+import {SiteLine} from "../../models/machine/siteLine.mod.js";
 
 export const createDownTime = async (req, res) => {
     const transaction = await db.transaction()
@@ -69,7 +73,13 @@ export const createDownTime = async (req, res) => {
 
         const listLamp = await ListLampModel.findOne({
             where: { ID_SITELINE, IS_WORK: true },
-            transaction
+            include: [
+                {
+                    model: SiteLine,
+                    as: "SITELINE",
+                    attributes: ["SITE_NAME", "LINE_NAME"]
+                }
+            ]
         })
         if (listLamp) {
             try {
@@ -77,9 +87,26 @@ export const createDownTime = async (req, res) => {
                 await  listLamp.update({ IS_ACTIVE: true }, { transaction })
             } catch (err) {
                 await transaction.rollback()
+
+                const today = moment();
+                const troubleDate = moment(listLamp.DATE_TROUBLE);
+
+
+                if (troubleDate.isSame(today, 'day')) {
+                    const COUNT_TROUBLE = listLamp.COUNT_TROUBLE + 1
+                    if (COUNT_TROUBLE > 2) {
+                        await sendTelegramNotification(downtimeLampMessage(listLamp.IS_ACTIVE, listLamp.IP_ADDRESS, listLamp?.SITELINE?.SITE_NAME, listLamp?.SITELINE?.LINE_NAME), AUTO_LAMP_CHANNEL)
+                        await listLamp.update({ DATE_TROUBLE: new Date(), IS_WORK: false, COUNT_TROUBLE })
+                    } else {
+                        await listLamp.update({ DATE_TROUBLE: new Date(), COUNT_TROUBLE })
+                    }
+                } else {
+                    await listLamp.update({ DATE_TROUBLE: new Date(), COUNT_TROUBLE: 1 })
+                }
+
                 return res.status(500).json({
                     success: false,
-                    message: `Tolong tekan kembali tombol downtime, karena terdapat gangguan saat menyalakan lampu`,
+                    message: `Tolong tekan kembali tombol downtime, karena terdapat gangguan saat menyalakan lampu (count ${listLamp?.COUNT_TROUBLE || 0})`,
                 });
             }
         }
@@ -382,7 +409,13 @@ export const updateStatusAction = async (req, res) => {
         if (!isStillError) {
             const listLamp = await ListLampModel.findOne({
                 where: { ID_SITELINE: downTime.ID_SITELINE, IS_WORK: true },
-                transaction
+                include: [
+                    {
+                        model: SiteLine,
+                        as: "SITELINE",
+                        attributes: ["SITE_NAME", "LINE_NAME"]
+                    }
+                ]
             })
 
             if (listLamp) {
@@ -391,6 +424,23 @@ export const updateStatusAction = async (req, res) => {
                     await listLamp.update({ IS_ACTIVE: false }, { transaction })
                 } catch (err) {
                     await  transaction.rollback()
+
+                    const today = moment();
+                    const troubleDate = moment(listLamp.DATE_TROUBLE);
+
+
+                    if (troubleDate.isSame(today, 'day')) {
+                        const COUNT_TROUBLE = listLamp.COUNT_TROUBLE + 1
+                        if (COUNT_TROUBLE > 2) {
+                            await sendTelegramNotification(downtimeLampMessage(listLamp.IS_ACTIVE, listLamp.IP_ADDRESS, listLamp?.SITELINE?.SITE_NAME, listLamp?.SITELINE?.LINE_NAME), AUTO_LAMP_CHANNEL)
+                            await listLamp.update({ DATE_TROUBLE: new Date(), IS_WORK: false, COUNT_TROUBLE })
+                        } else {
+                            await listLamp.update({ DATE_TROUBLE: new Date(), COUNT_TROUBLE })
+                        }
+                    } else {
+                        await listLamp.update({ DATE_TROUBLE: new Date(), COUNT_TROUBLE: 1 })
+                    }
+
                     return res.status(500).json({status: false, message: "Tolong klik lagi matikan downtime, terdapat gangguan sinyal saat mematikan lampu"})
                 }
             }

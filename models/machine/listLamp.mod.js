@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import db from "../../config/database.js";
+import {SiteLine} from "./siteLine.mod.js";
 
 export const ListLampModel = db.define(
     "list_lamp",
@@ -31,6 +32,14 @@ export const ListLampModel = db.define(
             allowNull: true,
             field: 'createdAt'
         },
+        DATE_TROUBLE: {
+            type: DataTypes.DATE,
+            allowNull: true
+        },
+        COUNT_TROUBLE: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0
+        },
         updatedAt: {
             type: DataTypes.DATE,
             allowNull: true,
@@ -43,3 +52,8 @@ export const ListLampModel = db.define(
         underscored: false
     }
 );
+
+ListLampModel.belongsTo(SiteLine, {
+    foreignKey: "ID_SITELINE",
+    as: "SITELINE",
+})
