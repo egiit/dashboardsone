@@ -86,8 +86,6 @@ export const createDownTime = async (req, res) => {
                 await axios.get(`http://${listLamp.IP_ADDRESS}/relay/on`, {timeout: 15000});
                 await  listLamp.update({ IS_ACTIVE: true }, { transaction })
             } catch (err) {
-                await transaction.rollback()
-
                 const today = moment();
                 const troubleDate = moment(listLamp.DATE_TROUBLE);
 
@@ -97,6 +95,13 @@ export const createDownTime = async (req, res) => {
                     if (COUNT_TROUBLE > 2) {
                         await sendTelegramNotification(downtimeLampMessage(listLamp.IS_ACTIVE, listLamp.IP_ADDRESS, listLamp?.SITELINE?.SITE_NAME, listLamp?.SITELINE?.LINE_NAME), AUTO_LAMP_CHANNEL)
                         await listLamp.update({ DATE_TROUBLE: new Date(), IS_WORK: false, COUNT_TROUBLE })
+
+                        await  transaction.commit()
+                        return res.status(200).json({
+                            success: true,
+                            message: "Downtime record action updated successfully",
+                            data: newDownTime,
+                        });
                     } else {
                         await listLamp.update({ DATE_TROUBLE: new Date(), COUNT_TROUBLE })
                     }
@@ -104,6 +109,7 @@ export const createDownTime = async (req, res) => {
                     await listLamp.update({ DATE_TROUBLE: new Date(), COUNT_TROUBLE: 1 })
                 }
 
+                await transaction.rollback()
                 return res.status(500).json({
                     success: false,
                     message: `Tolong tekan kembali tombol downtime, karena terdapat gangguan saat menyalakan lampu (count ${listLamp?.COUNT_TROUBLE || 0})`,
@@ -423,17 +429,21 @@ export const updateStatusAction = async (req, res) => {
                     await axios.get(`http://${listLamp.IP_ADDRESS}/relay/off`, {timeout: 15000});
                     await listLamp.update({ IS_ACTIVE: false }, { transaction })
                 } catch (err) {
-                    await  transaction.rollback()
-
                     const today = moment();
                     const troubleDate = moment(listLamp.DATE_TROUBLE);
-
 
                     if (troubleDate.isSame(today, 'day')) {
                         const COUNT_TROUBLE = listLamp.COUNT_TROUBLE + 1
                         if (COUNT_TROUBLE > 2) {
                             await sendTelegramNotification(downtimeLampMessage(listLamp.IS_ACTIVE, listLamp.IP_ADDRESS, listLamp?.SITELINE?.SITE_NAME, listLamp?.SITELINE?.LINE_NAME), AUTO_LAMP_CHANNEL)
                             await listLamp.update({ DATE_TROUBLE: new Date(), IS_WORK: false, COUNT_TROUBLE })
+
+                            await  transaction.commit()
+                            return res.status(200).json({
+                                success: true,
+                                message: "Downtime record action updated successfully",
+                                data: downTime,
+                            });
                         } else {
                             await listLamp.update({ DATE_TROUBLE: new Date(), COUNT_TROUBLE })
                         }
@@ -441,6 +451,7 @@ export const updateStatusAction = async (req, res) => {
                         await listLamp.update({ DATE_TROUBLE: new Date(), COUNT_TROUBLE: 1 })
                     }
 
+                    await  transaction.rollback()
                     return res.status(500).json({status: false, message: "Tolong klik lagi matikan downtime, terdapat gangguan sinyal saat mematikan lampu"})
                 }
             }
