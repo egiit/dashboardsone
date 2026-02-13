@@ -1,3 +1,6 @@
+import { DataTypes } from "sequelize";
+import db from "../../config/database.js";
+
 export const SiteLine = db.define(
     "item_siteline",
     {
