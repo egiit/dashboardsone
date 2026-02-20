@@ -34,11 +34,10 @@ export const sendConnectionSocket = (req, res) => {
   if (!event || !data) {
     return res.status(400).json({ error: 'event dan data diperlukan' });
   }
-
     try {
         req.io.emit(event, data);
-        res.status(200).json({ success: true, message: "Success send connection" });
+        return res.status(200).json({ success: true, message: "Success send connection" });
     } catch (err) {
-        res.status(500).json({status: false, message: err.message || "Failed to connect to socket"})
+        return  res.status(500).json({status: false, message: err.message || "Failed to connect to socket"})
     }
 }
