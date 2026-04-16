@@ -21,8 +21,10 @@ export const getDowntimeAlerts = async () => {
     console.log("--- Downtime Alerts Running ---");
     try {
         const listAlertDowntime = await db.query(queryDowntimeAlert, {type: QueryTypes.SELECT})
-        const textMessage =  downtimeAlertMessage(listAlertDowntime)
-        await sendTelegramNotification(textMessage, DOWNTIME_ALERT_CHANNEL)
+        if (listAlertDowntime.length) {
+            const textMessage =  downtimeAlertMessage(listAlertDowntime)
+            await sendTelegramNotification(textMessage, DOWNTIME_ALERT_CHANNEL)
+        }
     } catch (err) {
         console.error(err.message)
     }
