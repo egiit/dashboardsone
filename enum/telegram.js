@@ -12,7 +12,7 @@ Sewing : ${line}
 `
 
 export const downtimeAlertMessage = (listDowntime) => {
-    let response = `Detected ${listDowntime.length} downtimes that have not been turned off \n`
+    let response = `Downtime machine detected = ${listDowntime.length}\n`
     for (let i = 0; i < listDowntime.length; i++) {
         const item = listDowntime[i]
         response += `
