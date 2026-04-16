@@ -12,7 +12,7 @@ import cron from "node-cron";
 
 import sumbiriOneRoute from "./routes/index.js";
 import { funcReschedule } from "./cronjob/cronSchdVsActual.js";
-import { cronLogDialyOut } from "./cronjob/logDailyOutput.js";
+import {cronLogDialyOut, getDowntimeAlerts} from "./cronjob/logDailyOutput.js";
 import * as http from "http";
 import {setupWebSocket} from "./controllers/soket/soket.js";
 
@@ -34,6 +34,10 @@ const runDb = async () => {
 };
 
 runDb();
+
+cron.schedule(" */15 * * * *", () => {
+    getDowntimeAlerts();
+});
 
 // cron.schedule(" 30 * * * *", () => {
 //   console.log("running a task reschedule");

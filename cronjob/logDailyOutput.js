@@ -8,6 +8,25 @@ import {
   logEndlineCheck,
   queryQcLogCheck,
 } from "../models/production/quality.mod.js";
+import {queryDowntimeAlert} from "../models/machine/machine.mod.js";
+import {
+    AUTO_LAMP_CHANNEL,
+    DOWNTIME_ALERT_CHANNEL,
+    downtimeAlertMessage,
+    downtimeLampMessage
+} from "../enum/telegram.js";
+import {sendTelegramNotification} from "../controllers/util/TelegramNotif.js";
+
+export const getDowntimeAlerts = async () => {
+    console.log("--- Downtime Alerts Running ---");
+    try {
+        const listAlertDowntime = await db.query(queryDowntimeAlert, {type: QueryTypes.SELECT})
+        const textMessage =  downtimeAlertMessage(listAlertDowntime)
+        await sendTelegramNotification(textMessage, DOWNTIME_ALERT_CHANNEL)
+    } catch (err) {
+        console.error(err.message)
+    }
+}
 
 export const cronLogDialyOut = async () => {
   try {

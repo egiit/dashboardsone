@@ -172,3 +172,8 @@ export const MecListMachine = db.define(
     }
 );
 
+export const queryDowntimeAlert = `
+    SELECT mdt.ID, mdt.DESCRIPTION, mdt.MACHINE_ID, mdt.START_TIME, i.SITE_NAME, i.LINE_NAME FROM mec_down_time mdt
+    LEFT JOIN item_siteline i on mdt.ID_SITELINE = i.ID_SITELINE
+    WHERE mdt.IS_COMPLETE = 0 AND mdt.MECHANIC_ID IS NULL AND mdt.RESPONSE_TIME IS null AND mdt.START_TIME < NOW() - INTERVAL 1 HOUR
+`
