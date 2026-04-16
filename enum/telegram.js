@@ -16,7 +16,7 @@ export const downtimeAlertMessage = (listDowntime) => {
     for (let i = 0; i < listDowntime.length; i++) {
         const item = listDowntime[i]
         response += `
-${i+1}. ---- ${item.SITE_NAME} ${item.LINE_NAME} ----------------
+${i+1}. ---- ${item.SITE_NAME} | ${item.LINE_NAME} ----------------
 Machine ID : ${item.MACHINE_ID}
 Description: ${item.DESCRIPTION} 
 Start Date : ${moment(item.START_TIME).format("DD-MMM-YYYY HH:mm")}
