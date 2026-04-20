@@ -35,7 +35,7 @@ const runDb = async () => {
 
 runDb();
 
-// cron.schedule(" */15 * * * *", () => {
+// cron.schedule(" */11 * * * *", () => {
 //     getDowntimeAlerts();
 // });
 
