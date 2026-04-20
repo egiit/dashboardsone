@@ -35,9 +35,9 @@ const runDb = async () => {
 
 runDb();
 
-cron.schedule(" */15 * * * *", () => {
-    getDowntimeAlerts();
-});
+// cron.schedule(" */15 * * * *", () => {
+//     getDowntimeAlerts();
+// });
 
 // cron.schedule(" 30 * * * *", () => {
 //   console.log("running a task reschedule");
