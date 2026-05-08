@@ -1,8 +1,8 @@
 import axios from "../../config/impinjConn.js"
 
-export const sendPublishedDynamic = async (topic, message) => {
+export const sendPublishedDynamic = async (topic, tag) => {
     try {
-        await axios.post("/publish-dynamic", {topic, message})
+        await axios.post("/publish-dynamic", {topic, tag})
 
         return {status: true, message: "Successfully published"};
     } catch (err) {
