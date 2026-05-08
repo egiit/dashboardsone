@@ -83,10 +83,10 @@ export const createDownTime = async (req, res) => {
 
         const listLampEsp = await ListLampEspModel.findOne({where: {ID_SITELINE}})
         if (listLampEsp) {
-            const {status} = await sendPublishedDynamic(`downtime/relay/${ID_SITELINE}`, "ON")
+            const {status, message} = await sendPublishedDynamic(`downtime/relay/${ID_SITELINE}`, "ON")
             if (!status) {
                 await transaction.rollback()
-                return res.status(500).json({ success: false, message: `Terdapat kesalahan saat menyalakan lampu, mohon buat aduan ke IT malui tombol 'Bantuan sistem'`, });
+                return res.status(500).json({ success: false, message: `Terdapat kesalahan saat menyalakan lampu, mohon buat aduan ke IT malui tombol 'Bantuan sistem'`, error: message });
             }
         } else {
             const listLamp = await ListLampModel.findOne({
@@ -446,7 +446,7 @@ export const updateStatusAction = async (req, res) => {
                 const {status} = await sendPublishedDynamic(`downtime/relay/${downTime.ID_SITELINE}`, "OFF")
                 if (!status) {
                     await transaction.rollback()
-                    return res.status(500).json({ success: false, message: `Terdapat kesalahan saat menyalakan lampu, mohon buat aduan ke IT malui tombol 'Bantuan sistem'`, });
+                    return res.status(500).json({ success: false, message: `Terdapat kesalahan saat menyalakan lampu, mohon buat aduan ke IT malui tombol 'Bantuan sistem'`});
                 }
 
             } else {

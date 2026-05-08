@@ -6,6 +6,6 @@ export const sendPublishedDynamic = async (topic, message) => {
 
         return {status: true, message: "Successfully published"};
     } catch (err) {
-        return {status: false, message: err.message}
+        return {status: false, message: err?.response?.data?.message || err?.message};
     }
 }
