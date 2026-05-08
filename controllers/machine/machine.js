@@ -2,7 +2,7 @@ import {MecDownTimeModel, MecListMachine} from "../../models/machine/machine.mod
 import {DataTypes, Op} from "sequelize";
 import StorageInventoryLogModel from "../../models/storage/StorageInventoryLog.js";
 import {EnumStorage} from "../../enum/general.js";
-import {ListLampModel} from "../../models/machine/listLamp.mod.js";
+import {ListLampEspModel, ListLampModel} from "../../models/machine/listLamp.mod.js";
 import {QcUsers} from "../../models/production/quality.mod.js";
 import db from "../../config/database.js";
 import axios from "axios";
@@ -10,11 +10,21 @@ import moment from "moment";
 import {sendTelegramNotification} from "../util/TelegramNotif.js";
 import {AUTO_LAMP_CHANNEL, downtimeLampMessage} from "../../enum/telegram.js";
 import {SiteLine} from "../../models/machine/siteLine.mod.js";
+import {sendPublishedDynamic} from "../api/impinjApi.js";
 
 export const createDownTime = async (req, res) => {
     const transaction = await db.transaction()
     try {
-        const { DESCRIPTION, MACHINE_ID, STORAGE_INVENTORY_ID, STORAGE_INVENTORY_NODE_ID, ID_SITELINE, SCHD_ID, SCH_ID, USER_ID } = req.body;
+        const {
+            DESCRIPTION,
+            MACHINE_ID,
+            STORAGE_INVENTORY_ID,
+            STORAGE_INVENTORY_NODE_ID,
+            ID_SITELINE,
+            SCHD_ID,
+            SCH_ID,
+            USER_ID
+        } = req.body;
 
         if (!DESCRIPTION || !MACHINE_ID || !STORAGE_INVENTORY_ID || !ID_SITELINE || !SCHD_ID) {
             await transaction.rollback()
@@ -54,7 +64,7 @@ export const createDownTime = async (req, res) => {
             });
         }
 
-        await machine.update({ STATUS: "BROKEN" }, {transaction});
+        await machine.update({STATUS: "BROKEN"}, {transaction});
 
         const newDownTime = await MecDownTimeModel.create({
             START_TIME: new Date(),
@@ -62,7 +72,7 @@ export const createDownTime = async (req, res) => {
             MACHINE_ID,
             STORAGE_INVENTORY_NODE_ID,
             STORAGE_INVENTORY_ID,
-            ID_SITELINE, 
+            ID_SITELINE,
             SCHD_ID,
             SCH_ID,
             STATUS: "BROKEN",
@@ -71,51 +81,60 @@ export const createDownTime = async (req, res) => {
             CREATED_AT: new Date()
         }, {transaction});
 
-        const listLamp = await ListLampModel.findOne({
-            where: { ID_SITELINE, IS_WORK: true },
-            include: [
-                {
-                    model: SiteLine,
-                    as: "SITELINE",
-                    attributes: ["SITE_NAME", "LINE_NAME"]
-                }
-            ]
-        })
-        if (listLamp) {
-            try {
-                await axios.get(`http://${listLamp.IP_ADDRESS}/relay/on`, {timeout: 15000});
-                await  listLamp.update({ IS_ACTIVE: true }, { transaction })
-            } catch (err) {
-                const today = moment();
-                const troubleDate = moment(listLamp.DATE_TROUBLE);
-
-
-                if (troubleDate.isSame(today, 'day')) {
-                    const COUNT_TROUBLE = listLamp.COUNT_TROUBLE + 1
-                    if (COUNT_TROUBLE > 2) {
-                        await sendTelegramNotification(downtimeLampMessage(listLamp.IS_ACTIVE, listLamp.IP_ADDRESS, listLamp?.SITELINE?.SITE_NAME, listLamp?.SITELINE?.LINE_NAME), AUTO_LAMP_CHANNEL)
-                        await listLamp.update({ DATE_TROUBLE: new Date(), IS_WORK: false, COUNT_TROUBLE })
-
-                        await  transaction.commit()
-                        return res.status(200).json({
-                            success: true,
-                            message: "Downtime record action updated successfully",
-                            data: newDownTime,
-                        });
-                    } else {
-                        await listLamp.update({ DATE_TROUBLE: new Date(), COUNT_TROUBLE })
-                    }
-                } else {
-                    await listLamp.update({ DATE_TROUBLE: new Date(), COUNT_TROUBLE: 1 })
-                }
-
+        const listLampEsp = await ListLampEspModel.findOne({where: {ID_SITELINE}})
+        if (listLampEsp) {
+            const {status} = await sendPublishedDynamic(`downtime/relay/${ID_SITELINE}`, "ON")
+            if (!status) {
                 await transaction.rollback()
-                return res.status(500).json({
-                    success: false,
-                    message: `Tolong tekan kembali tombol downtime, karena terdapat gangguan saat menyalakan lampu (count ${listLamp?.COUNT_TROUBLE || 0})`,
-                });
+                return res.status(500).json({ success: false, message: `Terdapat kesalahan saat menyalakan lampu, mohon buat aduan ke IT malui tombol 'Bantuan sistem'`, });
+            }
+        } else {
+            const listLamp = await ListLampModel.findOne({
+                where: {ID_SITELINE, IS_WORK: true},
+                include: [
+                    {
+                        model: SiteLine,
+                        as: "SITELINE",
+                        attributes: ["SITE_NAME", "LINE_NAME"]
+                    }
+                ]
+            })
+            if (listLamp) {
+                try {
+                    await axios.get(`http://${listLamp.IP_ADDRESS}/relay/on`, {timeout: 15000});
+                    await listLamp.update({IS_ACTIVE: true}, {transaction})
+                } catch (err) {
+                    const today = moment();
+                    const troubleDate = moment(listLamp.DATE_TROUBLE);
+
+                    if (troubleDate.isSame(today, 'day')) {
+                        const COUNT_TROUBLE = listLamp.COUNT_TROUBLE + 1
+                        if (COUNT_TROUBLE > 2) {
+                            await sendTelegramNotification(downtimeLampMessage(listLamp.IS_ACTIVE, listLamp.IP_ADDRESS, listLamp?.SITELINE?.SITE_NAME, listLamp?.SITELINE?.LINE_NAME), AUTO_LAMP_CHANNEL)
+                            await listLamp.update({DATE_TROUBLE: new Date(), IS_WORK: false, COUNT_TROUBLE})
+
+                            await transaction.commit()
+                            return res.status(200).json({
+                                success: true,
+                                message: "Downtime record action updated successfully",
+                                data: newDownTime,
+                            });
+                        } else {
+                            await listLamp.update({DATE_TROUBLE: new Date(), COUNT_TROUBLE})
+                        }
+                    } else {
+                        await listLamp.update({DATE_TROUBLE: new Date(), COUNT_TROUBLE: 1})
+                    }
+
+                    await transaction.rollback()
+                    return res.status(500).json({
+                        success: false,
+                        message: `Tolong tekan kembali tombol downtime, karena terdapat gangguan saat menyalakan lampu (count ${listLamp?.COUNT_TROUBLE || 0})`,
+                    });
+                }
             }
         }
+
         await transaction.commit()
         return res.status(201).json({
             success: true,
@@ -320,7 +339,7 @@ export const updateStatusAction = async (req, res) => {
     try {
         const {STORAGE_INVENTORY_ID, MACHINE_ID, STATUS, USER_ID} = req.body;
 
-        if (!STORAGE_INVENTORY_ID || !MACHINE_ID || !STATUS  || !USER_ID) {
+        if (!STORAGE_INVENTORY_ID || !MACHINE_ID || !STATUS || !USER_ID) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required",
@@ -329,7 +348,7 @@ export const updateStatusAction = async (req, res) => {
 
         const qcUser = await QcUsers.findByPk(USER_ID, {transaction})
         if (!qcUser) {
-            await  transaction.rollback()
+            await transaction.rollback()
             return res.status(404).json({
                 success: false,
                 message: "QC user not found",
@@ -347,7 +366,7 @@ export const updateStatusAction = async (req, res) => {
         });
 
         if (!downTime) {
-            await  transaction.rollback()
+            await transaction.rollback()
             return res.status(404).json({
                 success: false,
                 message: "No downtime record created today for this machine and storage inventory",
@@ -356,7 +375,7 @@ export const updateStatusAction = async (req, res) => {
 
         const machine = await MecListMachine.findByPk(MACHINE_ID, {transaction});
         if (!machine) {
-            await  transaction.rollback()
+            await transaction.rollback()
             return res.status(404).json({
                 success: false,
                 message: "Machine ID not found",
@@ -366,12 +385,21 @@ export const updateStatusAction = async (req, res) => {
         if (STATUS === "REPLACE") {
             let inventoryId;
             switch (qcUser.SITE_NAME) {
-                case "SBR_01": inventoryId = 168; break;
+                case "SBR_01":
+                    inventoryId = 168;
+                    break;
                 case "SBR_02A":
-                case "SBR_02B": inventoryId = 173; break;
-                case "SBR_03": inventoryId = 174; break;
-                case "SBR_04": inventoryId = 175; break;
-                default: inventoryId = 168;
+                case "SBR_02B":
+                    inventoryId = 173;
+                    break;
+                case "SBR_03":
+                    inventoryId = 174;
+                    break;
+                case "SBR_04":
+                    inventoryId = 175;
+                    break;
+                default:
+                    inventoryId = 168;
             }
 
             await machine.update({
@@ -381,13 +409,13 @@ export const updateStatusAction = async (req, res) => {
             }, {transaction});
 
             await StorageInventoryLogModel.create({
-                STORAGE_INVENTORY_ID:inventoryId,
+                STORAGE_INVENTORY_ID: inventoryId,
                 MACHINE_ID: MACHINE_ID,
                 USER_ADD_ID: USER_ID,
                 DESCRIPTION: 'REPLACE MACHINE'
             }, {transaction})
         } else {
-            await machine.update({ STATUS: "NORMAL", }, {transaction});
+            await machine.update({STATUS: "NORMAL",}, {transaction});
         }
 
         await MecDownTimeModel.update(
@@ -413,58 +441,71 @@ export const updateStatusAction = async (req, res) => {
         })
 
         if (!isStillError) {
-            const listLamp = await ListLampModel.findOne({
-                where: { ID_SITELINE: downTime.ID_SITELINE, IS_WORK: true },
-                include: [
-                    {
-                        model: SiteLine,
-                        as: "SITELINE",
-                        attributes: ["SITE_NAME", "LINE_NAME"]
-                    }
-                ]
-            })
+            const listLampEsp = await ListLampEspModel.findOne({where: {ID_SITELINE: downTime.ID_SITELINE}})
+            if (listLampEsp) {
+                const {status} = await sendPublishedDynamic(`downtime/relay/${downTime.ID_SITELINE}`, "OFF")
+                if (!status) {
+                    await transaction.rollback()
+                    return res.status(500).json({ success: false, message: `Terdapat kesalahan saat menyalakan lampu, mohon buat aduan ke IT malui tombol 'Bantuan sistem'`, });
+                }
 
-            if (listLamp) {
-                try {
-                    await axios.get(`http://${listLamp.IP_ADDRESS}/relay/off`, {timeout: 15000});
-                    await listLamp.update({ IS_ACTIVE: false }, { transaction })
-                } catch (err) {
-                    const today = moment();
-                    const troubleDate = moment(listLamp.DATE_TROUBLE);
-
-                    if (troubleDate.isSame(today, 'day')) {
-                        const COUNT_TROUBLE = listLamp.COUNT_TROUBLE + 1
-                        if (COUNT_TROUBLE > 2) {
-                            await sendTelegramNotification(downtimeLampMessage(listLamp.IS_ACTIVE, listLamp.IP_ADDRESS, listLamp?.SITELINE?.SITE_NAME, listLamp?.SITELINE?.LINE_NAME), AUTO_LAMP_CHANNEL)
-                            await listLamp.update({ DATE_TROUBLE: new Date(), IS_WORK: false, COUNT_TROUBLE })
-
-                            await  transaction.commit()
-                            return res.status(200).json({
-                                success: true,
-                                message: "Downtime record action updated successfully",
-                                data: downTime,
-                            });
-                        } else {
-                            await listLamp.update({ DATE_TROUBLE: new Date(), COUNT_TROUBLE })
+            } else {
+                const listLamp = await ListLampModel.findOne({
+                    where: {ID_SITELINE: downTime.ID_SITELINE, IS_WORK: true},
+                    include: [
+                        {
+                            model: SiteLine,
+                            as: "SITELINE",
+                            attributes: ["SITE_NAME", "LINE_NAME"]
                         }
-                    } else {
-                        await listLamp.update({ DATE_TROUBLE: new Date(), COUNT_TROUBLE: 1 })
-                    }
+                    ]
+                })
 
-                    await  transaction.rollback()
-                    return res.status(500).json({status: false, message: "Tolong klik lagi matikan downtime, terdapat gangguan sinyal saat mematikan lampu"})
+                if (listLamp) {
+                    try {
+                        await axios.get(`http://${listLamp.IP_ADDRESS}/relay/off`, {timeout: 15000});
+                        await listLamp.update({IS_ACTIVE: false}, {transaction})
+                    } catch (err) {
+                        const today = moment();
+                        const troubleDate = moment(listLamp.DATE_TROUBLE);
+
+                        if (troubleDate.isSame(today, 'day')) {
+                            const COUNT_TROUBLE = listLamp.COUNT_TROUBLE + 1
+                            if (COUNT_TROUBLE > 2) {
+                                await sendTelegramNotification(downtimeLampMessage(listLamp.IS_ACTIVE, listLamp.IP_ADDRESS, listLamp?.SITELINE?.SITE_NAME, listLamp?.SITELINE?.LINE_NAME), AUTO_LAMP_CHANNEL)
+                                await listLamp.update({DATE_TROUBLE: new Date(), IS_WORK: false, COUNT_TROUBLE})
+
+                                await transaction.commit()
+                                return res.status(200).json({
+                                    success: true,
+                                    message: "Downtime record action updated successfully",
+                                    data: downTime,
+                                });
+                            } else {
+                                await listLamp.update({DATE_TROUBLE: new Date(), COUNT_TROUBLE})
+                            }
+                        } else {
+                            await listLamp.update({DATE_TROUBLE: new Date(), COUNT_TROUBLE: 1})
+                        }
+
+                        await transaction.rollback()
+                        return res.status(500).json({
+                            status: false,
+                            message: "Tolong klik lagi matikan downtime, terdapat gangguan sinyal saat mematikan lampu"
+                        })
+                    }
                 }
             }
         }
 
-        await  transaction.commit()
+        await transaction.commit()
         return res.status(200).json({
             success: true,
             message: "Downtime record action updated successfully",
             data: downTime,
         });
     } catch (error) {
-        await  transaction.rollback()
+        await transaction.rollback()
         return res.status(500).json({
             success: false,
             message: `Failed to update downtime action: ${error.message}`,
