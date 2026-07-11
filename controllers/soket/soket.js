@@ -42,6 +42,7 @@ export const setupWebSocket = (io) => {
         });
 
         socket.on("history_route", async (data) => {
+            if (data?.PATH_URL)  return
             try {
                 await UserHistoryRoute.create({
                     USER_ID: socket.userId,
