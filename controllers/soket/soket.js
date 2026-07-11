@@ -57,7 +57,6 @@ export const setupWebSocket = (io) => {
 
 
         socket.on("disconnect", async () => {
-            console.log("User disconnected:", socket.id);
             if (socket.userId) {
                 try {
                     await UsersMod.update({IS_ONLINE: false, LAST_ONLINE_AT: new Date(), SOCKET_KEY: ''}, {where: {USER_ID: userId}})
