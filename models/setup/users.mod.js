@@ -33,6 +33,9 @@ const Users = db.define(
     USER_MOD_DATE: { type: DataTypes.DATE },
     USER_ADD_ID: { type: DataTypes.BIGINT },
     USER_MOD_ID: { type: DataTypes.BIGINT },
+    IS_ONLINE: { type: DataTypes.BOOLEAN, defaultValue: false },
+    LAST_ONLINE_AT: { type: DataTypes.DATE },
+    SOCKET_KEY: { type: DataTypes.TEXT }
   },
   {
     freezeTableName: true,

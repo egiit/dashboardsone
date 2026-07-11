@@ -49,4 +49,15 @@ const db2 = new Sequelize("db_sumbiri_one", "sumbirispm", "Asd54321`", {
   },
 });
 
+export const dbLog = new Sequelize("sumbiri_log", "sumbiri", "9R34TSBR94RM3NT!@#$", {
+  host: "192.168.8.253",
+  port: 3306,
+  dialect: "mysql",
+  logging: false,
+  timezone: "+07:00",
+  dialectOptions: {
+    timezone: "local",
+  },
+});
+
 export default db;

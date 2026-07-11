@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import db from "./config/database.js";
+import db, {dbLog} from "./config/database.js";
 import db2 from "./config/database.js";
 import { Server } from 'socket.io'
 
@@ -27,6 +27,7 @@ const runDb = async () => {
   try {
     await db.authenticate();
     await db2.authenticate();
+    await dbLog.authenticate();
     console.log("DB Connected");
   } catch (err) {
     console.log("Unable to connect to the database SPM:", err);
